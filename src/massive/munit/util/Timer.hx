@@ -1,5 +1,5 @@
 /****
-* Copyright 2013 Massive Interactive. All rights reserved.
+* Copyright 2016 Massive Interactive. All rights reserved.
 * 
 * Redistribution and use in source and binary forms, with or without modification, are
 * permitted provided that the following conditions are met:
@@ -56,6 +56,8 @@ package massive.munit.util;
 import neko.vm.Thread;
 #elseif cpp
 import cpp.vm.Thread;
+#elseif java
+import java.vm.Thread;
 #end
 
 @:expose('massive.munit.util.Timer')
@@ -69,7 +71,7 @@ class Timer
 	#if js
 	private static var arr = new Array<Timer>();
 	private var timerId:Int;
-	#elseif (neko||cpp)
+	#elseif (neko || cpp || java)
 	private var runThread:Thread;
 	#end
 
@@ -84,13 +86,13 @@ class Timer
 		#elseif nodejs
 			var arr :Array<Dynamic> = untyped global.haxe_timers = global.haxe_timers == null ? [] : global.haxe_timers;
 			var me 	= this;
-			me.id		= arr.length;
+			me.id = arr.length;
 			arr[me.id] = me;
 		#elseif js
 			id = arr.length;
 			arr[id] = this;
 			timerId = untyped window.setInterval("massive.munit.util.Timer.arr["+id+"].run();",time_ms);
-		#elseif (neko||cpp)
+		#elseif (neko || cpp || java)
 			var me = this;
 			runThread = Thread.create(function() { me.runLoop(time_ms); } );
 		#end
@@ -117,7 +119,7 @@ class Timer
 				while ( p >= 0 && arr[p] == null) p--;
 				arr = arr.slice(0, p + 1);
 			}
-		#elseif (neko||cpp)
+		#elseif (neko || cpp || java)
 			run = function() {};
 			runThread.sendMessage("stop");
 		#end
@@ -127,7 +129,7 @@ class Timer
 	public dynamic function run() 
 	{}
 
-	#if (neko||cpp)
+	#if (neko || cpp || java)
 	private function runLoop(time_ms)
 	{
 		var shouldStop = false;
@@ -168,14 +170,10 @@ class Timer
 	{
 		#if flash
 			return flash.Lib.getTimer() / 1000;
-		#elseif (neko || cpp)
-			return Sys.time();
-		#elseif php
+		#elseif (neko || cpp || java)
 			return Sys.time();
 		#elseif js
 			return Date.now().getTime() / 1000;
-		#elseif cpp
-			return untyped __time_stamp();
 		#else
 			return 0;
 		#end
