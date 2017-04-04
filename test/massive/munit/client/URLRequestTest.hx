@@ -47,10 +47,7 @@ class URLRequestTest
 		
 		#if (js || neko || cpp)
 			Assert.areEqual(url, instance.client.url);
-		#elseif flash9
-			Assert.areEqual(url, instance.client.url);
 		#elseif flash
-			
 		#end
 	}
 }
