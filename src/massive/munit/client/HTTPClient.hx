@@ -54,7 +54,7 @@ class HTTPClient implements IAdvancedTestResultClient
 	@:extern public inline static var CLIENT_HEADER_KEY:String = "munit-clientId";
 
 	/**
-	 * HTTP header key. Contains id of platform being tests (flash9,flash,js,neko,cpp,php).
+	 * HTTP header key. Contains id of platform being tests (flash,js,neko,cpp,php).
 	 */
 	@:extern public inline static var PLATFORM_HEADER_KEY:String = "munit-platformId";
 
@@ -195,8 +195,7 @@ class HTTPClient implements IAdvancedTestResultClient
 
 	private function platform():String
 	{
-		#if (flash8 || flash7 || flash6) return "as2";
-		#elseif flash return "as3";
+		#if flash return "as3";
 		#elseif js return "js";
 		#elseif neko return "neko";
 		#elseif cpp return "cpp";
@@ -252,8 +251,6 @@ class URLRequest
 
 	#if (js || neko || cpp)
 		public var client:Http;
-	#elseif flash9
-		public var client:flash.net.URLRequest;
 	#elseif flash
 		public var client:flash.LoadVars;
 	#end
@@ -270,8 +267,6 @@ class URLRequest
 	{
 		#if (js || neko || cpp)
 			client = new Http(url);
-		#elseif flash9
-			client = new flash.net.URLRequest(url);
 		#elseif flash			
 			client = new flash.LoadVars();
 		#end		
@@ -281,8 +276,6 @@ class URLRequest
 	{
 		#if (js || neko || cpp)
 			client.setHeader(name, value);
-		#elseif flash9
-			client.requestHeaders.push(new flash.net.URLRequestHeader(name, value));
 		#elseif flash
 			client.addRequestHeader(name, value);
 		#end
@@ -299,14 +292,6 @@ class URLRequest
 				client.setParameter("data", data);
 			#end
 			client.request(true);
-		#elseif flash9
-			client.data = data;
-			client.method = "POST";
-			var loader = new flash.net.URLLoader();
-			loader.addEventListener(flash.events.Event.COMPLETE, internalOnData);
-			loader.addEventListener(flash.events.IOErrorEvent.IO_ERROR, internalOnError);
-
-			loader.load(client);
 		#elseif flash
 			var result = new flash.LoadVars();
 			result.onData = internalOnData;
@@ -316,17 +301,7 @@ class URLRequest
 		#end		
 	}
 
-	#if flash9
-		function internalOnData(event:flash.events.Event) 
-		{
-			onData(event.target.data);
-		}
-
-		function internalOnError(event:flash.events.Event)
-		{
-			onError("Invalid Server Response.");
-		}
-	#elseif flash
+	#if flash
 		function internalOnData(value:String)
 		{
 			if (value == null)

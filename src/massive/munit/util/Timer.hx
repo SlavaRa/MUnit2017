@@ -75,10 +75,7 @@ class Timer
 
 	public function new(time_ms:Int)
 	{
-		#if flash9
-			var me = this;
-			id = untyped __global__["flash.utils.setInterval"](function() { me.run(); },time_ms);
-		#elseif flash
+		#if flash
 			var me = this;
 			id = untyped _global["setInterval"](function() { me.run(); },time_ms);
 		#elseif nodejs
@@ -98,12 +95,10 @@ class Timer
 
 	public function stop()
 	{
-		#if( php || flash9 || flash || js )
+		#if(php || flash || js )
 			if (id == null) return;
 		#end
-		#if flash9
-			untyped __global__["flash.utils.clearInterval"](id);
-		#elseif flash
+		#if flash
 			untyped _global["clearInterval"](id);
 		#elseif nodejs
 			untyped clearInterval(timerId);
