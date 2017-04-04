@@ -13,11 +13,6 @@ class CreateTestCommand extends MUnitCommand
 	var qualifiedTestName:String;
 	var qualifiedClassName:String;
 	
-	public function new():Void
-	{
-		super();
-	}
-
 	override public function initialise():Void
 	{
 		qualifiedTestName = console.getNextArg();
@@ -46,15 +41,11 @@ class CreateTestCommand extends MUnitCommand
 		var packages = qualifiedTestName.split(".");
 		var testName = packages.pop();
 		var testPackage = packages.length > 0 ? packages.join(".") : "";
-
 		var testFilePath = qualifiedTestName.split(".").join("/") + ".hx";
-
-
 		var hasClass = qualifiedClassName != null;
 		var classPackage:String = null;
 		var className:String = null;
 		var classFilePath:String = null;
-
 		if(hasClass)
 		{
 			packages = qualifiedClassName.split(".");
@@ -62,9 +53,7 @@ class CreateTestCommand extends MUnitCommand
 			classPackage = packages.length > 0 ? packages.join("."): "";
 			classFilePath = qualifiedClassName.split(".").join("/") + ".hx";
 		}
-		
 		var testFile = File.create(testFilePath, config.src);
-
 		if(!testFile.exists)
 		{
 			var props = {testName:testName, packageName:testPackage, hasClass:hasClass, qualifiedClassName:qualifiedClassName, className:className};
@@ -73,11 +62,8 @@ class CreateTestCommand extends MUnitCommand
 			var content = TemplateUtil.getTemplate("test-stub-test", props);
 			testFile.writeString(content, true);
 		}
-
 		if(!hasClass) return;
-
 		var classFile = File.create(classFilePath, config.classPaths[0]);
-
 		if(!classFile.exists)
 		{
 			var props = {packageName:classPackage, className:className};

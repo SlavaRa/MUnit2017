@@ -42,27 +42,21 @@ class ConfigCommand extends MUnitCommand
 	static inline var DEFAULT_REPORT:String = "report";
 	static inline var DEFAULT_CLASSPATHS:String = "src";
 	static inline var DEFAULT_HXML:String = "test.hxml";
-		
 
 	var file:File;//external file
-
-
 	var useDefaultsIfMissing:Bool;
 	var useConsoleInput:Bool;
-
 	var src:File;
 	var bin:File;
 	var report:File;
 	var hxml:File;
 	var classPaths:Array<File>;
-
 	var resources:File;
 	var templates:File;
-
 	var coveragePackages:Array<String>;
 	var coverageIgnoredClasses:Array<String>;
 
-	public function new():Void
+	public function new()
 	{
 		super();
 		useDefaultsIfMissing = false;

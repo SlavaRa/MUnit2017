@@ -12,10 +12,9 @@ class Target
 	public var main:File;
 	public var flags:StringMap<String>;
 	public var debug:Bool;
-
 	public var executableFile:File;
 
-	public function new():Void
+	public function new()
 	{
 		hxml = "";
 		debug = false;
@@ -24,7 +23,6 @@ class Target
 	
 	public function toString():String
 	{
-
 		return "Target " + Std.string(type) + " " + file.toString();
 	}
 
@@ -44,7 +42,6 @@ class Target
 
 enum TargetType
 {
-	as2;
 	as3;
 	js;
 	neko;

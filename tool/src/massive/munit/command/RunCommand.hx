@@ -27,7 +27,6 @@
  */
 package massive.munit.command;
 
-
 import haxe.Http;
 import haxe.io.Eof;
 import massive.haxe.util.RegExpUtil;
@@ -46,8 +45,6 @@ import massive.munit.Config;
 import massive.munit.Target;
 import sys.net.Host;
 import sys.net.Socket;
-
-
 import haxe.ds.StringMap;
  
 /**
@@ -55,40 +52,28 @@ Don't ask - compiler always thinks it is massive.munit.TargetType enum 'neko'
 */
 typedef SysFile = sys.io.File;
 
-
-
-
 class RunCommand extends MUnitTargetCommandBase
 {
 	public static inline var DEFAULT_SERVER_TIMEOUT_SEC:Int = 30;
 
 	var browser:String;
-
 	var reportDir:File;
 	var reportRunnerDir:File;
 	var reportTestDir:File;
-
 	var tmpDir:File;
 	var tmpRunnerDir:File;
 	var binDir:File;
-
 	var killBrowser:Bool;
 	var indexPage:File;
-
 	var hasBrowserTests:Bool;
-	
 	var hasNekoTests:Bool;
 	var hasCPPTests:Bool;
-
 	var nekoFile:File;
 	var cppFile:File;
-	
-	
 	var serverTimeoutTimeSec:Int;
-
 	var resultExitCode:Bool;
 
-	public function new():Void
+	public function new()
 	{
 		super();
 		killBrowser = false;
@@ -97,7 +82,6 @@ class RunCommand extends MUnitTargetCommandBase
 	override public function initialise():Void
 	{
 		initialiseTargets(false);
-
 		locateBinDir();
 		gatherTestRunnerFiles();
 		locateReportDir();
@@ -132,7 +116,6 @@ class RunCommand extends MUnitTargetCommandBase
 
 		Log.debug("binPath: " + binDir);
 	}
-
 
 	function gatherTestRunnerFiles()
 	{

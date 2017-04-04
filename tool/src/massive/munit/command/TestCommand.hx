@@ -87,7 +87,7 @@ class TestCommand extends MUnitTargetCommandBase
 		{
 			if (line.indexOf("main_test.") != -1)
 			{
-				Sys.println("Error: The naming convention main_test.<type> is deprecated. Please update your test.hxml file to generate the file(s) 'as2_test.swf', 'as3_test.swf', 'js_test.js', 'neko_test.n', 'cpp_test' respectively. [Cause: " + line + "]");
+				Sys.println("Error: The naming convention main_test.<type> is deprecated. Please update your test.hxml file to generate the file(s) 'as3_test.swf', 'js_test.js', 'neko_test.n', 'cpp_test' respectively. [Cause: " + line + "]");
 				invalid = true;
 			}
 		}
@@ -147,7 +147,7 @@ class TestCommand extends MUnitTargetCommandBase
 				target.hxml += "--macro mcover.MCover.coverage(['" + coverPackages + "'],['" + clsPaths.join("','") + "'],['" + coverIgnoredClasses + "'])\n";	
 			}
 			
-			if (target.type == TargetType.as2 || target.type == TargetType.as3)
+			if (target.type == TargetType.as3)
 			{
 				target.hxml = updateSwfHeader(target.hxml);
 			}

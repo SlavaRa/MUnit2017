@@ -38,7 +38,7 @@ class GenerateCommand extends MUnitCommand
 	private var includeHxml:Bool;
 	private var testFilter:String;
 	
-	public function new():Void
+	public function new()
 	{
 		super();
 		testFilter = null;
@@ -49,25 +49,18 @@ class GenerateCommand extends MUnitCommand
 	{
 		var testSrcPath = console.getNextArg();
 		dir = initialiseTestSourceDirectory(testSrcPath);
-		
 		includeHxml = console.getOption("nohxml") != "true";
-		
 		if(!includeHxml)
 		{
 			var hxmlPath  = console.getNextArg();
 			hxmlOutput = initialiseHxmlOutputFile(hxmlPath);
 		}
-	
-		
-		
 		testFilter = console.getOption("-filter");
 	}
 
-	
 	private function initialiseTestSourceDirectory(?testSrcPath:String=null):File
 	{
 		var dir:File;
-		
 		if(testSrcPath == null)
 		{
 			dir = config.src;
@@ -75,14 +68,11 @@ class GenerateCommand extends MUnitCommand
 			{
 				error("Default test src directory is not set. Please run munit config.");
 			}
-			
-			
 			if(!dir.exists)
 			{
 				error("Default test src directory does not exist (" + config.dir.getRelativePath(dir) + ").\nPlease run munit config or specify a <src> and <hxml> path");
 			}
 		}
-		
 		else
 		{
 			dir = File.create(testSrcPath, console.dir);
@@ -98,7 +88,6 @@ class GenerateCommand extends MUnitCommand
 				}
 			}
 		}
-		
 		return dir;
 	}
 
@@ -106,7 +95,6 @@ class GenerateCommand extends MUnitCommand
 	private function initialiseHxmlOutputFile(?hxmlPath:String=null):File
 	{
 		var hxmlOutput:File = null;
-		
 		if(hxmlPath == null) 
 		{
 			if( config.hxml == null)	error("Default hxml path is not set. Please run munit config or specify a hxml file path.");
@@ -116,37 +104,26 @@ class GenerateCommand extends MUnitCommand
 		{
 			hxmlOutput = File.create(hxmlPath, config.dir); 
 		}
-		
-		
-		
 		if(hxmlOutput == null || !hxmlOutput.isFile) error("Invalid hxml path " + hxmlPath);
-		
-		
 		return hxmlOutput;
 	}
 	
-
 	override public function execute():Void
 	{
 		if(!hasTestMain())
 		{
 			creatTestMainClass();
 			createExampleTestClass();
-			
 			if(includeHxml) createTestHxmlFile();
-		
 		}
-		
 		createTestSuiteClass();
 	}
-	
 	
 	private function hasTestMain():Bool
 	{
 		var testMain:File = dir.resolvePath("TestMain.hx");
 		return testMain.exists;
 	}
-
 	
 	private function creatTestMainClass():Void
 	{
@@ -177,7 +154,6 @@ class GenerateCommand extends MUnitCommand
 		
 	}
 	
-	
 	private function createTestSuiteClass():Void
 	{
 		var classes:Array<String> = getFilteredClassesInDirectory(dir);
@@ -189,23 +165,18 @@ class GenerateCommand extends MUnitCommand
 	
 	private function getFilteredClassesInDirectory(dir:File):Array<String>
 	{
-	
 		var files:Array<File> = dir.getRecursiveDirectoryListing(~/.*Test\.hx$/);
-	
 		var classes:Array<String> = [];
 		var clasz:String;
-
 		for(file in files)
 		{
 			clasz = dir.getRelativePath(file).substr(0, -3);
 			clasz = clasz.split("/").join(".");
 			if(clasz == "TestMain") continue;
 			if(testFilter != null && clasz.indexOf(testFilter) == -1) continue;
-			
 			classes.push(clasz);
 			
 		}	
-		
 		return classes;
 	}
 	
@@ -213,15 +184,12 @@ class GenerateCommand extends MUnitCommand
 	{
 		var imports:String = "";
 		var tests:String = "";
-		
 		for(clasz in classes)
 		{
 			imports += "\nimport " + clasz + ";";
 			tests += "\n		add(" + clasz + ");";
 		}
-		
 		return TemplateUtil.getTemplate("test-suite", {imports:imports,tests:tests});
 	}
-	
 
 }

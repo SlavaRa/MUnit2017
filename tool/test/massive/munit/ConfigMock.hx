@@ -9,7 +9,7 @@ class ConfigMock
 	public var mockDir:File;
 	public var mockConfigFile:File;
 	
-	public function new():Void
+	public function new()
 	{
 		mockDir = File.createTempDirectory();
 		mockConfigFile = createMockConfigFile();

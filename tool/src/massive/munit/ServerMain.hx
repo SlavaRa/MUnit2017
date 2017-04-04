@@ -52,7 +52,7 @@ class ServerMain
 		new ServerMain();
 	}
 
-	public function new():Void
+	public function new()
 	{
 		try 
 		{
