@@ -30,7 +30,6 @@ package massive.munit;
 import massive.munit.Assert;
 
 /**
- * ...
  * @author Mike Stead
  */
 class AssertTest 
@@ -41,7 +40,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testIsTrue():Void
+	public function testIsTrue()
 	{
 		Assert.isTrue(true);
 		try 
@@ -56,7 +55,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testIsFalse():Void
+	public function testIsFalse()
 	{
 		Assert.isFalse(false);
 		try 
@@ -71,7 +70,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testIsNull():Void
+	public function testIsNull()
 	{
 		Assert.isNull(null);
 		try 
@@ -86,7 +85,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testIsNotNull():Void
+	public function testIsNotNull()
 	{
 		Assert.isNotNull({});
 		try 
@@ -101,7 +100,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testIsNaN():Void
+	public function testIsNaN()
 	{
 		Assert.isNaN(Math.NaN);
 		try 
@@ -116,7 +115,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testIsNotNaN():Void
+	public function testIsNotNaN()
 	{
 		Assert.isNotNaN(1);
 		try 
@@ -131,7 +130,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testIsType():Void
+	public function testIsType()
 	{
 		Assert.isType(1, Int);
 		try 
@@ -146,7 +145,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testIsNotType():Void
+	public function testIsNotType()
 	{
 		Assert.isNotType(1, String);
 		try 
@@ -161,7 +160,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testAreEqualString():Void
+	public function testAreEqualString()
 	{
 		Assert.areEqual("yoyo", "yoyo");
 		try 
@@ -176,7 +175,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testAreEqualObject():Void
+	public function testAreEqualObject()
 	{
 		var obj:Dynamic = { };
 		Assert.areEqual(obj, obj);
@@ -192,7 +191,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testAreEqualNumber():Void
+	public function testAreEqualNumber()
 	{
 		Assert.areEqual(1, 1);
 		try 
@@ -207,7 +206,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testAreEqualEnum():Void
+	public function testAreEqualEnum()
 	{
 		Assert.areEqual(ValueA, ValueA);
 		try
@@ -222,7 +221,7 @@ class AssertTest
 	}
 
 	@Test
-	public function testAreEqualEnumWithParam():Void
+	public function testAreEqualEnumWithParam()
 	{
 		Assert.areEqual(ValueC("foo"), ValueC("foo"));
 		try
@@ -237,7 +236,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testAreNotEqualString():Void
+	public function testAreNotEqualString()
 	{
 		Assert.areNotEqual("", "yoyo");
 		try 
@@ -252,7 +251,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testAreNotEqualObject():Void
+	public function testAreNotEqualObject()
 	{
 		var obj:Dynamic = { };
 		Assert.areNotEqual({}, obj);
@@ -268,7 +267,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testAreNotEqualNumber():Void
+	public function testAreNotEqualNumber()
 	{
 		Assert.areNotEqual(1, 2);
 		try 
@@ -283,7 +282,7 @@ class AssertTest
 	}
 
 	@Test
-	public function testAreNotEqualEnum():Void
+	public function testAreNotEqualEnum()
 	{
 		Assert.areNotEqual(ValueA, ValueB);
 		try
@@ -298,7 +297,7 @@ class AssertTest
 	}
 
 	@Test
-	public function testAreNotEqualEnumWithParam():Void
+	public function testAreNotEqualEnumWithParam()
 	{
 		Assert.areNotEqual(ValueC("foo"), ValueC("bar"));
 		try
@@ -312,7 +311,7 @@ class AssertTest
 		Assert.fail("Invalid assertion not captured");
 	}
 
-	public function testAreSameString():Void
+	public function testAreSameString()
 	{
 		Assert.areSame("yoyo", "yoyo");
 		try
@@ -327,7 +326,7 @@ class AssertTest
 	}
 
 	@Test
-	public function testAreSameObject():Void
+	public function testAreSameObject()
 	{
 		var obj:Dynamic = {};
 		Assert.areSame(obj, obj);
@@ -343,53 +342,7 @@ class AssertTest
 	}
 
 	@Test
-	public function testAreSameNumber():Void
-	{
-		Assert.areSame(1, 1);
-		try
-		{
-			Assert.areSame(1, 2);
-		}
-		catch (e:AssertionException)
-		{
-			return;
-		}
-		Assert.fail("Invalid assertion not captured");
-	}
-
-	@Test
-	public function testAreSameEnum():Void
-	{
-		Assert.areSame(ValueA, ValueA);
-		try
-		{
-			Assert.areSame(ValueA, ValueB);
-		}
-		catch (e:AssertionException)
-		{
-			return;
-		}
-		Assert.fail("Invalid assertion not captured");
-	}
-
-	@Test
-	public function testAreSameEnumWithParam():Void
-	{
-		var e = ValueC("foo");
-		Assert.areSame(e, e);
-		try
-		{
-			Assert.areSame(e, ValueC("foo"));
-		}
-		catch (e:AssertionException)
-		{
-			return;
-		}
-		Assert.fail("Invalid assertion not captured");
-	}
-
-	@Test
-	public function testAreNotSameString():Void
+	public function testAreNotSameString()
 	{
 		Assert.areNotSame("", "yoyo");
 		try
@@ -404,7 +357,7 @@ class AssertTest
 	}
 
 	@Test
-	public function testAreNotSameObject():Void
+	public function testAreNotSameObject()
 	{
 		var obj:Dynamic = {};
 		Assert.areNotSame({}, obj);
@@ -420,53 +373,7 @@ class AssertTest
 	}
 
 	@Test
-	public function testAreNotSameNumber():Void
-	{
-		Assert.areNotSame(1, 2);
-		try
-		{
-			Assert.areNotSame(1, 1);
-		}
-		catch (e:AssertionException)
-		{
-			return;
-		}
-		Assert.fail("Invalid assertion not captured");
-	}
-
-	@Test
-	public function testAreNotSameEnum():Void
-	{
-		Assert.areNotSame(ValueA, ValueB);
-		try
-		{
-			Assert.areNotSame(ValueA, ValueA);
-		}
-		catch (e:AssertionException)
-		{
-			return;
-		}
-		Assert.fail("Invalid assertion not captured");
-	}
-
-	@Test
-	public function testAreNotSameEnumWithParam():Void
-	{
-		Assert.areNotSame(ValueC("foo"), ValueC("foo"));
-		try
-		{
-			var e = ValueC("foo");
-			Assert.areNotSame(e, e);
-		}
-		catch (e:AssertionException)
-		{
-			return;
-		}
-		Assert.fail("Invalid assertion not captured");
-	}
-
-	@Test
-	public function testFail():Void
+	public function testFail()
 	{
 		try 
 		{
@@ -481,7 +388,7 @@ class AssertTest
 	}
 	
 	@Test
-	public function testThrowsStringAndObject():Void
+	public function testThrowsStringAndObject()
 	{
 		// Positive case: throws expected string
 		var expectedMessage:String = "Invalid operation!";
@@ -515,7 +422,7 @@ class AssertTest
 	}
 
 	@Test
-	public function testThrowsFailsIfWrongExceptionTypeThrown():Void
+	public function testThrowsFailsIfWrongExceptionTypeThrown()
 	{
 		try
 		{

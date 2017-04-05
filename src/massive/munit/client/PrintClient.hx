@@ -1,5 +1,5 @@
 /****
-* Copyright 2013 Massive Interactive. All rights reserved.
+* Copyright 2016 Massive Interactive. All rights reserved.
 * 
 * Redistribution and use in source and binary forms, with or without modification, are
 * permitted provided that the following conditions are met:
@@ -129,8 +129,6 @@ class PrintClient extends PrintClientBase
 	}
 	#end
 
-
-	////// TEST CLASS LIFECYCLE //////
 	override function printOverallResult(result:Bool)
 	{
 		super.printOverallResult(result);
@@ -142,15 +140,11 @@ class PrintClient extends PrintClientBase
 		#end
 	}
 
-
-
 	function customTrace(value, ?info:haxe.PosInfos)
 	{
 		addTrace(value, info);
 	}
 	
-	////// PRINT APIS //////
-
 	override public function reportFinalStatistics(testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float):Dynamic
 	{
 		return super.reportFinalStatistics(testCount, passCount, failCount, errorCount, ignoreCount, time);
@@ -167,7 +161,7 @@ class PrintClient extends PrintClientBase
 
 		#if nodejs
 			untyped process.stdout.write(value);
-		#elseif (neko || cpp || php)
+		#elseif (neko || cpp || php || java)
 			Sys.print(value);
 		#elseif (js || flash)
 			external.print(value);

@@ -46,4 +46,5 @@ enum TargetType
 	js;
 	neko;
 	cpp;
+	java;
 }
