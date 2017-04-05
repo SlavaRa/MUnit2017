@@ -4,12 +4,20 @@
 -cp src
 -lib mlib
 -neko bin/test/core/neko_test.n
---next
 
-# # CPP
-# -main TestMain
-# -cp test
-# -cp src
-# -lib mlib
-# -D HXCPP_M64
-# -cpp bin/test/core/cpp_test
+# CPP
+--next
+-main TestMain
+-cp test
+-cp src
+-lib mlib
+#-D HXCPP_M64
+-cpp bin/test/core/cpp_test
+
+## Java
+--next
+-main TestMain
+-cp test
+-cp src
+-lib mlib
+-java bin/test/core/java_test

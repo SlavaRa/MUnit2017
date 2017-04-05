@@ -4,7 +4,7 @@ import massive.munit.util.Timer;
 
 class Calculator
 {
-	public function new():Void
+	public function new()
 	{}
 	
 	public function add(x:Int, y:Int):Int

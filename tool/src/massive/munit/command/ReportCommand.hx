@@ -18,7 +18,7 @@ class ReportCommand extends MUnitTargetCommandBase
 	var reportDir:File;
 	var destDir:File;
 
-	public function new():Void
+	public function new()
 	{
 		super();
 		minCoverage = 0;
@@ -64,10 +64,10 @@ class ReportCommand extends MUnitTargetCommandBase
 						switch(reg.matched(1))
 						{
 							case "js": targetTypes.push(TargetType.js);
-							case "as2": targetTypes.push(TargetType.as2);
 							case "as3": targetTypes.push(TargetType.as3);
 							case "neko": targetTypes.push(TargetType.neko);
 							case "cpp": targetTypes.push(TargetType.cpp);
+							case "java": targetTypes.push(TargetType.java);
 						}
 					}
 				}
@@ -80,7 +80,6 @@ class ReportCommand extends MUnitTargetCommandBase
 			targetTypes = config.targetTypes.concat([]);
 		}
 	}
-
 
 	function getReportFormatType()
 	{
@@ -134,8 +133,6 @@ class ReportCommand extends MUnitTargetCommandBase
 			Log.debug("minCoverage " + coverage);
 		}
 	}
-
-	////// EXECUTION PHASE ////////
 
 	override public function execute():Void
 	{

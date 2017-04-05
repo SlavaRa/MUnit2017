@@ -522,7 +522,7 @@ massive_haxe_util_ReflectUtil.here = function(info) {
 };
 var massive_munit_MUnitException = function(message,info) {
 	massive_haxe_Exception.call(this,message,info);
-	this.type = massive_haxe_util_ReflectUtil.here({ fileName : "MUnitException.hx", lineNumber : 50, className : "massive.munit.MUnitException", methodName : "new"}).className;
+	this.type = massive_haxe_util_ReflectUtil.here({ fileName : "MUnitException.hx", lineNumber : 52, className : "massive.munit.MUnitException", methodName : "new"}).className;
 };
 massive_munit_MUnitException.__name__ = true;
 massive_munit_MUnitException.__super__ = massive_haxe_Exception;
@@ -531,7 +531,7 @@ massive_munit_MUnitException.prototype = $extend(massive_haxe_Exception.prototyp
 });
 var massive_munit_AssertionException = function(msg,info) {
 	massive_munit_MUnitException.call(this,msg,info);
-	this.type = massive_haxe_util_ReflectUtil.here({ fileName : "AssertionException.hx", lineNumber : 49, className : "massive.munit.AssertionException", methodName : "new"}).className;
+	this.type = massive_haxe_util_ReflectUtil.here({ fileName : "AssertionException.hx", lineNumber : 51, className : "massive.munit.AssertionException", methodName : "new"}).className;
 };
 massive_munit_AssertionException.__name__ = true;
 massive_munit_AssertionException.__super__ = massive_munit_MUnitException;
