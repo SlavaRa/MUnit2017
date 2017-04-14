@@ -45,7 +45,7 @@ interface ITestResultClient
 	/**
 	 * Handler which if present, should be called when the client has completed its processing of the results.
 	 */
-	var completionHandler(get, set):ITestResultClient -> Void;
+	var completionHandler(get, set):ITestResultClient->Void;
 
 	/**
 	 * The unique identifier for the client.
@@ -140,9 +140,9 @@ interface ICoverageTestResultClient extends IAdvancedTestResultClient
 	 * @param	executionFrequency		statement/branch frequency	
 	 */
 	function reportFinalCoverage(?percent:Float=0, missingCoverageResults:Array<CoverageResult>, summary:String,
-		?classBreakdown:String=null,
-		?packageBreakdown:String=null,
-		?executionFrequency:String=null
+		?classBreakdown:String,
+		?packageBreakdown:String,
+		?executionFrequency:String
 	):Void;
 
 }

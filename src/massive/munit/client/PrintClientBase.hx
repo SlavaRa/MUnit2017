@@ -30,12 +30,10 @@
 
 package massive.munit.client;
 
-import massive.munit.AssertionException;
-import massive.munit.ITestResultClient;
+import massive.haxe.util.ReflectUtil;
+import massive.munit.ITestResultClient.CoverageResult;
 import massive.munit.TestResult;
 import massive.munit.util.MathUtil;
-import massive.haxe.util.ReflectUtil;
-import massive.munit.util.Timer;
 
 class PrintClientBase extends AbstractTestResultClient
 {
@@ -43,9 +41,7 @@ class PrintClientBase extends AbstractTestResultClient
 	 * Default id of this client.
 	 */
 	public static inline var DEFAULT_ID:String = "simple";
-
 	public var verbose:Bool;
-
 	var includeIgnoredReport:Bool;
 	var divider:String;
 	var divider2:String;
@@ -56,7 +52,6 @@ class PrintClientBase extends AbstractTestResultClient
 		id = DEFAULT_ID;
 		verbose = false;
 		this.includeIgnoredReport = includeIgnoredReport;
-
 		printLine("MUnit Results");
 		printLine(divider);
 	}
@@ -136,10 +131,11 @@ class PrintClientBase extends AbstractTestResultClient
 		// 	}
 		// }
 	}
+	
 	override public function reportFinalCoverage(?percent:Float=0, missingCoverageResults:Array<CoverageResult>, summary:String,
-		?classBreakdown:String=null,
-		?packageBreakdown:String=null,
-		?executionFrequency:String=null
+		?classBreakdown:String,
+		?packageBreakdown:String,
+		?executionFrequency:String
 		):Void
 	{
 		super.reportFinalCoverage(percent, missingCoverageResults, summary,classBreakdown,packageBreakdown,executionFrequency);
@@ -197,10 +193,7 @@ class PrintClientBase extends AbstractTestResultClient
 	}
 
 	////// FINAL REPORTS //////
-	override function printReports()
-	{
-		printFinalIgnoredStatistics(ignoreCount);
-	}
+	override function printReports() printFinalIgnoredStatistics(ignoreCount);
 
 	function printFinalIgnoredStatistics(count:Int)
 	{
@@ -243,16 +236,10 @@ class PrintClientBase extends AbstractTestResultClient
 		printLine("");	
 	}
 
-	override function printOverallResult(result:Bool)
-	{
-		printLine("");
-	}
+	override function printOverallResult(result:Bool) printLine("");
 	
 	////// PRINT APIS //////
-	public function print(value:Dynamic)
-	{
-		output += Std.string(value);
-	}
+	public function print(value:Dynamic) output += Std.string(value);
 
 	public function printLine(value:Dynamic, ?indent:Int = 0)
 	{
@@ -263,12 +250,7 @@ class PrintClientBase extends AbstractTestResultClient
 
 	function indentString(value:String, ?indent:Int=0):String
 	{
-		if(indent > 0)
-		{
-			value = StringTools.lpad("", " ", indent*4) + value;
-		}
-
-		if(value == "") value = "";
+		if(indent > 0) value = StringTools.lpad("", " ", indent*4) + value;
 		return value;
 	}
 }
@@ -367,108 +349,49 @@ class ExternalPrintClientJS implements ExternalPrintClient
 
 
 	// SIMPLE CLIENT APIS
-	public function print(value:String)
-	{
-		queue("munitPrint", value);
-	}
+	public function print(value:String) queue("munitPrint", value);
 
-	public function printLine(value:String)
-	{
-		queue("munitPrintLine", value);
-	}
+	public function printLine(value:String) queue("munitPrintLine", value);
 
-	public function setResult(value:Bool)
-	{
-		queue("setResult", value);	
-	}
+	public function setResult(value:Bool) queue("setResult", value);	
 
-	public function setResultBackground(value:Bool)
-	{
-		queue("setResultBackground", value);	
-	}
+	public function setResultBackground(value:Bool) queue("setResultBackground", value);	
 
 	//RICH CLIENT APIs
 
-	public function trace(value:Dynamic)
-	{
-		queue("munitTrace", value);	
-	}
+	public function trace(value:Dynamic) queue("munitTrace", value);	
 
-	public function createTestClass(className:String)
-	{
-		queue("createTestClass", className);
-	}
+	public function createTestClass(className:String) queue("createTestClass", className);
 
-	public function printToTestClassSummary(value:String)
-	{
-		queue("updateTestSummary", value);
-	}
+	public function printToTestClassSummary(value:String) queue("updateTestSummary", value);
 
-	public function setTestClassResult(resultType:Int):Void
-	{
-		queue("setTestClassResult", resultType);
-	}
+	public function setTestClassResult(resultType:Int):Void queue("setTestClassResult", resultType);
 
-	public function addTestPass(value:String):Void
-	{
-		if(value == null) return;
-		queue("addTestPass", value);
-	}
+	public function addTestPass(value:String):Void if(value != null) queue("addTestPass", value);
 
-	public function addTestFail(value:String):Void
-	{
-		queue("addTestFail", value);
-	}
+	public function addTestFail(value:String):Void queue("addTestFail", value);
 
-	public function addTestError(value:String):Void
-	{
-		queue("addTestError", value);
-	}
+	public function addTestError(value:String):Void queue("addTestError", value);
 
-	public function addTestIgnore(value:String):Void
-	{
-		queue("addTestIgnore", value);
-	}
+	public function addTestIgnore(value:String):Void queue("addTestIgnore", value);
 
-	public function addTestClassCoverage(className:String, percent:Float=0):Void
-	{
-		queue("addTestCoverageClass", [className, percent]);
-	}
+	public function addTestClassCoverage(className:String, percent:Float=0):Void queue("addTestCoverageClass", [className, percent]);
 
-	public function addTestClassCoverageItem(value:String):Void
-	{
-		queue("addTestCoverageItem", value);
-	}
+	public function addTestClassCoverageItem(value:String):Void queue("addTestCoverageItem", value);
 
 	//// COVERAGE REPORTING APIS
 
-	public function createCoverageReport(percent:Float=0):Void
-	{
-		queue("createCoverageReport", percent);
-	}
+	public function createCoverageReport(percent:Float=0):Void queue("createCoverageReport", percent);
 
-	public function addMissingCoverageClass(className:String, percent:Float=0):Void
-	{
-		queue("addMissingCoverageClass", [className,percent]);
-	}
+	public function addMissingCoverageClass(className:String, percent:Float=0):Void queue("addMissingCoverageClass", [className,percent]);
 
-	public function addCoverageReportSection(name:String, value:String):Void
-	{
-		queue("addCoverageReportSection", [name, value]);
-	}
+	public function addCoverageReportSection(name:String, value:String):Void queue("addCoverageReportSection", [name, value]);
 	
-	public function addCoverageSummary(value:String):Void
-	{
-		queue("addCoverageSummary", value);
-	}
-
+	public function addCoverageSummary(value:String):Void queue("addCoverageSummary", value);
 
 	//// FINAL SUMMARY
 
-	public function printSummary(value:String):Void
-	{
-		queue("printSummary", value);
-	}
+	public function printSummary(value:String):Void queue("printSummary", value);
 
 	///// OTHER
 

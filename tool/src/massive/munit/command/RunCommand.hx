@@ -27,9 +27,8 @@
  */
 package massive.munit.command;
 
-import haxe.Http;
+import haxe.ds.StringMap;
 import haxe.io.Eof;
-import haxe.io.Path;
 import massive.haxe.log.Log;
 import massive.haxe.util.RegExpUtil;
 import massive.munit.ServerMain;
@@ -42,7 +41,6 @@ import sys.FileSystem;
 import sys.io.Process;
 import sys.net.Host;
 import sys.net.Socket;
-import haxe.ds.StringMap;
  
 /**
  * Don't ask - compiler always thinks it is massive.munit.TargetType enum 'neko'

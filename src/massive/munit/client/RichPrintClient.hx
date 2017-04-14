@@ -27,14 +27,11 @@
 ****/
 
 package massive.munit.client;
-import massive.munit.AssertionException;
-import massive.munit.ITestResultClient;
+import massive.munit.ITestResultClient.CoverageResult;
 import massive.munit.TestResult;
-import massive.munit.util.MathUtil;
-import massive.haxe.util.ReflectUtil;
-import massive.munit.util.Timer;
-
 import massive.munit.client.PrintClientBase;
+import massive.munit.util.MathUtil;
+
 
 class RichPrintClient extends PrintClientBase
 {

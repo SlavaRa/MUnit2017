@@ -3,7 +3,7 @@ MUnit is a metadata driven unit testing framework for cross-platform Haxe develo
 
 It includes tools for creating, updating, compiling and running unit test cases from the command line.
 
-Munit supports Haxe 2.10 and Haxe 3 RC
+MUnit2017 supports Haxe 3 and newer
 
 Installation
 ---------------------
@@ -23,7 +23,7 @@ To check that it is all installed and to view the help run:
 
 To install latest build from git:
 
-    haxelib git munit https://github.com/massiveinteractive/MassiveUnit.git src
+    haxelib git munit https://github.com/SlavaRa/MUnit2017.git src
 
 Features
 ---------------------
@@ -31,7 +31,7 @@ Features
 ### Cross Platform
 
 MUnit has been designed for cross platform Haxe development.
-It currently supports js, swf8, swf9, neko and c++, and the tool chain works on PC and OSX
+It currently supports js, swf, neko, c++ and java, and the tool chain works on PC and OSX
 
 
 ### Test Metadata
@@ -39,7 +39,7 @@ It currently supports js, swf8, swf9, neko and c++, and the tool chain works on 
 Test cases use Haxe metadata to simplify creating tests (and avoid needing to extend or implement framework classes).
 
 	@Test
-	public function testExample():Void
+	public function testExample()
 	{
 		Assert.isTrue(true);
 	}
@@ -49,7 +49,7 @@ Test cases use Haxe metadata to simplify creating tests (and avoid needing to ex
 Unlike the default haxe unit test classes, MUnit supports asynchronous testing
 
 	@AsyncTest
-	public function asyncTestExample(factory:AsyncFactory):Void
+	public function asyncTestExample(factory:AsyncFactory)
 	{
 		...
 	}
@@ -85,7 +85,7 @@ If you want to help, [fork it](https://github.com/massiveinteractive/MassiveUnit
 
 To install latest build from git:
 
-    haxelib git munit https://github.com/massiveinteractive/MassiveUnit.git src
+    haxelib git munit https://github.com/SlavaRa/MUnit2017.git src
 
 
 If you want to make sure it works, make sure to run the bash script (build.sh) and check that the tests all pass on all platforms:

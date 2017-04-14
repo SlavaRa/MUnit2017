@@ -1,12 +1,7 @@
 package massive.munit.command;
 
-import massive.haxe.log.Log;
-import massive.sys.haxe.HaxeWrapper;
-import massive.sys.io.File;
-import massive.sys.io.FileSys;
-import massive.sys.util.PathUtil;
-import massive.munit.Config;
 import massive.haxe.util.TemplateUtil;
+import massive.sys.io.File;
 
 class CreateTestCommand extends MUnitCommand
 {

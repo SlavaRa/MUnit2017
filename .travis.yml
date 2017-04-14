@@ -1,0 +1,30 @@
+language: haxe
+
+haxe:
+  - development
+  - 3.4.2
+
+os:
+  - linux
+  - osx
+
+sudo: false
+
+install:
+#  - yes | haxelib install test.hxml
+#  - if [ "${TRAVIS_HAXE_VERSION}" = "development" ]; then
+#      haxelib git hxcpp https://github.com/HaxeFoundation/hxcpp.git;
+#      pushd $(haxelib path hxcpp | head -1);
+#        pushd tools/hxcpp; haxe compile.hxml; popd;
+#        pushd project; neko build.n; popd;
+#      popd;
+#    else
+#      haxelib install hxcpp;
+#    fi
+  - haxelib install hxcpp;
+  - haxelib install hxjava;
+  - haxelib install mlib;
+  - haxelib install mcover;
+
+script:
+  - haxe build.hxml

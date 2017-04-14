@@ -30,8 +30,8 @@
 
 package massive.munit.async;
 import haxe.PosInfos;
-import massive.munit.MUnitException;
 import massive.haxe.util.ReflectUtil;
+import massive.munit.MUnitException;
 
 /**
  * Exception thrown when an asynchronous test does not create an AsyncDelegate.

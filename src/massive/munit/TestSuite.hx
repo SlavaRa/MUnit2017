@@ -125,6 +125,6 @@ class TestSuite
 		var yName:String = Type.getClassName(y);
 		if (xName == yName) return 0;
 		if (xName > yName) return 1;
-		else return -1;
+		return -1;
 	}
 }

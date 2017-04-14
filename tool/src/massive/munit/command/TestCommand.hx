@@ -28,12 +28,8 @@
 package massive.munit.command;
 
 import massive.haxe.log.Log;
-import massive.sys.haxe.HaxeWrapper;
-import massive.sys.io.File;
-import massive.sys.io.FileSys;
-import massive.sys.util.PathUtil;
-import massive.munit.Config;
 import massive.munit.Target;
+import massive.sys.haxe.HaxeWrapper;
 
 class TestCommand extends MUnitTargetCommandBase
 {

@@ -29,7 +29,6 @@
 package massive.munit;
 
 import haxe.PosInfos;
-
 import massive.munit.Assert;
 import massive.munit.async.AsyncDelegate;
 import massive.munit.async.AsyncFactory;
@@ -94,7 +93,7 @@ class TestRunner implements IAsyncDelegateObserver
      * Handler called when all tests have been executed and all clients
      * have completed processing the results.
      */
-    public var completionHandler:Bool -> Void;
+    public var completionHandler:Bool->Void;
 
     public var clientCount(get_clientCount, null):Int;
     private function get_clientCount():Int { return clients.length; }
@@ -107,12 +106,9 @@ class TestRunner implements IAsyncDelegateObserver
     private var passCount:Int;
     private var ignoreCount:Int;
     private var clientCompleteCount:Int;
-
     private var clients:Array<ITestResultClient>;
-
     private var activeHelper:TestClassHelper;
     private var testSuites:Array<TestSuite>;
-
     private var asyncPending:Bool;
     private var asyncDelegate:AsyncDelegate;
     private var suiteIndex:Int;
@@ -127,12 +123,9 @@ class TestRunner implements IAsyncDelegateObserver
     }
 
     private var emptyParams:Array<Dynamic>;
-
     private var startTime:Float;
     private var testStartTime:Float;
-
     private var isDebug(default, null):Bool;
-
 
     /**
      * Class constructor.
@@ -165,7 +158,6 @@ class TestRunner implements IAsyncDelegateObserver
         resultClient.completionHandler = clientCompletionHandler;
         clients.push(resultClient);
     }
-
 
     /**
      * Run one or more suites of unit tests containing @TestDebug.

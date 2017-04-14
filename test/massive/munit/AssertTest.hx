@@ -311,6 +311,7 @@ class AssertTest
 		Assert.fail("Invalid assertion not captured");
 	}
 
+    @Test
 	public function testAreSameString()
 	{
 		Assert.areSame("yoyo", "yoyo");

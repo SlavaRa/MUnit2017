@@ -12,7 +12,7 @@ class Calculator
 		return x + y;
 	}
 	
-	public function addAsync(x:Int, y:Int, handler:Int -> Void):Void
+	public function addAsync(x:Int, y:Int, handler:Int->Void):Void
 	{
 		Timer.delay(function() {
 			handler(x + y);

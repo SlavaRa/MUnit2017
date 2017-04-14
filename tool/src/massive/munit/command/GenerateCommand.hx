@@ -27,9 +27,9 @@
  */
 package massive.munit.command;
 
-import massive.sys.io.File;
 import massive.haxe.util.TemplateUtil;
 import massive.munit.client.HTTPClient;
+import massive.sys.io.File;
 
 class GenerateCommand extends MUnitCommand
 {

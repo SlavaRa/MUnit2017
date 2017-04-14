@@ -30,12 +30,8 @@
 
 package massive.munit.client;
 
-import massive.munit.AssertionException;
 import massive.munit.ITestResultClient;
 import massive.munit.TestResult;
-import massive.munit.util.MathUtil;
-import massive.haxe.util.ReflectUtil;
-import massive.munit.util.Timer;
 
 class AbstractTestResultClient implements IAdvancedTestResultClient implements ICoverageTestResultClient
 {
@@ -47,13 +43,13 @@ class AbstractTestResultClient implements IAdvancedTestResultClient implements I
 	/**
 	 * Handler which if present, is called when the client has completed generating its results.
 	 */
-	@:isVar public var completionHandler(get, set):ITestResultClient -> Void;
+	@:isVar public var completionHandler(get, set):ITestResultClient->Void;
 
-	function get_completionHandler():ITestResultClient -> Void 
+	function get_completionHandler():ITestResultClient->Void 
 	{
 		return completionHandler;
 	}
-	function set_completionHandler(value:ITestResultClient -> Void):ITestResultClient -> Void
+	function set_completionHandler(value:ITestResultClient->Void):ITestResultClient->Void
 	{
 		return completionHandler = value;
 	}
@@ -187,9 +183,9 @@ class AbstractTestResultClient implements IAdvancedTestResultClient implements I
 
 	////// FINAL REPORTS //////
 	public function reportFinalCoverage(?percent:Float=0, missingCoverageResults:Array<CoverageResult>, summary:String,
-		?classBreakdown:String=null,
-		?packageBreakdown:String=null,
-		?executionFrequency:String=null
+		?classBreakdown:String,
+		?packageBreakdown:String,
+		?executionFrequency:String
 	):Void
 	{
 		totalCoveragePercent = percent;
@@ -210,24 +206,17 @@ class AbstractTestResultClient implements IAdvancedTestResultClient implements I
 	public function reportFinalStatistics(testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float):Dynamic
 	{
 		finalResult = passCount == testCount;
-
 		printReports();
-
 		printFinalStatistics(finalResult, testCount, passCount, failCount, errorCount, ignoreCount, time);
-		
 		printOverallResult(finalResult);
-		
 		haxe.Log.trace = originalTrace;
 		if (completionHandler != null) completionHandler(this); 
 		return output;
 	}
 
-
-	////// TEST CLASS LIFECYCLE //////
-
 	/**
-	* Called when a new test class is about to execute tests
-	*/
+	 * Called when a new test class is about to execute tests
+	 */
 	function initializeTestClass()
 	{
 		currentClassResults = [];
@@ -239,8 +228,8 @@ class AbstractTestResultClient implements IAdvancedTestResultClient implements I
 	}
 
 	/**
-	* Called after every test has executed
-	*/
+	 * Called after every test has executed
+	 */
 	function updateTestClass(result:TestResult)
 	{
 		currentClassResults.push(result);
@@ -248,52 +237,28 @@ class AbstractTestResultClient implements IAdvancedTestResultClient implements I
 	}
 
 	/**
-	* Called when a test class has completed executing all tests
-	*/
-	function finalizeTestClass()
-	{
-		currentClassResults.sort(sortTestResults);
-	}
-
-
-	////// FINAL REPORTS //////
+	 * Called when a test class has completed executing all tests
+	 */
+	function finalizeTestClass() currentClassResults.sort(sortTestResults);
 
 	/**
-	* Override to print any additional reports (e.g. overall coverage)
-	*/
-	function printReports()
-	{
-		
-	}
+	 * Override to print any additional reports (e.g. overall coverage)
+	 */
+	function printReports() {}
 
 	/**
-	* Override to print final summary 
-	*/
-	function printFinalStatistics(result:Bool, testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float)
-	{
-		
-	}
+	 * Override to print final summary 
+	 */
+	function printFinalStatistics(result:Bool, testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float) {}
 
-	function printOverallResult(result:Bool)
-	{
-		
-	}
+	function printOverallResult(result:Bool) {}
 
-	///////
-
-	function addTrace(value:Dynamic, ?info:haxe.PosInfos)
-	{
-		var traceString = info.fileName + "|" + info.lineNumber + "| " + Std.string(value);
-		traces.push(traceString);
-	}
+	function addTrace(value:Dynamic, ?info:haxe.PosInfos) traces.push(info.fileName + "|" + info.lineNumber + "| " + Std.string(value));
 
 	/**
-	* returns the current class trace statements
-	*/
-	function getTraces():Array<String>
-	{
-		return traces.concat([]);
-	}
+	 * returns the current class trace statements
+	 */
+	function getTraces():Array<String> return traces.concat([]);
 
 	function sortTestResults(a:TestResult, b:TestResult):Int
 	{

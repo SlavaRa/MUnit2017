@@ -26,8 +26,8 @@
  * or implied, of Massive Interactive.
  */
 package massive.munit;
-import massive.sys.io.File;
 import massive.munit.Target;
+import massive.sys.io.File;
 
 class Config
 {
