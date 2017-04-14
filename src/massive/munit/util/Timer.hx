@@ -52,6 +52,10 @@
  */
 package massive.munit.util;
 
+#if hl
+typedef Timer = haxe.Timer;
+#else
+
 #if neko
 import neko.vm.Thread;
 #elseif cpp
@@ -173,3 +177,4 @@ class Timer
 		#end
 	}
 }
+#end

@@ -187,6 +187,7 @@ class HTTPClient implements IAdvancedTestResultClient
 		#elseif cpp return "cpp";
 		#elseif php return "php";
 		#elseif java return "java";
+		#elseif hl return "hl";
 		#end
 		return "unknown";
 	}
@@ -236,7 +237,7 @@ class URLRequest
 	var url:String;
 	var headers:StringMap<String>;
 
-	#if (js || neko || cpp || java)
+	#if (js || neko || cpp || java || hl)
 		public var client:Http;
 	#elseif flash
 		public var client:flash.LoadVars;
@@ -252,7 +253,7 @@ class URLRequest
 
 	function createClient(url:String)
 	{
-		#if (js || neko || cpp || java)
+		#if (js || neko || cpp || java || hl)
 			client = new Http(url);
 		#elseif flash			
 			client = new flash.LoadVars();
@@ -261,7 +262,7 @@ class URLRequest
 
 	public function setHeader(name:String, value:String)
 	{
-		#if (js || neko || cpp || java)
+		#if (js || neko || cpp || java || hl)
 			client.setHeader(name, value);
 		#elseif flash
 			client.addRequestHeader(name, value);
@@ -270,7 +271,7 @@ class URLRequest
 
 	public function send()
 	{
-		#if (js || neko || cpp || java)
+		#if (js || neko || cpp || java || hl)
 			client.onData = onData;
 			client.onError = onError;
 			#if js

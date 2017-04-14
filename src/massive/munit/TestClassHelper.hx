@@ -28,6 +28,7 @@
 
 package massive.munit;
 import haxe.rtti.Meta;
+import haxe.Constraints.Function;
 
 /**
  * A helper used to discover, and provide access to, the test and life cycle methods of a test class.
@@ -113,25 +114,25 @@ class TestClassHelper {
 	/**
 	 * The life cycle method to be called once, before tests in the class are executed.
 	 */
-	public var beforeClass(default, null):Dynamic;
+	public var beforeClass(default, null):Function;
 	
 	/**
 	 * The life cycle method to be called once, after tests in the class are executed.
 	 */
-	public var afterClass(default, null):Dynamic;
+	public var afterClass(default, null):Function;
 	
 	/**
 	 * The life cycle method to be called once, before each test in the class is executed.
 	 */
-	public var before(default, null):Dynamic;
+	public var before(default, null):Function;
 	
 	/**
 	 * The life cycle method to be called once, after each test in the class is executed.
 	 */
-	public var after(default, null):Dynamic;
+	public var after(default, null):Function;
 	
-	private var tests:Array<TestCaseData>;
-	private var index:Int;
+	var tests:Array<TestCaseData> = [];
+	var index:Int = 0;
 	public var className(default, null):String;
 	private var isDebug:Bool;
 
@@ -140,19 +141,14 @@ class TestClassHelper {
 	 * 
 	 * @param	type			type of test class this helper is wrapping
 	 */
-	public function new(type:Class<Dynamic>, ?isDebug:Bool=false) 
-	{
+	public function new(type:Class<Dynamic>, isDebug = false) {
 		this.type = type;
 		this.isDebug = isDebug;
-		tests = [];
-		index = 0;
 		className = Type.getClassName(type);
-		
 		beforeClass = nullFunc;
 		afterClass = nullFunc;
 		before = nullFunc;
 		after = nullFunc;
-		
 		parse(type);
 	}
 	
@@ -161,51 +157,38 @@ class TestClassHelper {
 	 * 
 	 * @return	true if there is one or more tests available, false if not.
 	 */
-	public function hasNext():Bool
-	{
-		return index < tests.length;
-	}
+	public function hasNext():Bool return index < tests.length;
 	
 	/**
 	 * Returns the next test in the iterable list of tests.
 	 * 
 	 * @return	if another test is available it's returned, otherwise returns null
 	 */
-	public function next():Dynamic
-	{
-		return hasNext() ? tests[index++] : null;
-	}
+	public function next():TestCaseData return hasNext() ? tests[index++] : null;
 	
 	/**
 	 * Get the current test in the iterable list of tests.
 	 * 
 	 * @return	current test in the iterable list of tests
 	 */
-	public function current():Dynamic
-	{
-		return (index <= 0) ? tests[0] : tests[index - 1];
-	}
+	public function current():TestCaseData return (index <= 0) ? tests[0] : tests[index - 1];
 	
-	private function parse(type:Class<Dynamic>):Void
-	{
+	function parse(type:Class<Dynamic>) {
 		test = Type.createEmptyInstance(type);
-		
 		var inherintanceChain = getInheritanceChain(type);
 		var fieldMeta = collateFieldMeta(inherintanceChain);
 		scanForTests(fieldMeta);
 		tests.sort(sortTestsByName); // not pc as allows for possible test dependencies but useful for report consistency
 	}
 		
-	function getInheritanceChain(clazz:Class<Dynamic>):Array<Class<Dynamic>>
-	{
+	function getInheritanceChain(clazz:Class<Dynamic>):Array<Class<Dynamic>> {
 		var inherintanceChain = [clazz];
 		while ((clazz = Type.getSuperClass(clazz)) != null)
 			inherintanceChain.push(clazz);
 		return inherintanceChain;
 	}
 	
-	function collateFieldMeta(inherintanceChain:Array<Class<Dynamic>>):Dynamic
-	{
+	function collateFieldMeta(inherintanceChain:Array<Class<Dynamic>>):Dynamic {
 		var meta = {};
 		while (inherintanceChain.length > 0)
 		{
@@ -255,26 +238,20 @@ class TestClassHelper {
 		return meta;
 	}
 	
-	function scanForTests(fieldMeta:Dynamic)
-	{
+	function scanForTests(fieldMeta:Dynamic) {
 		var fieldNames = Reflect.fields(fieldMeta);
-		for (fieldName in fieldNames)
-		{
+		for(fieldName in fieldNames) {
 			var f:Dynamic = Reflect.field(test, fieldName);
-			if (Reflect.isFunction(f))
-			{
+			if(Reflect.isFunction(f)) {
 				var funcMeta:Dynamic = Reflect.field(fieldMeta, fieldName);
 				searchForMatchingTags(fieldName, f, funcMeta);
 			}
 		}
 	}
 	
-	function searchForMatchingTags(fieldName:String, func:Dynamic, funcMeta:Dynamic)
-	{
-		for (tag in META_TAGS)
-		{
-			if (Reflect.hasField(funcMeta, tag))
-			{
+	function searchForMatchingTags(fieldName:String, func:Function, funcMeta:Dynamic) {
+		for (tag in META_TAGS) {
+			if (Reflect.hasField(funcMeta, tag)) {
 				var args:Array<String> = Reflect.field(funcMeta, tag);
 				var description = (args != null) ? args[0] : "";
 				var isAsync = (args != null && description == META_PARAM_ASYNC_TEST); // deprecated support for @Test("Async")
@@ -315,7 +292,7 @@ class TestClassHelper {
 	}
 	
 	private function addTest(field:String, 
-							testFunction:Dynamic, 
+							testFunction:Function, 
 							testInstance:Dynamic, 
 							isAsync:Bool, 
 							isIgnored:Bool, 
@@ -331,18 +308,17 @@ class TestClassHelper {
 		tests.push(data);
 	}
 	
-	private function sortTestsByName(x:TestCaseData, y:TestCaseData):Int
-	{
+	private function sortTestsByName(x:TestCaseData, y:TestCaseData):Int {
 		if (x.result.name == y.result.name) return 0;
 		if (x.result.name > y.result.name) return 1;
 		return -1;
 	}
 
-	function nullFunc() {}
+	public static function nullFunc() {}
 }
 
 typedef TestCaseData = {
-	var test:Dynamic;
+	var test:Function;
 	var scope:Dynamic;
 	var result:TestResult;
 }

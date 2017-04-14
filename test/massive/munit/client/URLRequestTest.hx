@@ -40,7 +40,7 @@ class URLRequestTest
 		var url = "http://www.example.org";
 		instance = new URLRequest(url);
 		Assert.isNotNull(instance.client);
-		#if (js || neko || cpp || java)
+		#if (js || neko || cpp || java || hl)
 		Assert.areEqual(url, instance.client.url);
 		#elseif flash
 		#end

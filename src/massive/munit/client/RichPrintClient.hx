@@ -275,23 +275,16 @@ class RichPrintClient extends PrintClientBase
 		var t = traces[traces.length-1];
 		external.trace(t);
 	}
-	
-	////// PRINT APIS //////
 
 	override public function print(value:Dynamic)
 	{
 		super.print(value);
 
 		#if (js || flash)
-			//external.queue(ExternalPrintClientJS.PRINT, value);
-			return;
-		#elseif (neko || cpp || php || java)
-			Sys.print(value);
+		//external.queue(ExternalPrintClientJS.PRINT, value);
+		return;
+		#elseif (neko || cpp || php || java || hl)
+		Sys.print(value);
 		#end
-	}
-
-	override public function printLine(value:Dynamic, ?indent:Int = 0)
-	{
-		super.printLine(value, indent);
 	}
 }

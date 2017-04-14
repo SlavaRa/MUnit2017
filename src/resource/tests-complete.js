@@ -8,7 +8,7 @@ function $extend(from, fields) {
 }
 var BrowserTestsCompleteReporter = $hx_exports["BrowserTestsCompleteReporter"] = function() {
 };
-BrowserTestsCompleteReporter.__name__ = true;
+BrowserTestsCompleteReporter.__name__ = ["BrowserTestsCompleteReporter"];
 BrowserTestsCompleteReporter.main = function() {
 };
 BrowserTestsCompleteReporter.sendReport = function(onData,onError) {
@@ -26,7 +26,7 @@ BrowserTestsCompleteReporter.prototype = {
 var EReg = function(r,opt) {
 	this.r = new RegExp(r,opt.split("u").join(""));
 };
-EReg.__name__ = true;
+EReg.__name__ = ["EReg"];
 EReg.prototype = {
 	match: function(s) {
 		if(this.r.global) {
@@ -39,7 +39,7 @@ EReg.prototype = {
 	,__class__: EReg
 };
 var Lambda = function() { };
-Lambda.__name__ = true;
+Lambda.__name__ = ["Lambda"];
 Lambda.exists = function(it,f) {
 	var x = it.iterator();
 	while(x.hasNext()) {
@@ -64,7 +64,7 @@ Lambda.filter = function(it,f) {
 var List = function() {
 	this.length = 0;
 };
-List.__name__ = true;
+List.__name__ = ["List"];
 List.prototype = {
 	add: function(item) {
 		var x = new _$List_ListNode(item,null);
@@ -93,14 +93,14 @@ var _$List_ListNode = function(item,next) {
 	this.item = item;
 	this.next = next;
 };
-_$List_ListNode.__name__ = true;
+_$List_ListNode.__name__ = ["_List","ListNode"];
 _$List_ListNode.prototype = {
 	__class__: _$List_ListNode
 };
 var _$List_ListIterator = function(head) {
 	this.head = head;
 };
-_$List_ListIterator.__name__ = true;
+_$List_ListIterator.__name__ = ["_List","ListIterator"];
 _$List_ListIterator.prototype = {
 	hasNext: function() {
 		return this.head != null;
@@ -112,14 +112,23 @@ _$List_ListIterator.prototype = {
 	}
 	,__class__: _$List_ListIterator
 };
-Math.__name__ = true;
+Math.__name__ = ["Math"];
 var Std = function() { };
-Std.__name__ = true;
+Std.__name__ = ["Std"];
 Std.string = function(s) {
 	return js_Boot.__string_rec(s,"");
 };
+var Type = function() { };
+Type.__name__ = ["Type"];
+Type.getClassName = function(c) {
+	var a = c.__name__;
+	if(a == null) {
+		return null;
+	}
+	return a.join(".");
+};
 var haxe_IMap = function() { };
-haxe_IMap.__name__ = true;
+haxe_IMap.__name__ = ["haxe","IMap"];
 var haxe_Http = function(url) {
 	this.url = url;
 	this.headers = new List();
@@ -127,7 +136,7 @@ var haxe_Http = function(url) {
 	this.async = true;
 	this.withCredentials = false;
 };
-haxe_Http.__name__ = true;
+haxe_Http.__name__ = ["haxe","Http"];
 haxe_Http.prototype = {
 	setHeader: function(header,value) {
 		this.headers = Lambda.filter(this.headers,function(h) {
@@ -268,7 +277,7 @@ haxe_Http.prototype = {
 	,__class__: haxe_Http
 };
 var haxe_ds_StringMap = function() { };
-haxe_ds_StringMap.__name__ = true;
+haxe_ds_StringMap.__name__ = ["haxe","ds","StringMap"];
 haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
 var js__$Boot_HaxeError = function(val) {
 	Error.call(this);
@@ -278,7 +287,7 @@ var js__$Boot_HaxeError = function(val) {
 		Error.captureStackTrace(this,js__$Boot_HaxeError);
 	}
 };
-js__$Boot_HaxeError.__name__ = true;
+js__$Boot_HaxeError.__name__ = ["js","_Boot","HaxeError"];
 js__$Boot_HaxeError.wrap = function(val) {
 	if((val instanceof Error)) {
 		return val;
@@ -291,7 +300,7 @@ js__$Boot_HaxeError.prototype = $extend(Error.prototype,{
 	__class__: js__$Boot_HaxeError
 });
 var js_Boot = function() { };
-js_Boot.__name__ = true;
+js_Boot.__name__ = ["js","Boot"];
 js_Boot.getClass = function(o) {
 	if((o instanceof Array) && o.__enum__ == null) {
 		return Array;
@@ -486,7 +495,7 @@ js_Boot.__resolveNativeClass = function(name) {
 	return $global[name];
 };
 var js_Browser = function() { };
-js_Browser.__name__ = true;
+js_Browser.__name__ = ["js","Browser"];
 js_Browser.createXMLHttpRequest = function() {
 	if(typeof XMLHttpRequest != "undefined") {
 		return new XMLHttpRequest();
@@ -499,29 +508,29 @@ js_Browser.createXMLHttpRequest = function() {
 var massive_haxe_Exception = function(message,info) {
 	this.message = message;
 	this.info = info;
-	this.type = massive_haxe_util_ReflectUtil.here({ fileName : "Exception.hx", lineNumber : 70, className : "massive.haxe.Exception", methodName : "new"}).className;
+	this.type = massive_haxe_util_ReflectUtil.here({ fileName : "Exception.hx", lineNumber : 67, className : "massive.haxe.Exception", methodName : "new"}).className;
 };
-massive_haxe_Exception.__name__ = true;
+massive_haxe_Exception.__name__ = ["massive","haxe","Exception"];
 massive_haxe_Exception.prototype = {
 	toString: function() {
-		var str = this.type + ": " + this.message;
+		var result = this.type + ": " + this.message;
 		if(this.info != null) {
-			str += " at " + this.info.className + "#" + this.info.methodName + " (" + this.info.lineNumber + ")";
+			result += " at " + this.info.className + "#" + this.info.methodName + " (" + this.info.lineNumber + ")";
 		}
-		return str;
+		return result;
 	}
 	,__class__: massive_haxe_Exception
 };
 var massive_haxe_util_ReflectUtil = function() { };
-massive_haxe_util_ReflectUtil.__name__ = true;
+massive_haxe_util_ReflectUtil.__name__ = ["massive","haxe","util","ReflectUtil"];
 massive_haxe_util_ReflectUtil.here = function(info) {
 	return info;
 };
 var massive_munit_MUnitException = function(message,info) {
 	massive_haxe_Exception.call(this,message,info);
-	this.type = massive_haxe_util_ReflectUtil.here({ fileName : "MUnitException.hx", lineNumber : 52, className : "massive.munit.MUnitException", methodName : "new"}).className;
+	this.type = Type.getClassName(js_Boot.getClass(this));
 };
-massive_munit_MUnitException.__name__ = true;
+massive_munit_MUnitException.__name__ = ["massive","munit","MUnitException"];
 massive_munit_MUnitException.__super__ = massive_haxe_Exception;
 massive_munit_MUnitException.prototype = $extend(massive_haxe_Exception.prototype,{
 	__class__: massive_munit_MUnitException
@@ -530,24 +539,24 @@ var massive_munit_AssertionException = function(msg,info) {
 	massive_munit_MUnitException.call(this,msg,info);
 	this.type = massive_haxe_util_ReflectUtil.here({ fileName : "AssertionException.hx", lineNumber : 50, className : "massive.munit.AssertionException", methodName : "new"}).className;
 };
-massive_munit_AssertionException.__name__ = true;
+massive_munit_AssertionException.__name__ = ["massive","munit","AssertionException"];
 massive_munit_AssertionException.__super__ = massive_munit_MUnitException;
 massive_munit_AssertionException.prototype = $extend(massive_munit_MUnitException.prototype,{
 	__class__: massive_munit_AssertionException
 });
 var massive_munit_ITestResultClient = function() { };
-massive_munit_ITestResultClient.__name__ = true;
+massive_munit_ITestResultClient.__name__ = ["massive","munit","ITestResultClient"];
 massive_munit_ITestResultClient.prototype = {
 	__class__: massive_munit_ITestResultClient
 };
 var massive_munit_IAdvancedTestResultClient = function() { };
-massive_munit_IAdvancedTestResultClient.__name__ = true;
+massive_munit_IAdvancedTestResultClient.__name__ = ["massive","munit","IAdvancedTestResultClient"];
 massive_munit_IAdvancedTestResultClient.__interfaces__ = [massive_munit_ITestResultClient];
 massive_munit_IAdvancedTestResultClient.prototype = {
 	__class__: massive_munit_IAdvancedTestResultClient
 };
 var massive_munit_ICoverageTestResultClient = function() { };
-massive_munit_ICoverageTestResultClient.__name__ = true;
+massive_munit_ICoverageTestResultClient.__name__ = ["massive","munit","ICoverageTestResultClient"];
 massive_munit_ICoverageTestResultClient.__interfaces__ = [massive_munit_IAdvancedTestResultClient];
 massive_munit_ICoverageTestResultClient.prototype = {
 	__class__: massive_munit_ICoverageTestResultClient
@@ -563,7 +572,7 @@ var massive_munit_TestResult = function() {
 	this.error = null;
 	this.failure = null;
 };
-massive_munit_TestResult.__name__ = true;
+massive_munit_TestResult.__name__ = ["massive","munit","TestResult"];
 massive_munit_TestResult.prototype = {
 	get_location: function() {
 		if(this.name == "" && this.className == "") {
@@ -612,7 +621,7 @@ var massive_munit_client_HTTPClient = function(client,url,queueRequest) {
 	this.url = url;
 	this.queueRequest = queueRequest;
 };
-massive_munit_client_HTTPClient.__name__ = true;
+massive_munit_client_HTTPClient.__name__ = ["massive","munit","client","HTTPClient"];
 massive_munit_client_HTTPClient.__interfaces__ = [massive_munit_IAdvancedTestResultClient];
 massive_munit_client_HTTPClient.dispatchNextRequest = function() {
 	if(massive_munit_client_HTTPClient.responsePending || massive_munit_client_HTTPClient.queue.length == 0) {
@@ -693,7 +702,7 @@ var massive_munit_client_URLRequest = function(url) {
 	this.createClient(url);
 	this.setHeader("Content-Type","text/plain");
 };
-massive_munit_client_URLRequest.__name__ = true;
+massive_munit_client_URLRequest.__name__ = ["massive","munit","client","URLRequest"];
 massive_munit_client_URLRequest.prototype = {
 	createClient: function(url) {
 		this.client = new haxe_Http(url);
@@ -712,8 +721,8 @@ massive_munit_client_URLRequest.prototype = {
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
 String.prototype.__class__ = String;
-String.__name__ = true;
-Array.__name__ = true;
+String.__name__ = ["String"];
+Array.__name__ = ["Array"];
 var Int = { __name__ : ["Int"]};
 var Dynamic = { __name__ : ["Dynamic"]};
 var Float = Number;

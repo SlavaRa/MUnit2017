@@ -65,17 +65,18 @@ class AsyncDelegate
 	 */
 	public var delegateHandler(default, null):Dynamic;
 	public var timeoutDelay(default, null):Int;
-	public var timedOut(default, null):Bool;
-	private var testCase:Dynamic;
-	private var handler:Dynamic;
-	private var timer:Timer;
-	public var canceled(default, null):Bool;
-	private var deferredTimer:Timer;
+	public var timedOut(default, null):Bool = false;
+	public var canceled(default, null):Bool = false;
+	var testCase:Dynamic;
+	var handler:Dynamic;
+	var timer:Timer;
+	var deferredTimer:Timer;
 
-	/* An array of values to be passed as parameters to the test class handler.
+	/**
+	 * An array of values to be passed as parameters to the test class handler.
 	 * This should be populated inside the delegateHandler when it's called.
 	 */ 
-	private var params:Array<Dynamic>;
+	var params:Array<Dynamic> = [];
 	
 	/**
 	 * Class constructor.
@@ -85,16 +86,12 @@ class AsyncDelegate
 	 * @param	?timeout			[optional] number of milliseconds to wait before timing out. Defaults to 400
 	 * @param	?info				[optional] pos infos of the test which requests an instance of this delegate
 	 */
-	public function new(testCase:Dynamic, handler:Dynamic, ?timeout:Int, ?info:PosInfos)
-	{
+	public function new(testCase:Dynamic, handler:Dynamic, ?timeout:Int, ?info:PosInfos) {
 		this.testCase = testCase;
 		this.handler = handler;
 		this.delegateHandler = Reflect.makeVarArgs(responseHandler);
 		this.info = info;
-		params = [];
-		timedOut = false;
-		canceled = false;
-		if (timeout == null || timeout <= 0) timeout = DEFAULT_TIMEOUT;
+		if(timeout == null || timeout <= 0) timeout = DEFAULT_TIMEOUT;
 		timeoutDelay = timeout;
 		timer = Timer.delay(timeoutHandler, timeoutDelay);
 	}
@@ -121,17 +118,11 @@ class AsyncDelegate
 	private function responseHandler(?params:Array<Dynamic>):Dynamic
 	{	
 		if (timedOut || canceled) return null;
-
 		timer.stop();
-	
 		if(deferredTimer != null) deferredTimer.stop();
-		
-		if (params == null) params = [];
-		this.params = params;
-		
+		this.params = params == null ? [] : params.copy();
 		// defer callback to force async runner
 		if (observer != null) Timer.delay(delayActualResponseHandler, 1);
-
 		return null;
 	}
 

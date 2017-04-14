@@ -88,6 +88,7 @@ import haxe.CallStack;
  * @see TestSuite
  */
 class TestRunner implements IAsyncDelegateObserver {
+	
     /**
      * Handler called when all tests have been executed and all clients
      * have completed processing the results.
@@ -113,8 +114,8 @@ class TestRunner implements IAsyncDelegateObserver {
 
     public var asyncFactory(default, set):AsyncFactory;
     function set_asyncFactory(value:AsyncFactory):AsyncFactory {
-        if (value == asyncFactory) return value;
-        if (running) throw new MUnitException("Can't change AsyncFactory while tests are running");
+        if(value == asyncFactory) return value;
+        if(running) throw new MUnitException("Can't change AsyncFactory while tests are running");
         value.observer = this;
         return asyncFactory = value;
     }
@@ -134,7 +135,6 @@ class TestRunner implements IAsyncDelegateObserver {
         addResultClient(resultClient);
         asyncFactory = createAsyncFactory();
         running = false;
-
         #if (testDebug || testdebug)
         isDebug = true;
         #else
@@ -149,7 +149,6 @@ class TestRunner implements IAsyncDelegateObserver {
      */
     public function addResultClient(resultClient:ITestResultClient) {
         for (client in clients) if (client == resultClient) return;
-
         resultClient.completionHandler = clientCompletionHandler;
         clients.push(resultClient);
     }
@@ -170,8 +169,7 @@ class TestRunner implements IAsyncDelegateObserver {
      * @param	testSuiteClasses
      */
     public function run(testSuiteClasses:Array<Class<TestSuite>>) {
-        if (running) return;
-
+        if(running) return;
         running = true;
         asyncPending = false;
         asyncDelegate = null;
@@ -183,22 +181,17 @@ class TestRunner implements IAsyncDelegateObserver {
         suiteIndex = 0;
         clientCompleteCount = 0;
         Assert.assertionCount = 0; // don't really like this static but can't see way around it atm. ms 17/12/10
-        emptyParams = new Array();
-        testSuites = new Array<TestSuite>();
+        emptyParams = [];
         startTime = Timer.stamp();
-
-        for (suiteType in testSuiteClasses)
-            testSuites.push(Type.createInstance(suiteType, []));
-
+        testSuites = [for(it in testSuiteClasses) Type.createInstance(it, [])];
         #if (neko || cpp || java) 
 		var self = this;
 		var runThread:Thread = Thread.create(function() {
 			self.execute();
-			while (self.running) Sys.sleep(.2);
+			while(self.running) Sys.sleep(.2);
 			var mainThead:Thread = Thread.readMessage(true);
 			mainThead.sendMessage("done");
 		});
-
 		runThread.sendMessage(Thread.current());
 		Thread.readMessage(true);
         #else
@@ -207,16 +200,19 @@ class TestRunner implements IAsyncDelegateObserver {
     }
 
     function execute() {
-        for (i in suiteIndex...testSuites.length) {
+		Sys.println('suiteIndex: ${suiteIndex}, testSuites.length: ${testSuites.length}');
+        for(i in suiteIndex...testSuites.length) {
             var suite:TestSuite = testSuites[i];
-            for (testClass in suite) {
-                if (activeHelper == null || activeHelper.type != testClass) {
+            for(testClass in suite) {
+                if(activeHelper == null || activeHelper.type != testClass) {
                     activeHelper = new TestClassHelper(testClass, isDebug);
-                    Reflect.callMethod(activeHelper.test, activeHelper.beforeClass, emptyParams);
+					if(!Reflect.compareMethods(activeHelper.beforeClass, TestClassHelper.nullFunc))
+						Reflect.callMethod(activeHelper.test, activeHelper.beforeClass, emptyParams);
                 }
                 executeTestCases();
-                if (!asyncPending) {
-                    Reflect.callMethod(activeHelper.test, activeHelper.afterClass, emptyParams);
+                if(!asyncPending) {
+					if(!Reflect.compareMethods(activeHelper.afterClass, TestClassHelper.nullFunc))
+						Reflect.callMethod(activeHelper.test, activeHelper.afterClass, emptyParams);
                 } else {
                     suite.repeat();
                     suiteIndex = i;
@@ -225,10 +221,9 @@ class TestRunner implements IAsyncDelegateObserver {
             }
             testSuites[i] = null;
         }
-
-        if (!asyncPending) {
+        if(!asyncPending) {
             var time:Float = Timer.stamp() - startTime;
-            for (client in clients) {
+            for(client in clients) {
                 if(Std.is(client, IAdvancedTestResultClient)) {
                     var cl:IAdvancedTestResultClient = cast client;
                     cl.setCurrentTestClass(null);
@@ -247,11 +242,10 @@ class TestRunner implements IAsyncDelegateObserver {
                 }
             }
         }
-        for (testCaseData in activeHelper)         {
-            if (testCaseData.result.ignore) {
+        for(testCaseData in activeHelper)         {
+            if(testCaseData.result.ignore) {
                 ignoreCount++;
-                for (c in clients)
-                    c.addIgnore(cast testCaseData.result);
+                for(c in clients) c.addIgnore(cast testCaseData.result);
             } else {
                 testCount++; // note we don't include ignored in final test count
                 Reflect.callMethod(activeHelper.test, activeHelper.before, emptyParams);
@@ -266,7 +260,7 @@ class TestRunner implements IAsyncDelegateObserver {
     function executeTestCase(testCaseData:Dynamic, async:Bool) {
         var result:TestResult = testCaseData.result;
         try {
-            if (async) {
+            if(async) {
                 Reflect.callMethod(testCaseData.scope, testCaseData.test, [asyncFactory]);
                 if(asyncDelegate == null) throw new MissingAsyncDelegateException("No AsyncDelegate was created in async test at " + result.location, null);
                 asyncPending = true;
@@ -275,46 +269,36 @@ class TestRunner implements IAsyncDelegateObserver {
                 result.passed = true;
                 result.executionTime = Timer.stamp() - testStartTime;
                 passCount++;
-                for (c in clients)
-                    c.addPass(result);
+                for(c in clients) c.addPass(result);
             }
         } catch(e:Dynamic) {
             if(async && asyncDelegate != null) {
                 asyncDelegate.cancelTest();
                 asyncDelegate = null;
             }
-
 			#if hamcrest
-			if (Std.is(e, org.hamcrest.AssertionException))
-				e = new AssertionException(e.message, e.info);
+			if(Std.is(e, org.hamcrest.AssertionException)) e = new AssertionException(e.message, e.info);
 			#end
-
             if (Std.is(e, AssertionException)) {
                 result.executionTime = Timer.stamp() - testStartTime;
                 result.failure = e;
                 failCount++;
-                for (c in clients)
-                    c.addFail(result);
+                for(c in clients) c.addFail(result);
             } else {
                 result.executionTime = Timer.stamp() - testStartTime;
-                if (!Std.is(e, MUnitException))
-                    e = new UnhandledException(e, result.location);
-
+                if(!Std.is(e, MUnitException)) e = new UnhandledException(e, result.location);
                 result.error = e;
                 errorCount++;
-                for (c in clients)
-                    c.addError(result);
+                for(c in clients) c.addError(result);
             }
 
         }
     }
 
     function clientCompletionHandler(resultClient:ITestResultClient) {
-        if (++clientCompleteCount == clients.length) {
-            if (completionHandler != null) {
-                var successful:Bool = (passCount == testCount);
-                var handler:Dynamic = completionHandler;
-                Timer.delay(function() { handler(successful); }, 10);
+        if(++clientCompleteCount == clients.length) {
+            if(completionHandler != null) {
+				Timer.delay(completionHandler.bind(passCount == testCount), 10);
             }
             running = false;
         }

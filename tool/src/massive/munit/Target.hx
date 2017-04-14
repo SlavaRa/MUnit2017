@@ -1,5 +1,4 @@
 package massive.munit;
-
 import haxe.ds.StringMap;
 import massive.sys.io.File;
 
@@ -35,4 +34,5 @@ abstract TargetType(String) from String to String {
 	var neko = "neko";
 	var cpp = "cpp";
 	var java = "java";
+	var hl = "hl";
 }

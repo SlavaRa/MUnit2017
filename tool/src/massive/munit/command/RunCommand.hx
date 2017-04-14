@@ -47,8 +47,7 @@ import sys.net.Socket;
  */
 typedef SysFile = sys.io.File;
 
-class RunCommand extends MUnitTargetCommandBase
-{
+class RunCommand extends MUnitTargetCommandBase {
 	public static inline var DEFAULT_SERVER_TIMEOUT_SEC:Int = 30;
 
 	var browser:String;
@@ -64,20 +63,20 @@ class RunCommand extends MUnitTargetCommandBase
 	var hasNekoTests:Bool;
 	var hasCPPTests:Bool;
 	var hasJavaTests:Bool;
+	var hasHashLinkTests:Bool;
 	var nekoFile:File;
 	var cppFile:File;
 	var javaFile:File;
+	var hlFile:File;
 	var serverTimeoutTimeSec:Int;
 	var resultExitCode:Bool;
 
-	public function new()
-	{
+	public function new() {
 		super();
 		killBrowser = false;
 	}
 
-	override public function initialise()
-	{
+	override public function initialise() {
 		initialiseTargets(false);
 		locateBinDir();
 		gatherTestRunnerFiles();
@@ -144,6 +143,7 @@ class RunCommand extends MUnitTargetCommandBase
 					case neko: hasNekoTests = true;
 					case cpp: hasCPPTests = true;
 					case java: hasJavaTests = true;
+					case hl: hasHashLinkTests = true;
 					default:
 				}
 			}
@@ -227,12 +227,9 @@ class RunCommand extends MUnitTargetCommandBase
 	function generateTestRunnerPages()
 	{
 		var pageNames = [];
-		for (target in targets)
-		{
+		for (target in targets) {
 			var file = target.file;
-
-			switch(target.type)
-			{
+			switch(target.type) {
 				case neko:
 					hasNekoTests = true;
 					nekoFile = file;
@@ -242,16 +239,15 @@ class RunCommand extends MUnitTargetCommandBase
 				case java:
 					hasJavaTests = true;
 					javaFile = file;
+				case hl:
+					hasHashLinkTests = true;
+					hlFile = file;
 				default:
-
 					hasBrowserTests = true;
-
 					var pageName = Std.string(target.type);
 					var templateName = file.extension + "_runner-html";
 					var pageContent = getTemplateContent(templateName, {runnerName:file.fileName});
-					
 					var runnerPage = reportRunnerDir.resolvePath(pageName + ".html");
-
 					runnerPage.writeString(pageContent);
 					pageNames.push(pageName);
 			}
@@ -300,7 +296,6 @@ class RunCommand extends MUnitTargetCommandBase
 	 */
 	function getTemplateContent(templateName:String, properties:Dynamic)
 	{
-		var content:String = null;
 		var resource:String;
 		if (config.templates != null && config.templates.resolveFile(templateName + ".mtt").exists)
 		{
@@ -332,8 +327,6 @@ class RunCommand extends MUnitTargetCommandBase
 
 		var serverFile:File = createServerAlias();
 
-		var serverExitCode:Int = 0;
-
 		tmpDir = File.current.resolveDirectory("tmp");
 
 		if (tmpDir.exists)
@@ -357,52 +350,30 @@ class RunCommand extends MUnitTargetCommandBase
 		{
 			error("Unable to launch nekotools server. Please kill existing process and try again.", 1);
 		}
-		
 		var serverMonitor = Thread.create(readServerOutput);
 		serverMonitor.sendMessage(serverProcess);
-		
 		var resultMonitor = Thread.create(monitorResults);
 		resultMonitor.sendMessage(Thread.current());
 		resultMonitor.sendMessage(serverProcess);
 		resultMonitor.sendMessage(serverTimeoutTimeSec);
-		
-		if (hasNekoTests)
-			launchNeko(nekoFile);
-
-		if (hasCPPTests)
-			launchCPP(cppFile);
-
-		if (hasJavaTests)
-			launchJava(javaFile);
-		
-		if (hasBrowserTests)
-			launchFile(indexPage);
-		else
-			resultMonitor.sendMessage("quit");
-
+		if (hasNekoTests) launchNeko(nekoFile);
+		if (hasCPPTests) launchCPP(cppFile);
+		if (hasJavaTests) launchJava(javaFile);
+		if (hasHashLinkTests) launchHashLink(hlFile);
+		if (hasBrowserTests) launchFile(indexPage);
+		else resultMonitor.sendMessage("quit");
 		var platformResults:Bool = Thread.readMessage(true);
-
 		serverProcess.kill();
-
-		if (reportTestDir.exists)
-			reportTestDir.deleteDirectoryContents();
-		
-		if (!FileSys.isWindows)
-		{
-			serverFile.deleteFile();
-		}
-
+		if (reportTestDir.exists) reportTestDir.deleteDirectoryContents();
+		if (!FileSys.isWindows) serverFile.deleteFile();
 		tmpRunnerDir.deleteDirectory();
 		tmpDir.copyTo(reportTestDir);
 		tmpDir.deleteDirectory(true);
 		FileSys.setCwd(console.dir.nativePath);
-
-		if (!platformResults && resultExitCode)
-		{
+		if (!platformResults && resultExitCode) {
 			//print("TESTS FAILED");
 			Sys.stderr().writeString("TESTS FAILED\n");
 			Sys.stderr().flush();
-			
 			exit(1);
 		}
 	}
@@ -426,31 +397,25 @@ class RunCommand extends MUnitTargetCommandBase
 	{
 		// just consume server output
 		var serverProcess:Process = Thread.readMessage(true);
-		try
-		{
-			while (true)
-			{
+		try {
+			while (true) {
 				serverProcess.stdout.readLine();
 			}
 		}
 		catch (e:haxe.io.Eof) {}
 	}
 
-	function monitorResults()
-	{
+	function monitorResults() {
 		var mainThread = Thread.readMessage(true);
 		var serverProcess = Thread.readMessage(true);
 		var serverTimeoutTimeSec = Thread.readMessage(true);
-		var testRunCount = 0;
 		var testPassCount = 0;
 		var testFailCount = 0;
 		var testErrorCount = 0;
-
 		var startTime = Sys.time();
 		var lastResultTime = startTime;
 		var serverHung = false;
-
-		if (serverTimeoutTimeSec == null || serverTimeoutTimeSec < 10)
+		if(serverTimeoutTimeSec == null || serverTimeoutTimeSec < 10)
 			serverTimeoutTimeSec = DEFAULT_SERVER_TIMEOUT_SEC;
 
 		// Note: Tried using FileSystem.stat mod date to see changes in results.txt but
@@ -459,174 +424,107 @@ class RunCommand extends MUnitTargetCommandBase
 		var file = null;
 		var lineCount = 0;
 		var platformMap = new StringMap<Bool>();
-		do
-		{
-			if ((Sys.time() - lastResultTime) > serverTimeoutTimeSec)
-			{
+		do {
+			if((Sys.time() - lastResultTime) > serverTimeoutTimeSec) {
 				serverHung = true;
 				break;
 			}
-			if (Thread.readMessage(false) == "quit")
-				break;
-
-			if (!FileSystem.exists(fileName))
-				continue;
-
-			if (file == null)
-				file = tmpDir.resolvePath("results.txt");
-
+			if(Thread.readMessage(false) == "quit") break;
+			if(!FileSystem.exists(fileName)) continue;
+			if(file == null) file = tmpDir.resolvePath("results.txt");
 			var contents = "";
 			try {
 				contents = file.readString();
-			}
-			catch (e:Dynamic) {
+			} catch(e:Dynamic) {
 				Sys.sleep(0.1);
 				continue;
 			}
-
 			var lines = contents.split("\n");
 			lines.pop();
-
-			if (lines.length > lineCount)
-			{
+			if(lines.length > lineCount) {
 				var i = lineCount;
 				lineCount = lines.length;
-
-				if ( i < lineCount)
-					lastResultTime = Sys.time();
-
-				while (i < lineCount)
-				{
+				if(i < lineCount) lastResultTime = Sys.time();
+				while(i < lineCount) {
 					var line = lines[i++];
-
-					if (line != ServerMain.END)
-					{
-						if (checkIfTestPassed(line))
-							testPassCount++;
-						else if (checkIfTestFailed(line))
-							testFailCount++;
-						else
-							testErrorCount++;
-
+					if(line != ServerMain.END) {
+						if(checkIfTestPassed(line)) testPassCount++;
+						else if(checkIfTestFailed(line)) testFailCount++;
+						else testErrorCount++;
 						var parts = line.split("under ");
-						if (parts.length > 1)
-						{
+						if(parts.length > 1) {
 							var platform = parts[1].split(" ")[0];
 							platformMap.set(platform, true);
-
 							print(line);
 						}
 					}
 				}
-
-				if (lines[lineCount - 1] == ServerMain.END)
-				{
+				if(lines[lineCount - 1] == ServerMain.END) {
 					lineCount--;
 					break;
 				}
 			}
-		}
-		while (true);
-
+		} while(true);
 		var platformCount = Lambda.count(platformMap);
-
-
-		if (platformCount > 0)
-		{
+		if (platformCount > 0) {
 			print("------------------------------");
 			print("PLATFORMS TESTED: " + platformCount + ", PASSED: " + testPassCount + ", FAILED: " + testFailCount + ", ERRORS: " + testErrorCount + ", TIME: " + MathUtil.round(Sys.time() - startTime, 5));
 		}
-
-		if (serverHung)
-		{
+		if (serverHung) {
 			print("------------------------------");
 			print("ERROR: Local results server appeared to hang so test reporting was cancelled.");
 		}
-		
 		var platformResult:Bool = platformCount > 0 && testFailCount == 0 && testErrorCount == 0 && !serverHung;
-
 		mainThread.sendMessage(platformResult);
 	}
 
-	function getTargetName(result:String):String
-	{
-		return result.split("under ")[1].split(" using")[0];
-	}
+	function getTargetName(result:String):String return result.split("under ")[1].split(" using")[0];
 
-	function checkIfTestPassed(result:String):Bool
-	{
-		return result.indexOf(ServerMain.PASSED) != -1;
-	}
+	function checkIfTestPassed(result:String):Bool return result.indexOf(ServerMain.PASSED) != -1;
 
-	function checkIfTestFailed(result:String):Bool
-	{
-		return result.indexOf(ServerMain.FAILED) != -1;
-	}
+	function checkIfTestFailed(result:String):Bool return result.indexOf(ServerMain.FAILED) != -1;
 
-	function launchFile(file:File):Int
-	{
+	function launchFile(file:File):Int {
 		var targetLocation:String  = HTTPClient.DEFAULT_SERVER_URL + "/tmp/runner/" + file.fileName;
 		var parameters:Array<String> = [];
-
 		// See http://www.dwheeler.com/essays/open-files-urls.html
-		if (FileSys.isWindows)
-		{
+		if (FileSys.isWindows) {
 			parameters.push("start");
-			if (browser != null)
-			{
-				if (browser.substr(0, 12) == "flashdevelop") 
-				{
-					return sendFlashDevelopCommand(browser, "Browse", targetLocation);
-				}
+			if (browser != null) {
+				if (browser.substr(0, 12) == "flashdevelop") return sendFlashDevelopCommand(browser, "Browse", targetLocation);
 				parameters.push(browser);
 			}
-		}
-		else if (FileSys.isMac)
-		{
+		} else if (FileSys.isMac) {
 			parameters.push("open");
-			if (browser != null)
-				parameters.push("-a " + browser);
+			if (browser != null) parameters.push("-a " + browser);
+		} else if (FileSys.isLinux) {
+			if (browser != null) parameters.push(browser);
+			else parameters.push("xdg-open");
 		}
-		else if (FileSys.isLinux)
-		{
-			if (browser != null)
-				parameters.push(browser);
-			else 
-				parameters.push("xdg-open");
-		}
-
 		parameters.push(targetLocation);
-
 		var exitCode:Int = Sys.command(parameters.join(" "));
-		
-		if (exitCode > 0)
-			error("Error running " + targetLocation, exitCode);
-  
+		if (exitCode > 0) error("Error running " + targetLocation, exitCode);
 		return exitCode;
 	}
 	
-	function sendFlashDevelopCommand(args:String, cmd:String, data:String) 
-	{
+	function sendFlashDevelopCommand(args:String, cmd:String, data:String)  {
 		var port = 1978;
 		var parts = args.split(':');
 		if (parts.length > 1) port = Std.parseInt(parts[1]);
-		
 		try {
 			var conn = new Socket();
 			conn.connect(new Host("localhost"), port);
 			conn.write('<flashconnect><message cmd="call" command="' + cmd + '">' + data + '</message></flashconnect>');
 			conn.output.writeByte(0);
 			conn.close(); 
-		}
-		catch (ex:Dynamic) {
+		} catch (ex:Dynamic) {
 			print("ERROR: Failed to connect to FlashDevelop socket server");
 			return 1;
 		}
 		return 0;
 	}
 
-	function launchNeko(file:File):Int
-	{
+	function launchNeko(file:File):Int {
 		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
 		file.copyTo(reportRunnerFile);
 		FileSys.setCwd(config.dir.nativePath);
@@ -636,8 +534,7 @@ class RunCommand extends MUnitTargetCommandBase
 		return exitCode;
 	}
 	
-	function launchCPP(file:File):Int
-	{
+	function launchCPP(file:File):Int {
 		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
 		file.copyTo(reportRunnerFile);
 		FileSys.setCwd(config.dir.nativePath);
@@ -647,8 +544,7 @@ class RunCommand extends MUnitTargetCommandBase
 		return exitCode;
 	}
 	
-	function launchJava(file:File):Int
-	{
+	function launchJava(file:File):Int {
 		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
 		file.copyTo(reportRunnerFile);
 		FileSys.setCwd(config.dir.nativePath);
@@ -658,8 +554,17 @@ class RunCommand extends MUnitTargetCommandBase
 		return exitCode;
 	}
 	
-	function runProgram(name:String, ?args:Array<String>)
-	{
+	function launchHashLink(file:File):Int {
+		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
+		file.copyTo(reportRunnerFile);
+		FileSys.setCwd(config.dir.nativePath);
+		var exitCode = runProgram('hl', [reportRunnerFile.nativePath]);
+		FileSys.setCwd(console.originalDir.nativePath);
+		if (exitCode > 0) error('Error ($exitCode) running $file', exitCode);
+		return exitCode;
+	}
+	
+	function runProgram(name:String, ?args:Array<String>) {
 		var process = new Process(name, args);
 
 		try

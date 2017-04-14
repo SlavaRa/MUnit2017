@@ -43,7 +43,7 @@ class Config {
 	public var classPaths:Array<File>;
 	public var targets:Array<Target> = [];
 	public var targetTypes:Array<TargetType>;
-	public var defaultTargetTypes:Array<TargetType> = [TargetType.as3, TargetType.js, TargetType.neko, TargetType.cpp, TargetType.java];
+	public var defaultTargetTypes:Array<TargetType> = [TargetType.as3, TargetType.js, TargetType.neko, TargetType.cpp, TargetType.java, TargetType.hl];
 	public var coveragePackages:Array<String>;
 	public var coverageIgnoredClasses:Array<String>;
 	var configFile:File;
@@ -63,7 +63,7 @@ class Config {
 	}
 
 	private function parseConfig(string:String) {
-		var lines:Array<String>  = string.split("\n");
+		var lines:Array<String> = string.split("\n");
 		for(line in lines) {
 			line = StringTools.trim(line);
 			if(line.length == 0 || line.substr(0,1) == "#") continue;

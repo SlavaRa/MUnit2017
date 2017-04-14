@@ -31,28 +31,16 @@ class MUnitTargetCommandBase extends MUnitCommand
 		targets = config.targets;	
 	}
 
-	function getTargetsFromConsole():Array<TargetType>
-	{
-		var targetTypes = new Array();
-		if (console.getOption("swf") == "true")
-		{
-			targetTypes.push(TargetType.as3);
-		}
-		else
-		{
-			if (console.getOption(TargetType.as3) == "true")
-				targetTypes.push(TargetType.as3);
-		}
-		if (console.getOption(TargetType.js) == "true")
-			targetTypes.push(TargetType.js);
-		if (console.getOption(TargetType.neko) == "true")
-			targetTypes.push(TargetType.neko);
-		if (console.getOption(TargetType.cpp) == "true")
-			targetTypes.push(TargetType.cpp);
-		if (console.getOption(TargetType.java) == "true")
-			targetTypes.push(TargetType.java);
-
-		return targetTypes;
+	function getTargetsFromConsole():Array<TargetType> {
+		var result = [];
+		if (console.getOption("swf") == "true") result.push(TargetType.as3);
+		else if (console.getOption(TargetType.as3) == "true") result.push(TargetType.as3);
+		if (console.getOption(TargetType.js) == "true") result.push(TargetType.js);
+		if (console.getOption(TargetType.neko) == "true") result.push(TargetType.neko);
+		if (console.getOption(TargetType.cpp) == "true") result.push(TargetType.cpp);
+		if (console.getOption(TargetType.java) == "true") result.push(TargetType.java);
+		if (console.getOption(TargetType.hl) == "true") result.push(TargetType.hl);
+		return result;
 	}
 
 	/**
@@ -215,30 +203,17 @@ class MUnitTargetCommandBase extends MUnitCommand
 		return targets;
 	}
 
-	function updateHxmlOutput(target:Target)
-	{
-		var output:String = null;
-
-		switch(target.type)
-		{
-			case as3: output = "-swf";
-			default: output = "-" + Std.string(target.type);
+	function updateHxmlOutput(target:Target) {
+		var output:String =  switch(target.type) {
+			case as3: "-swf";
+			default: "-" + Std.string(target.type);
 		}
-
 		var file = config.dir.getRelativePath(target.file);
-
 		switch (target.type) {
 			case cpp:
 				var executablePath = target.main.name;
-		
-				if(target.debug)
-				{
-					executablePath += "-debug";
-				}
-		
-				if (FileSys.isWindows)
-					executablePath += ".exe";
-		
+				if(target.debug) executablePath += "-debug";
+				if (FileSys.isWindows) executablePath += ".exe";
 				target.executableFile = target.file.resolveFile(executablePath);
 			case java:
 				var executablePath = target.main.name;
@@ -247,9 +222,7 @@ class MUnitTargetCommandBase extends MUnitCommand
 				target.executableFile = target.file.resolveFile(executablePath);
 			default: target.executableFile = target.file;
 		}
-
 		output += " " + file;
-
 		target.hxml += output + "\n";
 	}
 
