@@ -309,13 +309,13 @@ class TestRunner implements IAsyncDelegateObserver {
      * @param	delegate		delegate which received the successful callback
      */
     public function asyncResponseHandler(delegate:AsyncDelegate) {
-        var testCaseData:Dynamic = activeHelper.current();
+        var testCaseData = activeHelper.current();
         testCaseData.test = delegate.runTest;
         testCaseData.scope = delegate;
         asyncPending = false;
         asyncDelegate = null;
         executeTestCase(testCaseData, false);
-        Reflect.callMethod(activeHelper.test, activeHelper.after, emptyParams);
+        activeHelper.after();
         execute();
     }
 
