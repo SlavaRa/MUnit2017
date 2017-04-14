@@ -10,6 +10,7 @@
 -cmd haxelib run munit test -coverage
 -cmd cd ..
 -cmd echo run core tests
--cmd haxelib run munit test -coverage
+#-cmd haxelib run munit test -coverage
+-cmd haxelib run munit test
 #-cmd echo package up and install over current version
 #-cmd haxelib run mlib install
