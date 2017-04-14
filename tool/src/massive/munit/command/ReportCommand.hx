@@ -1,11 +1,11 @@
 package massive.munit.command;
 
-import massive.munit.report.ReportType;
-import massive.munit.report.ReportFormatter;
-import massive.munit.Config;
-import massive.munit.Target;
-import massive.sys.io.File;
 import massive.haxe.log.Log;
+import massive.munit.Target.TargetType;
+import massive.munit.report.ReportFormatter;
+import massive.munit.report.ReportType;
+import massive.munit.report.TeamCityReportFormatter;
+import massive.sys.io.File;
 
 /**
 The ReportCommand converts raw report data into a specific format for a 3rd party tool or CI platform
@@ -63,11 +63,11 @@ class ReportCommand extends MUnitTargetCommandBase
 					{
 						switch(reg.matched(1))
 						{
-							case "js": targetTypes.push(TargetType.js);
-							case "as3": targetTypes.push(TargetType.as3);
-							case "neko": targetTypes.push(TargetType.neko);
-							case "cpp": targetTypes.push(TargetType.cpp);
-							case "java": targetTypes.push(TargetType.java);
+							case TargetType.js: targetTypes.push(TargetType.js);
+							case TargetType.as3: targetTypes.push(TargetType.as3);
+							case TargetType.neko: targetTypes.push(TargetType.neko);
+							case TargetType.cpp: targetTypes.push(TargetType.cpp);
+							case TargetType.java: targetTypes.push(TargetType.java);
 						}
 					}
 				}

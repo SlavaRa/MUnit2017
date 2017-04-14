@@ -29,11 +29,9 @@
 package massive.munit.client;
 
 import haxe.Http;
+import haxe.ds.StringMap;
 import massive.munit.ITestResultClient;
 import massive.munit.TestResult;
-import massive.munit.util.Timer;
-
-import haxe.ds.StringMap;
 
 /**
  * Decorates other ITestResultClient's, adding behavior to post test results to a specified url.
@@ -71,13 +69,13 @@ class HTTPClient implements IAdvancedTestResultClient
 	 * Handler which if present, is called when the client has completed sending the test results to the specificied url. 
 	 * This will be called once an HTTP response has been recieved.
 	 */
-	@:isVar public var completionHandler(get, set):ITestResultClient -> Void;
+	@:isVar public var completionHandler(get, set):ITestResultClient->Void;
 	
-	private function get_completionHandler():ITestResultClient -> Void 
+	private function get_completionHandler():ITestResultClient->Void 
 	{
 		return completionHandler;
 	}
-	private function set_completionHandler(value:ITestResultClient -> Void):ITestResultClient -> Void
+	private function set_completionHandler(value:ITestResultClient->Void):ITestResultClient->Void
 	{
 		return completionHandler = value;
 	}
@@ -120,40 +118,28 @@ class HTTPClient implements IAdvancedTestResultClient
 	 *  
 	 * @param	result			a passed test result
 	 */
-	public function addPass(result:TestResult):Void
-	{
-		client.addPass(result);
-	}
+	public function addPass(result:TestResult):Void client.addPass(result);
 
 	/**
 	 * Called when a test fails.
 	 *  
 	 * @param	result			a failed test result
 	 */
-	public function addFail(result:TestResult):Void
-	{
-		client.addFail(result);
-	}
+	public function addFail(result:TestResult):Void client.addFail(result);
 
 	/**
 	 * Called when a test triggers an unexpected exception.
 	 *  
 	 * @param	result			an erroneous test result
 	 */
-	public function addError(result:TestResult):Void
-	{
-		client.addError(result);
-	}
+	public function addError(result:TestResult):Void client.addError(result);
 	
 	/**
 	 * Called when a test has been ignored.
 	 *
 	 * @param	result			an ignored test
 	 */
-	public function addIgnore(result:TestResult):Void
-	{
-		client.addIgnore(result);	
-	}
+	public function addIgnore(result:TestResult):Void client.addIgnore(result);	
 
 	/**
 	 * Called when all tests are complete.
@@ -200,8 +186,7 @@ class HTTPClient implements IAdvancedTestResultClient
 		#elseif neko return "neko";
 		#elseif cpp return "cpp";
 		#elseif php return "php";
-		#elseif java
-		return "java";
+		#elseif java return "java";
 		#end
 		return "unknown";
 	}
@@ -244,8 +229,8 @@ class HTTPClient implements IAdvancedTestResultClient
 
 class URLRequest
 {
-	public var onData:Dynamic -> Void;
-	public var onError:Dynamic ->Void;
+	public var onData:Dynamic->Void;
+	public var onError:Dynamic->Void;
 	public var data:Dynamic;
 
 	var url:String;

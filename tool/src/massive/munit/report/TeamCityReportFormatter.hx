@@ -1,10 +1,11 @@
 package massive.munit.report;
 
-import massive.sys.io.File;
-import massive.munit.report.ReportFormatter;
-import massive.munit.report.ReportType;
-
 import haxe.ds.StringMap;
+import massive.munit.report.ReportFormatter.CoverageStatistics;
+import massive.munit.report.ReportFormatter.ReportFormatterBase;
+import massive.munit.report.ReportType;
+import massive.sys.io.File;
+
 
 /**
 Converts result summary data into the teamcity-info.xml format.

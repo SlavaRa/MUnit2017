@@ -1,10 +1,9 @@
 package massive.munit.command;
 
 import haxe.io.Path;
+import massive.munit.Target;
 import massive.sys.io.File;
 import massive.sys.io.FileSys;
-import massive.munit.Config;
-import massive.munit.Target;
 
 class MUnitTargetCommandBase extends MUnitCommand
 {
@@ -41,16 +40,16 @@ class MUnitTargetCommandBase extends MUnitCommand
 		}
 		else
 		{
-			if (console.getOption("as3") == "true")
+			if (console.getOption(TargetType.as3) == "true")
 				targetTypes.push(TargetType.as3);
 		}
-		if (console.getOption("js") == "true")
+		if (console.getOption(TargetType.js) == "true")
 			targetTypes.push(TargetType.js);
-		if (console.getOption("neko") == "true")
+		if (console.getOption(TargetType.neko) == "true")
 			targetTypes.push(TargetType.neko);
-		if (console.getOption("cpp") == "true")
+		if (console.getOption(TargetType.cpp) == "true")
 			targetTypes.push(TargetType.cpp);
-		if (console.getOption("java") == "true")
+		if (console.getOption(TargetType.java) == "true")
 			targetTypes.push(TargetType.java);
 
 		return targetTypes;

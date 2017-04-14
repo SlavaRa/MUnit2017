@@ -27,9 +27,8 @@
  */
 package massive.munit.command;
 
-import massive.sys.io.File;
-import massive.sys.io.FileSys;
 import massive.haxe.util.TemplateUtil;
+import massive.sys.io.File;
 
 /**
 The ConfigCommand provides a number of ways to create and modify the configuration file (.munit) for a project.

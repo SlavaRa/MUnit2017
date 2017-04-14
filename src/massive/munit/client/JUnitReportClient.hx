@@ -55,13 +55,13 @@ class JUnitReportClient implements IAdvancedTestResultClient
 	/**
 	 * Handler which if present, is called when the client has completed generating its results.
 	 */
-	@:isVar public var completionHandler(get, set):ITestResultClient -> Void;
+	@:isVar public var completionHandler(get, set):ITestResultClient->Void;
 	
-	private function get_completionHandler():ITestResultClient -> Void 
+	private function get_completionHandler():ITestResultClient->Void 
 	{
 		return completionHandler;
 	}
-	private function set_completionHandler(value:ITestResultClient -> Void):ITestResultClient -> Void
+	private function set_completionHandler(value:ITestResultClient->Void):ITestResultClient->Void
 	{
 		return completionHandler = value;
 	}
@@ -74,7 +74,6 @@ class JUnitReportClient implements IAdvancedTestResultClient
 	 * </p>
 	 */
 	public var newline:String;
-	
 	private var xml:StringBuf;
 	private var testSuiteXML:StringBuf;
 	private var currentTestClass:String;
@@ -96,7 +95,6 @@ class JUnitReportClient implements IAdvancedTestResultClient
 		xml.add("<testsuites>" + newline);
 	}
 	
-
 	/**
 	* Classed when test class changes
 	*
@@ -121,7 +119,6 @@ class JUnitReportClient implements IAdvancedTestResultClient
 	public function addPass(result:TestResult):Void
 	{
 		suitePassCount++;
-		
 		testSuiteXML.add("<testcase classname=\"" + result.className + "\" name=\"" + result.name + "\" time=\"" + MathUtil.round(result.executionTime, 5) + "\" />" + newline);
 	}
 	
@@ -133,7 +130,6 @@ class JUnitReportClient implements IAdvancedTestResultClient
 	public function addFail(result:TestResult):Void
 	{
 		suiteFailCount++;
-		
 		testSuiteXML.add( "<testcase classname=\"" + result.className + "\" name=\"" + result.name + "\" time=\"" + MathUtil.round(result.executionTime, 5) + "\" >" + newline);
 		testSuiteXML.add("<failure message=\"" + result.failure.message + "\" type=\"" + result.failure.type + "\">");
 		testSuiteXML.add(result.failure);
@@ -149,7 +145,6 @@ class JUnitReportClient implements IAdvancedTestResultClient
 	public function addError(result:TestResult):Void
 	{
 		suiteErrorCount++;
-
 		testSuiteXML.add("<testcase classname=\"" + result.className + "\" name=\"" + result.name + "\" time=\"" + MathUtil.round(result.executionTime, 5) + "\" >" + newline);
 		testSuiteXML.add("<error message=\"" + result.error.message + "\" type=\"" + result.error.type + "\">");
 		testSuiteXML.add(result.error);
@@ -184,7 +179,6 @@ class JUnitReportClient implements IAdvancedTestResultClient
 	 */
 	public function reportFinalStatistics(testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float):Dynamic
 	{
-
 		xml.add("</testsuites>");
 		if (completionHandler != null) completionHandler(this);
 		return xml.toString();
@@ -193,16 +187,12 @@ class JUnitReportClient implements IAdvancedTestResultClient
 	private function endTestSuite():Void
 	{
 		if (testSuiteXML == null) return;
-
 		var suiteTestCount:Int = suitePassCount + suiteFailCount + suiteErrorCount;
 		suiteExecutionTime = Timer.stamp() - suiteExecutionTime;
-
 		var header:String = "<testsuite errors=\"" + suiteErrorCount + "\" failures=\"" + suiteFailCount + "\" hostname=\"\" name=\"" + currentTestClass + "\" tests=\"" + suiteTestCount + "\" time=\"" +MathUtil.round(suiteExecutionTime, 5) + "\" timestamp=\"" + Date.now() + "\">" + newline;
 		var footer:String = "</testsuite>" + newline;
-
 		testSuiteXML.add("<system-out></system-out>" + newline);
 		testSuiteXML.add("<system-err></system-err>" + newline);
-		
 		xml.add(header);
 		xml.add(testSuiteXML.toString());
 		xml.add(footer);

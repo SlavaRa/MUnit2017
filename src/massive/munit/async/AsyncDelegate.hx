@@ -30,8 +30,8 @@
 
 package massive.munit.async;
 import haxe.PosInfos;
-
 import massive.munit.util.Timer;
+
 
 /**
  * Sits between an asynchronous test and an observer (typically the TestRunner), notifying 
@@ -64,16 +64,12 @@ class AsyncDelegate
 	 * </p>
 	 */
 	public var delegateHandler(default, null):Dynamic;
-
 	public var timeoutDelay(default, null):Int;
 	public var timedOut(default, null):Bool;
-	
 	private var testCase:Dynamic;
 	private var handler:Dynamic;
 	private var timer:Timer;
-
 	public var canceled(default, null):Bool;
-
 	private var deferredTimer:Timer;
 
 	/* An array of values to be passed as parameters to the test class handler.
@@ -130,7 +126,7 @@ class AsyncDelegate
 
 		timer.stop();
 	
-		if(deferredTimer!=null) deferredTimer.stop();
+		if(deferredTimer != null) deferredTimer.stop();
 		
 		if (params == null) params = [];
 		this.params = params;

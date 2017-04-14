@@ -93,6 +93,7 @@ class TestResult
 	public var error:Dynamic;
 
 	public var type(get_type, null):TestResultType;
+	
 	/**
 	 * Class constructor.
 	 */
@@ -115,7 +116,6 @@ class TestResult
 		if(failure != null) return FAIL;
 		if(ignore == true) return IGNORE;
 		if(passed == true) return PASS;
-
 		return UNKNOWN;
 	}
 

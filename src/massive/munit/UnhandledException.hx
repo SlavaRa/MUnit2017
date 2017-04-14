@@ -29,9 +29,8 @@
 
 
 package massive.munit;
-import haxe.PosInfos;
-import massive.haxe.util.ReflectUtil;
 import haxe.CallStack;
+import massive.haxe.util.ReflectUtil;
 
 /**
  * Exception thrown when a test triggers an exception in code which was not captured.

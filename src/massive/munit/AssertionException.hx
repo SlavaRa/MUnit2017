@@ -38,7 +38,6 @@ import massive.haxe.util.ReflectUtil;
  * @author Mike Stead
  * @see Assert
  */
-
 class AssertionException extends MUnitException
 {
 	/**

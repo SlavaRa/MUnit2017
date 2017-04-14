@@ -28,7 +28,11 @@
 
 package massive.munit;
 
+import haxe.Constraints.Function;
 import haxe.PosInfos;
+import haxe.extern.EitherType;
+
+private typedef RefType = EitherType<{}, Function>;
 
 /**
  * Used to make assertions about values in test cases.
@@ -151,7 +155,7 @@ class Assert
 	public static function areEqual<TExpected, TActual>(expected:TExpected, actual:TActual, ?info:PosInfos)
 	{
 		assertionCount++;
-		if (!equals(expected, actual)) fail("Value [" + actual +"] was not equal to expected value [" + expected + "]", info);
+		if (!equals(expected, actual)) fail("Value [" + actual + "] was not equal to expected value [" + expected + "]", info);
 	}
 	
 	/**
@@ -167,7 +171,7 @@ class Assert
 	public static function areNotEqual<TExpected, TActual>(expected:TExpected, actual:TActual, ?info:PosInfos)
 	{
 		assertionCount++;
-		if(equals(expected, actual)) fail("Value [" + actual +"] was equal to value [" + expected + "]", info);
+		if(equals(expected, actual)) fail("Value [" + actual + "] was equal to value [" + expected + "]", info);
 	}
 
 	/**
@@ -177,10 +181,10 @@ class Assert
 	 * @param	actual				actual value
 	 * @throws	AssertionException	if expected is not the same as the actual value
 	 */
-	public static function areSame<T:{}>(expected:T, actual:T, ?info:PosInfos)
+	public static function areSame<T:RefType>(expected:T, actual:T, ?info:PosInfos)
 	{
 		assertionCount++;
-		if(expected != actual) fail("Value [" + actual +"] was not the same as expected value [" + expected + "]", info);
+		if(expected != actual) fail("Value [" + actual + "] was not the same as expected value [" + expected + "]", info);
 	}
 
 	/**
@@ -190,10 +194,10 @@ class Assert
 	 * @param	actual				actual value
 	 * @throws	AssertionException	if expected is the same as the actual value
 	 */
-	public static function areNotSame<T:{}>(expected:T, actual:T, ?info:PosInfos)
+	public static function areNotSame<T:RefType>(expected:T, actual:T, ?info:PosInfos)
 	{
 		assertionCount++;
-		if(expected == actual) fail("Value [" + actual +"] was the same as expected value [" + expected + "]", info);
+		if(expected == actual) fail("Value [" + actual + "] was the same as expected value [" + expected + "]", info);
 	}
     
 	/**

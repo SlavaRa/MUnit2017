@@ -1,8 +1,8 @@
 package massive.munit;
 
+import haxe.ds.StringMap;
 import massive.sys.io.File;
 
-import haxe.ds.StringMap;
 
 class Target
 {
@@ -40,11 +40,11 @@ class Target
 	}
 }
 
-enum TargetType
-{
-	as3;
-	js;
-	neko;
-	cpp;
-	java;
+@:enum
+abstract TargetType(String) from String to String {
+	var as3 = "as3";
+	var js = "js";
+	var neko = "neko";
+	var cpp = "cpp";
+	var java = "java";
 }
