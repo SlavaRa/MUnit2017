@@ -326,15 +326,15 @@ class TestRunner implements IAsyncDelegateObserver {
      * @param	delegate		delegate whose asynchronous callback timed out
      */
     public function asyncTimeoutHandler(delegate:AsyncDelegate) {
-        var testCaseData:Dynamic = activeHelper.current();
-        var result:TestResult = testCaseData.result;
+        var testCaseData = activeHelper.current();
+        var result = testCaseData.result;
         result.executionTime = Timer.stamp() - testStartTime;
         result.error = new AsyncTimeoutException("", delegate.info);
         asyncPending = false;
         asyncDelegate = null;
         errorCount++;
         for (c in clients) c.addError(result);
-        Reflect.callMethod(activeHelper.test, activeHelper.after, emptyParams);
+        activeHelper.after();
         execute();
     }
 
