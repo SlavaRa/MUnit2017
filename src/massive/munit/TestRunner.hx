@@ -98,14 +98,14 @@ class TestRunner implements IAsyncDelegateObserver {
     public var clientCount(get, null):Int;
     function get_clientCount():Int return clients.length;
 	
-    public var running(default, null):Bool;
+    public var running(default, null):Bool = false;
     var testCount:Int;
     var failCount:Int;
     var errorCount:Int;
     var passCount:Int;
     var ignoreCount:Int;
     var clientCompleteCount:Int;
-    var clients:Array<ITestResultClient>;
+    var clients:Array<ITestResultClient> = [];
     var activeHelper:TestClassHelper;
     var testSuites:Array<TestSuite>;
     var asyncPending:Bool;
@@ -131,10 +131,8 @@ class TestRunner implements IAsyncDelegateObserver {
      * @param	resultClient	a result client to interpret test results
      */
     public function new(resultClient:ITestResultClient) {
-        clients = new Array<ITestResultClient>();
         addResultClient(resultClient);
         asyncFactory = createAsyncFactory();
-        running = false;
         #if (testDebug || testdebug)
         isDebug = true;
         #else

@@ -282,7 +282,7 @@ class TestClassHelper {
 		tests.push({test:testFunction, scope:testInstance, result:result});
 	}
 	
-	function sortTestsByName(x:TestCaseData, y:TestCaseData):Int {
+	inline function sortTestsByName(x:TestCaseData, y:TestCaseData):Int {
 		if (x.result.name == y.result.name) return 0;
 		if (x.result.name > y.result.name) return 1;
 		return -1;

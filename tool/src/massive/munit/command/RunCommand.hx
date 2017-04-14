@@ -57,7 +57,7 @@ class RunCommand extends MUnitTargetCommandBase {
 	var tmpDir:File;
 	var tmpRunnerDir:File;
 	var binDir:File;
-	var killBrowser:Bool;
+	var killBrowser:Bool = false;
 	var indexPage:File;
 	var hasBrowserTests:Bool;
 	var hasNekoTests:Bool;
@@ -71,11 +71,6 @@ class RunCommand extends MUnitTargetCommandBase {
 	var serverTimeoutTimeSec:Int;
 	var resultExitCode:Bool;
 
-	public function new() {
-		super();
-		killBrowser = false;
-	}
-
 	override public function initialise() {
 		initialiseTargets(false);
 		locateBinDir();
@@ -88,42 +83,26 @@ class RunCommand extends MUnitTargetCommandBase {
 		checkForExitOnFail();
 	}
 
-	function locateBinDir()
-	{
-		var binPath:String = console.getNextArg();
-
-		if (binPath == null)
-		{
+	function locateBinDir() {
+		var binPath = console.getNextArg();
+		if(binPath == null) {
 			binDir = config.bin;
-
-			if (binDir == null)
-				error("Default bin directory is not set. Please run munit config.");
-
-			if (!binDir.exists)
-				binDir.createDirectory();
-		}
-		else
-		{
+			if(binDir == null) error("Default bin directory is not set. Please run munit config.");
+			if(!binDir.exists) binDir.createDirectory();
+		} else {
 			binDir = File.create(binPath, console.dir);
-
-			if (!binDir.exists)
-				binDir.createDirectory();
+			if(!binDir.exists) binDir.createDirectory();
 		}
-
 		Log.debug("binPath: " + binDir);
 	}
 
-	function gatherTestRunnerFiles()
-	{
-		if (!binDir.isDirectory || !binDir.resolveDirectory(".temp").exists) return;
-		
+	function gatherTestRunnerFiles() {
+		if(!binDir.isDirectory || !binDir.resolveDirectory(".temp").exists) return;
 		var tempTargets = [];
-		for(target in targets)
-		{
+		for(target in targets) {
 			var type = target.type;
 			var tmp = binDir.resolveFile(".temp/" + type + ".txt");
-			if (!tmp.exists)
-			{
+			if(!tmp.exists) {
 				print("WARNING: Target type '" + type + "' not found in bin directory.");
 				continue;
 			}
@@ -131,15 +110,10 @@ class RunCommand extends MUnitTargetCommandBase {
 			//update as this will be the actual executable for cpp/php targets
 			target.file = File.current.resolveFile(tmp.readString());
 			
-			if (!target.file.exists)
-			{
-				print("WARNING: File for target type '" + target.type + "' not found: " + target.toString());
-			}
-			else
-			{
+			if(!target.file.exists) print("WARNING: File for target type '" + target.type + "' not found: " + target.toString());
+			else {
 				tempTargets.push(target);
-				switch(type)
-				{
+				switch(type) {
 					case neko: hasNekoTests = true;
 					case cpp: hasCPPTests = true;
 					case java: hasJavaTests = true;
@@ -148,100 +122,60 @@ class RunCommand extends MUnitTargetCommandBase {
 				}
 			}
 		}
-
 		targets = config.targets = tempTargets;
-
 		Log.debug(targets.length + " targets");
-
-		for (target in targets)
-			Log.debug("   " + target.file);
+		for(target in targets) Log.debug("   " + target.file);
 	}
 
-	function locateReportDir()
-	{
+	function locateReportDir() {
 		var reportPath:String = console.getNextArg();
-
-		if (reportPath == null)
-		{
+		if(reportPath == null) {
 			reportDir = config.report;
-
-			if (reportDir == null)
-				error("Default report directory is not set. Please run munit config.");
-			if (!reportDir.exists)
-				reportDir.createDirectory();
-		}
-		else
-		{
+			if(reportDir == null) error("Default report directory is not set. Please run munit config.");
+			if(!reportDir.exists) reportDir.createDirectory();
+		} else {
 			reportDir = File.create(reportPath, console.dir);
-
-			if (!reportDir.exists)
-				reportDir.createDirectory();
+			if(!reportDir.exists) reportDir.createDirectory();
 		}
-
 		Log.debug("report: " + reportDir);
 	}
 
-	function checkForCustomBrowser()
-	{
+	function checkForCustomBrowser() {
 		reportRunnerDir = reportDir.resolveDirectory("test-runner");
 		reportTestDir = reportDir.resolveDirectory("test");
-
-		var b:String = console.getOption("browser");
-		if (b != null && b != "true")
-			browser = b;
-
+		var option = console.getOption("browser");
+		if(option != null && option != "true") browser = option;
 		Log.debug("browser: " + browser);
 	}
 
-	function checkForBrowserKeepAliveFlag()
-	{
-		if (console.getOption("kill-browser") != null)
-		{
-			killBrowser = true;
-			Log.debug("killBrowser? " + killBrowser);
-		}
+	function checkForBrowserKeepAliveFlag() 	{
+		if(console.getOption("kill-browser") == null) return;
+		killBrowser = true;
+		Log.debug("killBrowser? " + killBrowser);
 	}
 
-	function checkForExitOnFail()
-	{
-		if (console.getOption("result-exit-code") != null)
-		{
-			resultExitCode = true;
-			Log.debug("resultExitCode? " + resultExitCode);
-		}
+	function checkForExitOnFail() {
+		if(console.getOption("result-exit-code") == null) return;
+		resultExitCode = true;
+		Log.debug("resultExitCode? " + resultExitCode);
 	}
 
-	function resetOutputDirectories()
-	{
-		if (!reportRunnerDir.exists)
-			reportRunnerDir.createDirectory();
-		else
-			reportRunnerDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
-
-		if (!reportTestDir.exists)
-			reportTestDir.createDirectory();
-		else
-			reportTestDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
+	function resetOutputDirectories() {
+		if(!reportRunnerDir.exists) reportRunnerDir.createDirectory();
+		else reportRunnerDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
+		if(!reportTestDir.exists) reportTestDir.createDirectory();
+		else reportTestDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
 	}
 
-	function generateTestRunnerPages()
-	{
+	function generateTestRunnerPages() {
 		var pageNames = [];
-		for (target in targets) {
+		for(target in targets) {
 			var file = target.file;
 			switch(target.type) {
-				case neko:
-					hasNekoTests = true;
-					nekoFile = file;
-				case cpp:
-					hasCPPTests = true;
-					cppFile = file;
-				case java:
-					hasJavaTests = true;
-					javaFile = file;
-				case hl:
-					hasHashLinkTests = true;
-					hlFile = file;
+				case neko: nekoFile = file;
+				case cpp: cppFile = file;
+				case java: javaFile = file;
+				case hl: hlFile = file;
 				default:
 					hasBrowserTests = true;
 					var pageName = Std.string(target.type);
@@ -252,39 +186,26 @@ class RunCommand extends MUnitTargetCommandBase {
 					pageNames.push(pageName);
 			}
 		}
-
 		var frameCols = "";
 		var frames = "";
 		var frameTitles = "";
 		var colCount = Math.round(100 / pageNames.length);
-		for (pageName in pageNames)
-		{
+		for(pageName in pageNames) {
 			frameCols += "*,";
 			frameTitles += '<td width="' + colCount + '%" title="Double click to maximise"><div>' + pageName.toUpperCase() + '<a href="#" title="Click to maximise">expand toggle</a></div></td>';
 			frames += '<frame src="' + pageName + ".html" + '" scrolling="auto" noresize="noresize"/>\n';
 		}
-
 		frameCols = frameCols.substr(0, -1);
-
 		var headerContent = getTemplateContent("target-headers-html", {targetHeaderTitles:frameTitles});
 		var headerPage = reportRunnerDir.resolvePath("target_headers.html");
 		headerPage.writeString(headerContent, true);
-
 		var pageContent = getTemplateContent("runner-html", {killBrowser:killBrowser, testCount:pageNames.length, frames:frames, frameCols:frameCols});
-
 		indexPage = reportRunnerDir.resolvePath("index.html");
 		indexPage.writeString(pageContent, true);
-
 		var commonResourceDir:File = console.originalDir.resolveDirectory("resource");
 		commonResourceDir.copyTo(reportRunnerDir);
-
-		if (config.resources != null)
-		{
-			config.resources.copyTo(reportRunnerDir);
-		}
-
-		for (target in targets)
-		{
+		if(config.resources != null) config.resources.copyTo(reportRunnerDir);
+		for(target in targets) {
 			var file = target.file;
 			file.copyTo(reportRunnerDir.resolveFile(file.fileName));
 		}
@@ -324,30 +245,19 @@ class RunCommand extends MUnitTargetCommandBase {
 			//for mac and linux we create a tmp directory locally within the bin
 			FileSys.setCwd(binDir.nativePath);
 		}
-
 		var serverFile:File = createServerAlias();
-
 		tmpDir = File.current.resolveDirectory("tmp");
-
-		if (tmpDir.exists)
-			tmpDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
-
+		if (tmpDir.exists) tmpDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
 		tmpRunnerDir = tmpDir.resolveDirectory("runner");
 		reportRunnerDir.copyTo(tmpRunnerDir);
-
 		var userTimeout = console.getOption("timeout");
 		if (userTimeout != null) serverTimeoutTimeSec = Std.parseInt(userTimeout);
 		if (serverTimeoutTimeSec == null) serverTimeoutTimeSec = DEFAULT_SERVER_TIMEOUT_SEC;
 		else print('Running tests with $serverTimeoutTimeSec seconds timeout');
-
 		var serverProcess:Process = null;
-
-		try
-		{
+		try {
 			serverProcess = new Process("nekotools", ["server"]);
-		}
-		catch(e:Dynamic)
-		{
+		} catch(e:Dynamic) {
 			error("Unable to launch nekotools server. Please kill existing process and try again.", 1);
 		}
 		var serverMonitor = Thread.create(readServerOutput);
@@ -356,21 +266,21 @@ class RunCommand extends MUnitTargetCommandBase {
 		resultMonitor.sendMessage(Thread.current());
 		resultMonitor.sendMessage(serverProcess);
 		resultMonitor.sendMessage(serverTimeoutTimeSec);
-		if (hasNekoTests) launchNeko(nekoFile);
-		if (hasCPPTests) launchCPP(cppFile);
-		if (hasJavaTests) launchJava(javaFile);
-		if (hasHashLinkTests) launchHashLink(hlFile);
-		if (hasBrowserTests) launchFile(indexPage);
+		if(nekoFile != null) launchNeko(nekoFile);
+		if(cppFile != null) launchCPP(cppFile);
+		if(javaFile != null) launchJava(javaFile);
+		if(hlFile != null) launchHashLink(hlFile);
+		if(hasBrowserTests) launchFile(indexPage);
 		else resultMonitor.sendMessage("quit");
 		var platformResults:Bool = Thread.readMessage(true);
 		serverProcess.kill();
-		if (reportTestDir.exists) reportTestDir.deleteDirectoryContents();
-		if (!FileSys.isWindows) serverFile.deleteFile();
+		if(reportTestDir.exists) reportTestDir.deleteDirectoryContents();
+		if(!FileSys.isWindows) serverFile.deleteFile();
 		tmpRunnerDir.deleteDirectory();
 		tmpDir.copyTo(reportTestDir);
 		tmpDir.deleteDirectory(true);
 		FileSys.setCwd(console.dir.nativePath);
-		if (!platformResults && resultExitCode) {
+		if(!platformResults && resultExitCode) {
 			//print("TESTS FAILED");
 			Sys.stderr().writeString("TESTS FAILED\n");
 			Sys.stderr().flush();
@@ -381,14 +291,10 @@ class RunCommand extends MUnitTargetCommandBase {
 	/**
 	 * Generates an alias to the nekotools server file on osx/linux
 	 */
-	function createServerAlias():File
-	{
+	function createServerAlias():File {
 		var serverFile = console.originalDir.resolveFile("index.n");
-
 		if (FileSys.isWindows) return serverFile;
-		
 		var copy = File.current.resolveFile("index.n");
-
 		serverFile.copyTo(copy);
 		return copy;
 	}

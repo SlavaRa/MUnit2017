@@ -34,8 +34,7 @@ import massive.sys.io.File;
 The ConfigCommand provides a number of ways to create and modify the configuration file (.munit) for a project.
 Either from command line args, manual input into the console, or from an external file.
 */
-class ConfigCommand extends MUnitCommand
-{
+class ConfigCommand extends MUnitCommand {
 	static inline var DEFAULT_SRC:String = "test";
 	static inline var DEFAULT_BIN:String = "build";
 	static inline var DEFAULT_REPORT:String = "report";
@@ -43,8 +42,8 @@ class ConfigCommand extends MUnitCommand
 	static inline var DEFAULT_HXML:String = "test.hxml";
 
 	var file:File;//external file
-	var useDefaultsIfMissing:Bool;
-	var useConsoleInput:Bool;
+	var useDefaultsIfMissing:Bool = false;
+	var useConsoleInput:Bool = false;
 	var src:File;
 	var bin:File;
 	var report:File;
@@ -55,15 +54,12 @@ class ConfigCommand extends MUnitCommand
 	var coveragePackages:Array<String>;
 	var coverageIgnoredClasses:Array<String>;
 
-	public function new()
-	{
+	public function new() {
 		super();
-		useDefaultsIfMissing = false;
-		useConsoleInput = false;
 		addPostRequisite(GenerateCommand);
 	}
 
-	override public function initialise():Void
+	override public function initialise()
 	{
 
 		if(hasDeleteArg())
@@ -97,7 +93,7 @@ class ConfigCommand extends MUnitCommand
 		}
 	}
 
-	override public function execute():Void
+	override public function execute()
 	{
 		if(useDefaultsIfMissing)
 		{
@@ -124,29 +120,13 @@ class ConfigCommand extends MUnitCommand
 		}
 	}
 
-	function hasDeleteArg():Bool
-	{
-		if(console.getOption("delete") != null) return true;
-		return false;
-	}
+	function hasDeleteArg():Bool return console.getOption("delete") != null;
 
-	function hasFileArg():Bool
-	{
-		if(console.getOption("file") != null) return true;
-		return false;
-	}
+	function hasFileArg():Bool return console.getOption("file") != null;
 
-	function hasResetArg():Bool
-	{
-		if(console.getOption("reset") != null) return true;
-		return false;
-	}
+	function hasResetArg():Bool return console.getOption("reset") != null;
 
-	function hasDefaultArg():Bool
-	{
-		if(console.getOption("default") != null) return true;
-		return false;
-	}
+	function hasDefaultArg():Bool return console.getOption("default") != null;
 
 	function hasInlineArgs():Bool
 	{
@@ -266,16 +246,12 @@ class ConfigCommand extends MUnitCommand
 		var reportArg = DEFAULT_REPORT;
 		var classPathsArg = DEFAULT_CLASSPATHS;
 		var hxmlArg = DEFAULT_HXML;
-		
 		if(src == null) src = convertToDirectory(srcArg, DEFAULT_SRC, "src");
 		if(bin == null) bin = convertToDirectory(binArg, DEFAULT_BIN, "build");
 		if(report == null) report = convertToDirectory(reportArg, DEFAULT_REPORT, "report");
 		if(classPaths == null) classPaths = convertToDirectoryList(classPathsArg, DEFAULT_CLASSPATHS, "class");
 		if(hxml == null) hxml = convertToFile(hxmlArg, DEFAULT_HXML, "hxml");
 	}
-
-	///////////
-
 
 	function parseFromFile(filePath:String)
 	{
@@ -316,7 +292,7 @@ class ConfigCommand extends MUnitCommand
 		if(file.exists && !overwrite) return false;
 
 		var src:String = src != null ? config.dir.getRelativePath(src) + "" : "";
-		var bin:String = bin != null ? config.dir.getRelativePath(bin) + "": "";
+		var bin:String = bin != null ? config.dir.getRelativePath(bin) + "" : "";
 
 		var clsPaths:Array<String> = [];
 
@@ -330,8 +306,6 @@ class ConfigCommand extends MUnitCommand
 		return true;
 		
 	}
-
-	///// utilities
 
 
 	function convertToDirectory(arg:String, defaultValue:String, label:String):File
