@@ -26,9 +26,8 @@
 * or implied, of Massive Interactive.
 ****/
 
-
-
 package massive.munit.async;
+import haxe.Constraints.Function;
 import haxe.PosInfos;
 import massive.munit.util.Timer;
 
@@ -39,8 +38,8 @@ import massive.munit.util.Timer;
  * 
  * @author Mike Stead
  */
-class AsyncDelegate 
-{
+class AsyncDelegate {
+	
 	/**
 	 * Default timeout period in milliseconds.
 	 */
@@ -68,7 +67,7 @@ class AsyncDelegate
 	public var timedOut(default, null):Bool = false;
 	public var canceled(default, null):Bool = false;
 	var testCase:Dynamic;
-	var handler:Dynamic;
+	var handler:Function;
 	var timer:Timer;
 	var deferredTimer:Timer;
 
@@ -86,7 +85,7 @@ class AsyncDelegate
 	 * @param	?timeout			[optional] number of milliseconds to wait before timing out. Defaults to 400
 	 * @param	?info				[optional] pos infos of the test which requests an instance of this delegate
 	 */
-	public function new(testCase:Dynamic, handler:Dynamic, ?timeout:Int, ?info:PosInfos) {
+	public function new(testCase:Dynamic, handler:Function, ?timeout:Int, ?info:PosInfos) {
 		this.testCase = testCase;
 		this.handler = handler;
 		this.delegateHandler = Reflect.makeVarArgs(responseHandler);
@@ -100,23 +99,18 @@ class AsyncDelegate
 	 * Execute the remainder of the asynchronous test. This should be called after observer
 	 * has been notified of a successful asynchronous response.
 	 */
-	public function runTest():Void
-	{
-		Reflect.callMethod(testCase, handler, params);
-	}
+	public function runTest() Reflect.callMethod(testCase, handler, params);
 
 	/**
 	 * Cancels pending async timeout.
 	 */
-	public function cancelTest():Void
-	{
+	public function cancelTest() {
 		canceled = true;
 		timer.stop();
-		if(deferredTimer!=null) deferredTimer.stop();
+		if(deferredTimer != null) deferredTimer.stop();
 	}
 
-	private function responseHandler(?params:Array<Dynamic>):Dynamic
-	{	
+	function responseHandler(?params:Array<Dynamic>):Dynamic {	
 		if (timedOut || canceled) return null;
 		timer.stop();
 		if(deferredTimer != null) deferredTimer.stop();
@@ -126,30 +120,26 @@ class AsyncDelegate
 		return null;
 	}
 
-	private function delayActualResponseHandler()
-	{
+	function delayActualResponseHandler() {
 		observer.asyncResponseHandler(this);
 		observer = null; 
 	}
 
-	private function timeoutHandler():Void
-	{
+	function timeoutHandler() {
 		#if flash
-			//pushing timeout onto next frame to prevent raxe condition bug when flash framerate drops too low and timeout timer executes prior to response on same frame
-			deferredTimer = Timer.delay(actualTimeoutHandler, 1);
+		//pushing timeout onto next frame to prevent raxe condition bug when flash framerate drops too low and timeout timer executes prior to response on same frame
+		deferredTimer = Timer.delay(actualTimeoutHandler, 1);
 		#else
-			actualTimeoutHandler();
+		actualTimeoutHandler();
 		#end
 	}
 
-	private function actualTimeoutHandler()
-	{
+	function actualTimeoutHandler() {
 		deferredTimer = null;
 		handler = null;
 		delegateHandler = null;
 		timedOut = true;
-		if (observer != null)
-		{
+		if(observer != null) {
 			observer.asyncTimeoutHandler(this);
 			observer = null; 
 		}

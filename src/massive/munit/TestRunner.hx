@@ -200,7 +200,6 @@ class TestRunner implements IAsyncDelegateObserver {
     }
 
     function execute() {
-		Sys.println('suiteIndex: ${suiteIndex}, testSuites.length: ${testSuites.length}');
         for(i in suiteIndex...testSuites.length) {
             var suite:TestSuite = testSuites[i];
             for(testClass in suite) {
