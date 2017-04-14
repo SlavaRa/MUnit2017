@@ -183,7 +183,7 @@ class TestRunner implements IAsyncDelegateObserver {
         Assert.assertionCount = 0; // don't really like this static but can't see way around it atm. ms 17/12/10
         emptyParams = [];
         startTime = Timer.stamp();
-        testSuites = [for(it in testSuiteClasses) Type.createInstance(it, [])];
+        testSuites = [for(it in testSuiteClasses) Type.createInstance(it, emptyParams)];
         #if (neko || cpp || java) 
 		var self = this;
 		var runThread:Thread = Thread.create(function() {
@@ -241,7 +241,7 @@ class TestRunner implements IAsyncDelegateObserver {
                 }
             }
         }
-        for(testCaseData in activeHelper)         {
+        for(testCaseData in activeHelper) {
             if(testCaseData.result.ignore) {
                 ignoreCount++;
                 for(c in clients) c.addIgnore(cast testCaseData.result);
@@ -296,9 +296,7 @@ class TestRunner implements IAsyncDelegateObserver {
 
     function clientCompletionHandler(resultClient:ITestResultClient) {
         if(++clientCompleteCount == clients.length) {
-            if(completionHandler != null) {
-				Timer.delay(completionHandler.bind(passCount == testCount), 10);
-            }
+            if(completionHandler != null) Timer.delay(completionHandler.bind(passCount == testCount), 10);
             running = false;
         }
     }

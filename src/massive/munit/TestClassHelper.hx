@@ -180,7 +180,7 @@ class TestClassHelper {
 		scanForTests(fieldMeta);
 		tests.sort(sortTestsByName); // not pc as allows for possible test dependencies but useful for report consistency
 	}
-		
+	
 	function getInheritanceChain(clazz:Class<Dynamic>):Array<Class<Dynamic>> {
 		var inherintanceChain = [clazz];
 		while ((clazz = Type.getSuperClass(clazz)) != null)
@@ -242,73 +242,47 @@ class TestClassHelper {
 		var fieldNames = Reflect.fields(fieldMeta);
 		for(fieldName in fieldNames) {
 			var f:Dynamic = Reflect.field(test, fieldName);
-			if(Reflect.isFunction(f)) {
-				var funcMeta:Dynamic = Reflect.field(fieldMeta, fieldName);
-				searchForMatchingTags(fieldName, f, funcMeta);
-			}
+			if(!Reflect.isFunction(f)) continue;
+			var funcMeta:Dynamic = Reflect.field(fieldMeta, fieldName);
+			searchForMatchingTags(fieldName, f, funcMeta);
 		}
 	}
 	
 	function searchForMatchingTags(fieldName:String, func:Function, funcMeta:Dynamic) {
-		for (tag in META_TAGS) {
-			if (Reflect.hasField(funcMeta, tag)) {
-				var args:Array<String> = Reflect.field(funcMeta, tag);
-				var description = (args != null) ? args[0] : "";
-				var isAsync = (args != null && description == META_PARAM_ASYNC_TEST); // deprecated support for @Test("Async")
-				var isIgnored = Reflect.hasField(funcMeta, META_TAG_IGNORE);
-				
-				if (isAsync) 
-				{
-					description = "";
-				}
-				else if (isIgnored)
-				{
-					args = Reflect.field(funcMeta, META_TAG_IGNORE);
-					description = (args != null) ? args[0] : "";
-				}
-				
-				switch(tag)
-				{
-					case META_TAG_BEFORE_CLASS:
-						beforeClass = func;
-					case META_TAG_AFTER_CLASS:
-						afterClass = func;
-					case META_TAG_BEFORE:
-						before = func;
-					case META_TAG_AFTER:
-						after = func;
-					case META_TAG_ASYNC_TEST:
-						if (!isDebug)
-							addTest(fieldName, func, test, true, isIgnored, description);
-					case META_TAG_TEST:
-						if (!isDebug)
-							addTest(fieldName, func, test, isAsync, isIgnored, description);
-					case META_TAG_TEST_DEBUG:
-						if (isDebug)
-							addTest(fieldName, func, test, isAsync, isIgnored, description);
-				}
+		for(tag in META_TAGS) {
+			if(!Reflect.hasField(funcMeta, tag)) continue;
+			var args:Array<String> = Reflect.field(funcMeta, tag);
+			var description = (args != null) ? args[0] : "";
+			var isAsync = (args != null && description == META_PARAM_ASYNC_TEST); // deprecated support for @Test("Async")
+			var isIgnored = Reflect.hasField(funcMeta, META_TAG_IGNORE);
+			if(isAsync) description = "";
+			else if(isIgnored) {
+				args = Reflect.field(funcMeta, META_TAG_IGNORE);
+				description = (args != null) ? args[0] : "";
+			}
+			switch(tag) {
+				case META_TAG_BEFORE_CLASS: beforeClass = func;
+				case META_TAG_AFTER_CLASS: afterClass = func;
+				case META_TAG_BEFORE: before = func;
+				case META_TAG_AFTER: after = func;
+				case META_TAG_ASYNC_TEST: if(!isDebug) addTest(fieldName, func, test, true, isIgnored, description);
+				case META_TAG_TEST: if(!isDebug) addTest(fieldName, func, test, isAsync, isIgnored, description);
+				case META_TAG_TEST_DEBUG: if(isDebug) addTest(fieldName, func, test, isAsync, isIgnored, description);
 			}
 		}
 	}
 	
-	private function addTest(field:String, 
-							testFunction:Function, 
-							testInstance:Dynamic, 
-							isAsync:Bool, 
-							isIgnored:Bool, 
-							description:String):Void
-	{
+	function addTest(field:String, testFunction:Function, testInstance:Dynamic, isAsync:Bool, isIgnored:Bool, description:String) {
 		var result:TestResult = new TestResult();
 		result.async = isAsync;
 		result.ignore = isIgnored;
 		result.className = className;
 		result.description = description;
 		result.name = field;
-		var data:TestCaseData = { test:testFunction, scope:testInstance, result:result };
-		tests.push(data);
+		tests.push({test:testFunction, scope:testInstance, result:result});
 	}
 	
-	private function sortTestsByName(x:TestCaseData, y:TestCaseData):Int {
+	function sortTestsByName(x:TestCaseData, y:TestCaseData):Int {
 		if (x.result.name == y.result.name) return 0;
 		if (x.result.name > y.result.name) return 1;
 		return -1;

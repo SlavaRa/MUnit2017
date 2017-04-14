@@ -26,8 +26,6 @@
 * or implied, of Massive Interactive.
 ****/
 
-
-
 package massive.munit.client;
 
 /**
@@ -56,18 +54,15 @@ time:1234.3
 # ... plus 5 more
 
 */
-class SummaryReportClient extends AbstractTestResultClient
-{
+class SummaryReportClient extends AbstractTestResultClient {
 	public static inline var DEFAULT_ID:String = "summary";
 
-	public function new()
-	{
+	public function new() {
 		super();
 		id = DEFAULT_ID;
 	}
 
-	override function printFinalStatistics(result:Bool, testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float)
-	{
+	override function printFinalStatistics(result:Bool, testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float) {
 		output = "";
 		output += "result:" + result;
 		output += "\ncount:" + testCount;
@@ -77,37 +72,20 @@ class SummaryReportClient extends AbstractTestResultClient
 		output += "\nignore:" + ignoreCount;
 		output += "\ntime:" + time;
 		output += "\n";
-
 		var resultCount = 0;
-
-		while(totalResults.length > 0 && resultCount < 10)
-		{
+		while(totalResults.length > 0 && resultCount < 10) {
 			var result = totalResults.shift();
-			if(!result.passed)
-			{
+			if(!result.passed) {
 				output += "\n# " + result.location;
-				resultCount ++;
+				resultCount++;
 			}
 		}
-
 		var remainder = (failCount + errorCount) - resultCount;
-
-		if(remainder > 0)
-		{
-			output += "# ... plus " + remainder  + " more";
-		}
-
+		if(remainder > 0) output += "# ... plus " + remainder  + " more";
 	}
 
-	override function printOverallResult(result:Bool)
-	{
-		//handled by printFinalStatistics		
-	}
+	override function printOverallResult(result:Bool) {}
 
-
-	override function printReports()
-	{
-		//not implemented 
-	}
+	override function printReports() {}
 
 }
