@@ -244,25 +244,18 @@ class ExternalPrintClientJS implements ExternalPrintClient {
 	}
 
 	#if flash
-		static var externalInterfaceQueue:Array<String> = [];
-		static var flashInitialised:Bool = false;
-		static var externalInterfaceCounter:Int = 0;
-		static var EXTERNAL_INTERFACE_FRAME_DELAY:Int = 20;
+	static var externalInterfaceQueue:Array<String> = [];
+	static var flashInitialised:Bool = false;
+	static var externalInterfaceCounter:Int = 0;
+	static var EXTERNAL_INTERFACE_FRAME_DELAY:Int = 20;
 
-		static function enterFrameHandler(_)
-		{
-			if(externalInterfaceQueue.length == 0) return;
-			if(externalInterfaceCounter ++ < EXTERNAL_INTERFACE_FRAME_DELAY) return;
-
-			externalInterfaceCounter = 0;
-			
-			var tempArray = externalInterfaceQueue.concat([]);
-			externalInterfaceQueue = [];
-
-			for(jsCode in tempArray)
-			{
-				flash.external.ExternalInterface.call(jsCode);
-			}
+	static function enterFrameHandler(_) {
+		if(externalInterfaceQueue.length == 0) return;
+		if(externalInterfaceCounter ++ < EXTERNAL_INTERFACE_FRAME_DELAY) return;
+		externalInterfaceCounter = 0;
+		var tempArray = externalInterfaceQueue.copy();
+		externalInterfaceQueue = [];
+		for(jsCode in tempArray) flash.external.ExternalInterface.call(jsCode);
 		}
 	#end
 

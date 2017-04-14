@@ -5,20 +5,15 @@ import massive.munit.Target;
 import massive.sys.io.File;
 import massive.sys.io.FileSys;
 
-class MUnitTargetCommandBase extends MUnitCommand
-{
+class MUnitTargetCommandBase extends MUnitCommand {
 	var hxml:File;
 	var targets:Array<Target>;
 	var targetTypes:Array<TargetType>;
 	var includeCoverage:Bool; 
 
-	override public function initialise():Void
-	{
+	override public function initialise() {
 		super.initialise();
-
-		//append code coverage
-		var coverage:String  = console.getOption("-coverage");
-		includeCoverage = coverage == "true";
+		includeCoverage = console.getOption("-coverage") == "true";
 	}
 
 	function initialiseTargets(getHxmlFromConsole:Bool)
@@ -33,29 +28,24 @@ class MUnitTargetCommandBase extends MUnitCommand
 
 	function getTargetsFromConsole():Array<TargetType> {
 		var result = [];
-		if (console.getOption("swf") == "true") result.push(TargetType.as3);
-		else if (console.getOption(TargetType.as3) == "true") result.push(TargetType.as3);
-		if (console.getOption(TargetType.js) == "true") result.push(TargetType.js);
-		if (console.getOption(TargetType.neko) == "true") result.push(TargetType.neko);
-		if (console.getOption(TargetType.cpp) == "true") result.push(TargetType.cpp);
-		if (console.getOption(TargetType.java) == "true") result.push(TargetType.java);
-		if (console.getOption(TargetType.hl) == "true") result.push(TargetType.hl);
+		if(console.getOption("swf") == "true") result.push(TargetType.as3);
+		else if(console.getOption(TargetType.as3) == "true") result.push(TargetType.as3);
+		if(console.getOption(TargetType.js) == "true") result.push(TargetType.js);
+		if(console.getOption(TargetType.neko) == "true") result.push(TargetType.neko);
+		if(console.getOption(TargetType.cpp) == "true") result.push(TargetType.cpp);
+		if(console.getOption(TargetType.java) == "true") result.push(TargetType.java);
+		if(console.getOption(TargetType.hl) == "true") result.push(TargetType.hl);
 		return result;
 	}
 
 	/**
 	Updates the config targetTypes if user has specified via the CLI.
 	*/
-	function setTargetTypes():Void
-	{
+	function setTargetTypes() {
 		if (config.targetTypes != config.defaultTargetTypes) return;
-
 		var targetTypes = getTargetsFromConsole();
-
-		if (targetTypes.length == 0)
-			targetTypes = config.targetTypes.concat([]);
-		else
-			config.targetTypes = targetTypes;//update config targets
+		if (targetTypes.length == 0) targetTypes = config.targetTypes.copy();
+		else config.targetTypes = targetTypes;//update config targets
 	}
 
 	/**
@@ -226,17 +216,14 @@ class MUnitTargetCommandBase extends MUnitCommand
 		target.hxml += output + "\n";
 	}
 
-	function getOutputFileFromLine(line:String):String
-	{
-		for (type in config.targetTypes)
-		{
+	function getOutputFileFromLine(line:String):String {
+		for(type in config.targetTypes) {
 			var stype:String = switch(type) {
 				case as3: "swf";
 				default: Std.string(type);
 			}
 			var targetMatcher = new EReg("^-" + stype + "\\s+", "");
-			if (targetMatcher.match(line))
-			{
+			if(targetMatcher.match(line)) {
 				var result = line.substr(stype.length + 2);
 				result = switch(type) {
 					case cpp | java if(includeCoverage): result + "-coverage";

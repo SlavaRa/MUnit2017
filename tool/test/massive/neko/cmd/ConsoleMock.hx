@@ -21,11 +21,7 @@ class ConsoleMock extends Console
 	
 	override private function parseArguments(a:Array<String>):Void
 	{
-		if(mockArgs != null)
-		{
-			systemArgs = mockArgs.concat([]);
-		}
-		
+		if(mockArgs != null) systemArgs = mockArgs.copy();
 		super.parseArguments(systemArgs);
 	}
 	
