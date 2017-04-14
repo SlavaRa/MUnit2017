@@ -87,7 +87,6 @@ class AsyncDelegate
 	 */
 	public function new(testCase:Dynamic, handler:Dynamic, ?timeout:Int, ?info:PosInfos)
 	{
-		var self = this;
 		this.testCase = testCase;
 		this.handler = handler;
 		this.delegateHandler = Reflect.makeVarArgs(responseHandler);
@@ -95,7 +94,6 @@ class AsyncDelegate
 		params = [];
 		timedOut = false;
 		canceled = false;
-		
 		if (timeout == null || timeout <= 0) timeout = DEFAULT_TIMEOUT;
 		timeoutDelay = timeout;
 		timer = Timer.delay(timeoutHandler, timeoutDelay);
