@@ -24,3 +24,12 @@
 #-cp ../src
 #-lib mlib
 #-java ../bin/test/tool
+#
+### HashLink
+#--next
+#-main TestMain
+#-cp test
+#-cp src
+#-cp ../src
+#-lib mlib
+#-hl ../bin/test/tool/munit_tool_test.hl
