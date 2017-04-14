@@ -1,48 +1,29 @@
 package massive.munit;
 
-import massive.munit.util.Timer;
 import massive.munit.Assert;
-import massive.munit.async.AsyncFactory;
 import massive.munit.UnhandledException;
-import massive.haxe.util.ReflectUtil;
-class UnhandledExceptionTest 
-{
+class UnhandledExceptionTest {
 	var instance:UnhandledException; 
 	
-	public function new() 
-	{
-		
-	}
+	public function new() {}
 	
 	@BeforeClass
-	public function beforeClass():Void
-	{
-	}
+	public function beforeClass() {}
 	
 	@AfterClass
-	public function afterClass():Void
-	{
-	}
+	public function afterClass() {}
 	
 	@Before
-	public function setup():Void
-	{
-	}
+	public function setup() {}
 	
 	@After
-	public function tearDown():Void
-	{
-	}
+	public function tearDown() {}
 	
 	@Test
-	public function testConstructor():Void
-	{
-		try
-		{
+	public function testConstructor() {
+		try {
 			throw "";
-		}
-		catch(e:Dynamic)
-		{
+		} catch(e:Dynamic) {
 			var source = "original msg";
 			var location:String = "location";
 			var exception = new UnhandledException(source, location);
@@ -51,5 +32,4 @@ class UnhandledExceptionTest
 			Assert.isTrue(exception.message.indexOf(" at " + location) > 0);
 		}
 	}
-	
 }

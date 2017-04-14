@@ -89,7 +89,7 @@ class TestResult
 	 */
 	public var error:Dynamic;
 
-	public var type(get_type, null):TestResultType;
+	public var type(get, null):TestResultType;
 	
 	/**
 	 * Class constructor.
@@ -99,17 +99,18 @@ class TestResult
 	function get_type():TestResultType {
 		if(error != null) return ERROR;
 		if(failure != null) return FAIL;
-		if(ignore == true) return IGNORE;
-		if(passed == true) return PASS;
+		if(ignore) return IGNORE;
+		if(passed) return PASS;
 		return UNKNOWN;
 	}
 
 }
 
-enum TestResultType {
-	UNKNOWN;
-	PASS;
-	FAIL;
-	ERROR;
-	IGNORE;
+@:enum
+abstract TestResultType(String) to String {
+	var UNKNOWN = "UNKNOWN";
+	var PASS = "PASS";
+	var FAIL = "FAIL";
+	var ERROR = "ERROR";
+	var IGNORE = "IGNORE";
 }

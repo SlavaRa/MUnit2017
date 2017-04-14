@@ -31,7 +31,6 @@ import haxe.Constraints.Function;
 import haxe.PosInfos;
 import massive.munit.util.Timer;
 
-
 /**
  * Sits between an asynchronous test and an observer (typically the TestRunner), notifying 
  * the observer when an asynchronous test has returned or timed out.

@@ -190,36 +190,26 @@ class TestClassHelper {
 	
 	function collateFieldMeta(inherintanceChain:Array<Class<Dynamic>>):Dynamic {
 		var meta = {};
-		while (inherintanceChain.length > 0)
-		{
-			var clazz = inherintanceChain.pop(); // start at root
+		var i = inherintanceChain.length;
+		while(i-- > 0) {
+			var clazz = inherintanceChain[i]; // start at root
 			var newMeta = Meta.getFields(clazz);			
 			var markedFieldNames = Reflect.fields(newMeta);
-			
-			for (fieldName in markedFieldNames)
-			{
+			for(fieldName in markedFieldNames) {
 				var recordedFieldTags = Reflect.field(meta, fieldName);
 				var newFieldTags = Reflect.field(newMeta, fieldName);
-				
 				var newTagNames = Reflect.fields(newFieldTags);
-				if (recordedFieldTags == null)
-				{
+				if(recordedFieldTags == null) {
 					// need to create copy of tags as may need to remove
 					// some later and this could impact other tests which
 					// extends the same class.
 					var tagsCopy = {};
-					for (tagName in newTagNames)
-						Reflect.setField(tagsCopy, tagName, Reflect.field(newFieldTags, tagName));
-						
+					for(tagName in newTagNames) Reflect.setField(tagsCopy, tagName, Reflect.field(newFieldTags, tagName));
 					Reflect.setField(meta, fieldName, tagsCopy);
-				}
-				else
-				{
+				} else {
 					var ignored = false;
-					for (tagName in newTagNames)
-					{
-						if (tagName == META_TAG_IGNORE)
-							ignored = true;
+					for (tagName in newTagNames) {
+						if (tagName == META_TAG_IGNORE) ignored = true;
 						
 						// TODO: Support @TestDebug ignore scenarios too. ms 4.9.2011
 						
@@ -234,6 +224,7 @@ class TestClassHelper {
 					}
 				}
 			}
+			
 		}
 		return meta;
 	}
@@ -283,8 +274,10 @@ class TestClassHelper {
 	}
 	
 	inline function sortTestsByName(x:TestCaseData, y:TestCaseData):Int {
-		if (x.result.name == y.result.name) return 0;
-		if (x.result.name > y.result.name) return 1;
+		var xName = x.result.name;
+		var yName = y.result.name;
+		if(xName == yName) return 0;
+		if(xName > yName) return 1;
 		return -1;
 	}
 

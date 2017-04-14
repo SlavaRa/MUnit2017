@@ -16,8 +16,7 @@ class MUnitTargetCommandBase extends MUnitCommand {
 		includeCoverage = console.getOption("-coverage") == "true";
 	}
 
-	function initialiseTargets(getHxmlFromConsole:Bool)
-	{
+	function initialiseTargets(getHxmlFromConsole:Bool) {
 		setTargetTypes();
 		setHXMLFile(getHxmlFromConsole);
 		setFilteredTargets();
@@ -55,27 +54,15 @@ class MUnitTargetCommandBase extends MUnitCommand {
 	{
 		var hxml:File = null;
 		var hxmlPath:String = null;
-		if (checkConsole) hxmlPath = console.getNextArg();
-		if (hxmlPath != null)
-		{
+		if(checkConsole) hxmlPath = console.getNextArg();
+		if(hxmlPath != null) {
 			hxml = File.create(hxmlPath, console.dir);
-			if (!hxml.exists)
-			{
-				error("Cannot locate hxml file: " + hxmlPath);
-			}
+			if(!hxml.exists) error("Cannot locate hxml file: " + hxmlPath);
 			config.hxml = hxml;//update config hxml file
-		}
-		else
-		{
+		} else {
 			hxml = config.hxml;
-			if (hxml == null)
-			{
-				error("Default hxml file path is not set. Please run munit config.");
-			}
-			if (!hxml.exists)
-			{
-				error("Default hxml file path does not exist. Please run munit config.");
-			}			
+			if(hxml == null) error("Default hxml file path is not set. Please run munit config.");
+			else if(!hxml.exists) error("Default hxml file path does not exist. Please run munit config.");
 		}
 	}
 

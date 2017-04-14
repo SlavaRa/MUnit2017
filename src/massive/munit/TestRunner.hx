@@ -28,7 +28,6 @@
 
 package massive.munit;
 
-import haxe.PosInfos;
 import massive.munit.Assert;
 import massive.munit.async.AsyncDelegate;
 import massive.munit.async.AsyncFactory;
@@ -45,8 +44,6 @@ import cpp.vm.Thread;
 #elseif java
 import java.vm.Thread;
 #end
-
-import haxe.CallStack;
 
 /**
  * Runner used to execute one or more suites of unit tests.
@@ -120,7 +117,7 @@ class TestRunner implements IAsyncDelegateObserver {
         return asyncFactory = value;
     }
 
-    var emptyParams:Array<Dynamic>;
+    static var emptyParams:Array<Dynamic> = [];
     var startTime:Float;
     var testStartTime:Float;
     var isDebug(default, null):Bool;
@@ -179,7 +176,6 @@ class TestRunner implements IAsyncDelegateObserver {
         suiteIndex = 0;
         clientCompleteCount = 0;
         Assert.assertionCount = 0; // don't really like this static but can't see way around it atm. ms 17/12/10
-        emptyParams = [];
         startTime = Timer.stamp();
         testSuites = [for(it in testSuiteClasses) Type.createInstance(it, emptyParams)];
         #if (neko || cpp || java) 
@@ -248,7 +244,7 @@ class TestRunner implements IAsyncDelegateObserver {
                 Reflect.callMethod(activeHelper.test, activeHelper.before, emptyParams);
                 testStartTime = Timer.stamp();
                 executeTestCase(testCaseData, testCaseData.result.async);
-                if (!asyncPending) Reflect.callMethod(activeHelper.test, activeHelper.after, emptyParams);
+                if(!asyncPending) Reflect.callMethod(activeHelper.test, activeHelper.after, emptyParams);
                 else break;
             }
         }

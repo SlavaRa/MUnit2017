@@ -60,10 +60,6 @@ class RunCommand extends MUnitTargetCommandBase {
 	var killBrowser:Bool = false;
 	var indexPage:File;
 	var hasBrowserTests:Bool;
-	var hasNekoTests:Bool;
-	var hasCPPTests:Bool;
-	var hasJavaTests:Bool;
-	var hasHashLinkTests:Bool;
 	var nekoFile:File;
 	var cppFile:File;
 	var javaFile:File;
@@ -106,21 +102,10 @@ class RunCommand extends MUnitTargetCommandBase {
 				print("WARNING: Target type '" + type + "' not found in bin directory.");
 				continue;
 			}
-
 			//update as this will be the actual executable for cpp/php targets
 			target.file = File.current.resolveFile(tmp.readString());
-			
 			if(!target.file.exists) print("WARNING: File for target type '" + target.type + "' not found: " + target.toString());
-			else {
-				tempTargets.push(target);
-				switch(type) {
-					case neko: hasNekoTests = true;
-					case cpp: hasCPPTests = true;
-					case java: hasJavaTests = true;
-					case hl: hasHashLinkTests = true;
-					default:
-				}
-			}
+			else tempTargets.push(target);
 		}
 		targets = config.targets = tempTargets;
 		Log.debug(targets.length + " targets");
@@ -202,7 +187,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		var pageContent = getTemplateContent("runner-html", {killBrowser:killBrowser, testCount:pageNames.length, frames:frames, frameCols:frameCols});
 		indexPage = reportRunnerDir.resolvePath("index.html");
 		indexPage.writeString(pageContent, true);
-		var commonResourceDir:File = console.originalDir.resolveDirectory("resource");
+		var commonResourceDir = console.originalDir.resolveDirectory("resource");
 		commonResourceDir.copyTo(reportRunnerDir);
 		if(config.resources != null) config.resources.copyTo(reportRunnerDir);
 		for(target in targets) {
@@ -215,35 +200,26 @@ class RunCommand extends MUnitTargetCommandBase {
 	 * Returns content from a html template.
 	 * Checks for local template before using default template
 	 */
-	function getTemplateContent(templateName:String, properties:Dynamic)
-	{
+	function getTemplateContent(templateName:String, properties:Dynamic) {
 		var resource:String;
 		if (config.templates != null && config.templates.resolveFile(templateName + ".mtt").exists)
 		{
 			resource = config.templates.resolveFile(templateName + ".mtt").readString();
 		}
-		else
-		{
-			resource = haxe.Resource.getString(templateName);
-		}
-
+		else resource = haxe.Resource.getString(templateName);
 		var template = new haxe.Template(resource);
 		return template.execute(properties);
 	}
 
-	override public function execute()
-	{
-		if (FileSys.isWindows)
-		{
+	override public function execute() {
+		if(FileSys.isWindows) {
 			//Windows has issue releasing port registries reliably.
 			//To prevent possibility of nekotools server failing, on
 			//windows the tmp directory is always located inside the munit install
-			FileSys.setCwd(console.originalDir.nativePath);
-		}
-		else
-		{
+			Sys.setCwd(console.originalDir.nativePath);
+		} else {
 			//for mac and linux we create a tmp directory locally within the bin
-			FileSys.setCwd(binDir.nativePath);
+			Sys.setCwd(binDir.nativePath);
 		}
 		var serverFile:File = createServerAlias();
 		tmpDir = File.current.resolveDirectory("tmp");
@@ -279,7 +255,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		tmpRunnerDir.deleteDirectory();
 		tmpDir.copyTo(reportTestDir);
 		tmpDir.deleteDirectory(true);
-		FileSys.setCwd(console.dir.nativePath);
+		Sys.setCwd(console.dir.nativePath);
 		if(!platformResults && resultExitCode) {
 			//print("TESTS FAILED");
 			Sys.stderr().writeString("TESTS FAILED\n");
@@ -293,22 +269,20 @@ class RunCommand extends MUnitTargetCommandBase {
 	 */
 	function createServerAlias():File {
 		var serverFile = console.originalDir.resolveFile("index.n");
-		if (FileSys.isWindows) return serverFile;
+		if(FileSys.isWindows) return serverFile;
 		var copy = File.current.resolveFile("index.n");
 		serverFile.copyTo(copy);
 		return copy;
 	}
 
-	function readServerOutput()
-	{
+	function readServerOutput() {
 		// just consume server output
 		var serverProcess:Process = Thread.readMessage(true);
 		try {
-			while (true) {
+			while(true) {
 				serverProcess.stdout.readLine();
 			}
-		}
-		catch (e:haxe.io.Eof) {}
+		} catch(e:haxe.io.Eof) {}
 	}
 
 	function monitorResults() {
@@ -394,36 +368,36 @@ class RunCommand extends MUnitTargetCommandBase {
 		var targetLocation:String  = HTTPClient.DEFAULT_SERVER_URL + "/tmp/runner/" + file.fileName;
 		var parameters:Array<String> = [];
 		// See http://www.dwheeler.com/essays/open-files-urls.html
-		if (FileSys.isWindows) {
+		if(FileSys.isWindows) {
 			parameters.push("start");
-			if (browser != null) {
-				if (browser.substr(0, 12) == "flashdevelop") return sendFlashDevelopCommand(browser, "Browse", targetLocation);
+			if(browser != null) {
+				if(browser.substr(0, 12) == "flashdevelop") return sendFlashDevelopCommand(browser, "Browse", targetLocation);
 				parameters.push(browser);
 			}
-		} else if (FileSys.isMac) {
+		} else if(FileSys.isMac) {
 			parameters.push("open");
 			if (browser != null) parameters.push("-a " + browser);
-		} else if (FileSys.isLinux) {
-			if (browser != null) parameters.push(browser);
+		} else if(FileSys.isLinux) {
+			if(browser != null) parameters.push(browser);
 			else parameters.push("xdg-open");
 		}
 		parameters.push(targetLocation);
 		var exitCode:Int = Sys.command(parameters.join(" "));
-		if (exitCode > 0) error("Error running " + targetLocation, exitCode);
+		if(exitCode > 0) error("Error running " + targetLocation, exitCode);
 		return exitCode;
 	}
 	
 	function sendFlashDevelopCommand(args:String, cmd:String, data:String)  {
 		var port = 1978;
 		var parts = args.split(':');
-		if (parts.length > 1) port = Std.parseInt(parts[1]);
+		if(parts.length > 1) port = Std.parseInt(parts[1]);
 		try {
 			var conn = new Socket();
 			conn.connect(new Host("localhost"), port);
 			conn.write('<flashconnect><message cmd="call" command="' + cmd + '">' + data + '</message></flashconnect>');
 			conn.output.writeByte(0);
 			conn.close(); 
-		} catch (ex:Dynamic) {
+		} catch(e:Dynamic) {
 			print("ERROR: Failed to connect to FlashDevelop socket server");
 			return 1;
 		}
@@ -433,80 +407,67 @@ class RunCommand extends MUnitTargetCommandBase {
 	function launchNeko(file:File):Int {
 		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
 		file.copyTo(reportRunnerFile);
-		FileSys.setCwd(config.dir.nativePath);
+		Sys.setCwd(config.dir.nativePath);
 		var exitCode = runProgram('neko', [reportRunnerFile.nativePath]);
-		FileSys.setCwd(console.originalDir.nativePath);
-		if (exitCode > 0) error('Error ($exitCode) running $file', exitCode);
+		Sys.setCwd(console.originalDir.nativePath);
+		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
 		return exitCode;
 	}
 	
 	function launchCPP(file:File):Int {
 		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
 		file.copyTo(reportRunnerFile);
-		FileSys.setCwd(config.dir.nativePath);
+		Sys.setCwd(config.dir.nativePath);
 		var exitCode = runProgram(file.nativePath);
-		FileSys.setCwd(console.originalDir.nativePath);
-		if (exitCode > 0) error('Error ($exitCode) running $file', exitCode);
+		Sys.setCwd(console.originalDir.nativePath);
+		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
 		return exitCode;
 	}
 	
 	function launchJava(file:File):Int {
 		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
 		file.copyTo(reportRunnerFile);
-		FileSys.setCwd(config.dir.nativePath);
+		Sys.setCwd(config.dir.nativePath);
 		var exitCode = runProgram('java', ['-jar', reportRunnerFile.nativePath]);
-		FileSys.setCwd(console.originalDir.nativePath);
-		if (exitCode > 0) error('Error ($exitCode) running $file', exitCode);
+		Sys.setCwd(console.originalDir.nativePath);
+		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
 		return exitCode;
 	}
 	
 	function launchHashLink(file:File):Int {
 		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
 		file.copyTo(reportRunnerFile);
-		FileSys.setCwd(config.dir.nativePath);
+		Sys.setCwd(config.dir.nativePath);
 		var exitCode = runProgram('hl', [reportRunnerFile.nativePath]);
-		FileSys.setCwd(console.originalDir.nativePath);
-		if (exitCode > 0) error('Error ($exitCode) running $file', exitCode);
+		Sys.setCwd(console.originalDir.nativePath);
+		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
 		return exitCode;
 	}
 	
 	function runProgram(name:String, ?args:Array<String>) {
 		var process = new Process(name, args);
-
-		try
-		{
-			while (true)
-			{
+		try {
+			while (true) {
 				Sys.sleep(0.01);
 				var output = process.stdout.readLine();
 				Sys.println(output);
 			}
-		}
-		catch (e:haxe.io.Eof) {}
-
+		} catch (e:haxe.io.Eof) {}
 		var exitCode:Int = 0;
 		var error:String = null;
-
-		try
-		{
+		try {
 			exitCode = process.exitCode();
-		}
-		catch(e:Dynamic)
-		{
+		} catch(e:Dynamic) {
 			exitCode = 1;
 			error = Std.string(e).split("\n").join("\n\t");
 		}
-
 		var stfErrString = process.stderr.readAll().toString().split("\n").join("\n\t");
-
 		if(stfErrString == null) stfErrString = "";
-
 		if (exitCode > 0 || stfErrString.length > 0)
 		{
 			if(error != null) error += "\n\t";
 			Sys.println("Error running '" + name + "'\n\t" + error);
 		}
-
 		return exitCode;
 	}
 }

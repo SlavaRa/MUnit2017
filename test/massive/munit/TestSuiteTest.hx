@@ -28,10 +28,8 @@
 package massive.munit;
 
 /**
- * ...
  * @author Mike Stead
  */
-
 class TestSuiteTest 
 {
 	private var suite:massive.munit.TestSuite;

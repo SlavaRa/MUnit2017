@@ -28,15 +28,12 @@
 package massive.munit;
 import massive.haxe.util.ReflectUtil;
 import massive.munit.TestResult;
+
 /**
- * ...
  * @author Mike Stead
  */
-
-class TestResultTest 
-{
-	public function new() 
-	{}
+class TestResultTest {
+	public function new() {}
 	
 	@Test
 	public function testConstructor():Void

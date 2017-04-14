@@ -537,7 +537,7 @@ massive_munit_MUnitException.prototype = $extend(massive_haxe_Exception.prototyp
 });
 var massive_munit_AssertionException = function(msg,info) {
 	massive_munit_MUnitException.call(this,msg,info);
-	this.type = massive_haxe_util_ReflectUtil.here({ fileName : "AssertionException.hx", lineNumber : 50, className : "massive.munit.AssertionException", methodName : "new"}).className;
+	this.type = Type.getClassName(js_Boot.getClass(this));
 };
 massive_munit_AssertionException.__name__ = ["massive","munit","AssertionException"];
 massive_munit_AssertionException.__super__ = massive_munit_MUnitException;
@@ -581,32 +581,21 @@ massive_munit_TestResult.prototype = {
 	}
 	,get_type: function() {
 		if(this.error != null) {
-			return massive_munit_TestResultType.ERROR;
+			return "ERROR";
 		}
 		if(this.failure != null) {
-			return massive_munit_TestResultType.FAIL;
+			return "FAIL";
 		}
-		if(this.ignore == true) {
-			return massive_munit_TestResultType.IGNORE;
+		if(this.ignore) {
+			return "IGNORE";
 		}
-		if(this.passed == true) {
-			return massive_munit_TestResultType.PASS;
+		if(this.passed) {
+			return "PASS";
 		}
-		return massive_munit_TestResultType.UNKNOWN;
+		return "UNKNOWN";
 	}
 	,__class__: massive_munit_TestResult
 };
-var massive_munit_TestResultType = { __ename__ : true, __constructs__ : ["UNKNOWN","PASS","FAIL","ERROR","IGNORE"] };
-massive_munit_TestResultType.UNKNOWN = ["UNKNOWN",0];
-massive_munit_TestResultType.UNKNOWN.__enum__ = massive_munit_TestResultType;
-massive_munit_TestResultType.PASS = ["PASS",1];
-massive_munit_TestResultType.PASS.__enum__ = massive_munit_TestResultType;
-massive_munit_TestResultType.FAIL = ["FAIL",2];
-massive_munit_TestResultType.FAIL.__enum__ = massive_munit_TestResultType;
-massive_munit_TestResultType.ERROR = ["ERROR",3];
-massive_munit_TestResultType.ERROR.__enum__ = massive_munit_TestResultType;
-massive_munit_TestResultType.IGNORE = ["IGNORE",4];
-massive_munit_TestResultType.IGNORE.__enum__ = massive_munit_TestResultType;
 var massive_munit_client_HTTPClient = function(client,url,queueRequest) {
 	if(queueRequest == null) {
 		queueRequest = true;
