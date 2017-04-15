@@ -77,7 +77,7 @@ class ReportCommand extends MUnitTargetCommandBase
 		//last option is to get from default target types
 		if (targetTypes.length == 0)
 		{
-			targetTypes = config.targetTypes.concat([]);
+			targetTypes = config.targetTypes.copy();
 		}
 	}
 

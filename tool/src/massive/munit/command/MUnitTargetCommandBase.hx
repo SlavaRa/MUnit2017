@@ -65,7 +65,7 @@ class MUnitTargetCommandBase extends MUnitCommand
 		var targetTypes = getTargetsFromConsole();
 
 		if (targetTypes.length == 0)
-			targetTypes = config.targetTypes.concat([]);
+			targetTypes = config.targetTypes.copy();
 		else
 			config.targetTypes = targetTypes;//update config targets
 	}
