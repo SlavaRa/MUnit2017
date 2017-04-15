@@ -337,7 +337,7 @@ class ExternalPrintClientJS implements ExternalPrintClient
 
 			externalInterfaceCounter = 0;
 			
-			var tempArray = externalInterfaceQueue.concat([]);
+			var tempArray = externalInterfaceQueue.copy();
 			externalInterfaceQueue = [];
 
 			for(jsCode in tempArray)
