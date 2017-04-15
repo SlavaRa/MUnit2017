@@ -26,10 +26,7 @@
 * or implied, of Massive Interactive.
 ****/
 
-
-
 package massive.munit;
-
 import haxe.rtti.Meta;
 
 /**
@@ -44,9 +41,7 @@ import haxe.rtti.Meta;
  * 
  * @author Mike Stead
  */
-
-class TestClassHelper 
-{
+class TestClassHelper {
 	/**
 	 * Meta tag marking method to be called before all tests in a class.
 	 */
@@ -340,15 +335,13 @@ class TestClassHelper
 	{
 		if (x.result.name == y.result.name) return 0;
 		if (x.result.name > y.result.name) return 1;
-		else return -1;
+		return -1;
 	}
 
-	private function nullFunc():Void
-	{}
+	function nullFunc() {}
 }
 
-typedef TestCaseData =
-{
+typedef TestCaseData = {
 	var test:Dynamic;
 	var scope:Dynamic;
 	var result:TestResult;
