@@ -28,6 +28,7 @@ class Target {
 }
 
 @:enum
+@:forward
 abstract TargetType(String) from String to String {
 	var as3 = "as3";
 	var js = "js";

@@ -499,16 +499,16 @@ js_Browser.createXMLHttpRequest = function() {
 var massive_haxe_Exception = function(message,info) {
 	this.message = message;
 	this.info = info;
-	this.type = massive_haxe_util_ReflectUtil.here({ fileName : "Exception.hx", lineNumber : 70, className : "massive.haxe.Exception", methodName : "new"}).className;
+	this.type = massive_haxe_util_ReflectUtil.here({ fileName : "Exception.hx", lineNumber : 67, className : "massive.haxe.Exception", methodName : "new"}).className;
 };
 massive_haxe_Exception.__name__ = true;
 massive_haxe_Exception.prototype = {
 	toString: function() {
-		var str = this.type + ": " + this.message;
+		var result = this.type + ": " + this.message;
 		if(this.info != null) {
-			str += " at " + this.info.className + "#" + this.info.methodName + " (" + this.info.lineNumber + ")";
+			result += " at " + this.info.className + "#" + this.info.methodName + " (" + this.info.lineNumber + ")";
 		}
-		return str;
+		return result;
 	}
 	,__class__: massive_haxe_Exception
 };
