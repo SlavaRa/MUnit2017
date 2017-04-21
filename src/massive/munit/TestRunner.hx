@@ -30,6 +30,7 @@ package massive.munit;
 
 import haxe.PosInfos;
 import massive.munit.Assert;
+import massive.munit.TestClassHelper.TestCaseData;
 import massive.munit.async.AsyncDelegate;
 import massive.munit.async.AsyncFactory;
 import massive.munit.async.AsyncTimeoutException;
@@ -188,7 +189,7 @@ class TestRunner implements IAsyncDelegateObserver {
         startTime = Timer.stamp();
 
         for (suiteType in testSuiteClasses)
-            testSuites.push(Type.createInstance(suiteType, []));
+            testSuites.push(Type.createInstance(suiteType, emptyParams));
 
         #if (neko || cpp || java) 
 		var self = this;
@@ -207,7 +208,7 @@ class TestRunner implements IAsyncDelegateObserver {
 
     function execute() {
         for (i in suiteIndex...testSuites.length) {
-            var suite:TestSuite = testSuites[i];
+            var suite = testSuites[i];
             for (testClass in suite) {
                 if (activeHelper == null || activeHelper.type != testClass) {
                     activeHelper = new TestClassHelper(testClass, isDebug);
@@ -262,8 +263,8 @@ class TestRunner implements IAsyncDelegateObserver {
         }
     }
 
-    function executeTestCase(testCaseData:Dynamic, async:Bool) {
-        var result:TestResult = testCaseData.result;
+    function executeTestCase(testCaseData:TestCaseData, async:Bool) {
+        var result = testCaseData.result;
         try {
             if (async) {
                 Reflect.callMethod(testCaseData.scope, testCaseData.test, [asyncFactory]);
@@ -323,7 +324,7 @@ class TestRunner implements IAsyncDelegateObserver {
      * @param	delegate		delegate which received the successful callback
      */
     public function asyncResponseHandler(delegate:AsyncDelegate) {
-        var testCaseData:Dynamic = activeHelper.current();
+        var testCaseData = activeHelper.current();
         testCaseData.test = delegate.runTest;
         testCaseData.scope = delegate;
         asyncPending = false;
@@ -340,8 +341,8 @@ class TestRunner implements IAsyncDelegateObserver {
      * @param	delegate		delegate whose asynchronous callback timed out
      */
     public function asyncTimeoutHandler(delegate:AsyncDelegate) {
-        var testCaseData:Dynamic = activeHelper.current();
-        var result:TestResult = testCaseData.result;
+        var testCaseData = activeHelper.current();
+        var result = testCaseData.result;
         result.executionTime = Timer.stamp() - testStartTime;
         result.error = new AsyncTimeoutException("", delegate.info);
         asyncPending = false;

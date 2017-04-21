@@ -306,7 +306,7 @@ class TestClassHelper {
 		return -1;
 	}
 
-	function nullFunc() {}
+	static function nullFunc() {}
 }
 
 typedef TestCaseData = {
