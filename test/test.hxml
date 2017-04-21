@@ -1,11 +1,11 @@
-# Neko
+## Neko
 -main TestMain
 -cp test
 -cp src
 -lib mlib
 -neko bin/test/core/neko_test.n
 
-# CPP
+## CPP
 --next
 -main TestMain
 -cp test

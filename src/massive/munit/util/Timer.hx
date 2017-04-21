@@ -124,32 +124,24 @@ class Timer
 	public dynamic function run() {}
 
 	#if (neko || cpp || java)
-	private function runLoop(time_ms)
-	{
+	function runLoop(time_ms:Int) {
 		var shouldStop = false;
-		while(!shouldStop)
-		{
+		while(!shouldStop) {
 			Sys.sleep(time_ms / 1000);
-			try
-			{
+			try {
 				run();
-			}
-			catch(ex:Dynamic)
-			{
+			} catch(ex:Dynamic) {
 				trace(ex);
 			}
-
 			var msg = Thread.readMessage(false);
 			if(msg == "stop") shouldStop = true;
 		}
 	}
 	#end
 
-	public static function delay(f:Void->Void, time_ms:Int):Timer
-	{
+	public static function delay(f:Void->Void, time_ms:Int):Timer {
 		var t = new Timer(time_ms);
-		t.run = function()
-		{
+		t.run = function() {
 			t.stop();
 			f();
 		};
@@ -158,18 +150,12 @@ class Timer
 	#end
 
 	/**
-	 *	Returns a timestamp, in seconds
-	 */
-	public static function stamp():Float
-	{
-		#if flash
-			return flash.Lib.getTimer() / 1000;
-		#elseif (neko || cpp || java)
-			return Sys.time();
-		#elseif js
-			return Date.now().getTime() / 1000;
-		#else
-			return 0;
-		#end
+		Returns a timestamp, in seconds with fractions.
+
+		The value itself might differ depending on platforms, only differences
+		between two values make sense.
+	**/
+	public static function stamp():Float {
+		return haxe.Timer.stamp();
 	}
 }
