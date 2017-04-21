@@ -262,9 +262,9 @@ class RunCommand extends MUnitTargetCommandBase {
 		resultMonitor.sendMessage(Thread.current());
 		resultMonitor.sendMessage(serverProcess);
 		resultMonitor.sendMessage(serverTimeoutTimeSec);
-		if(hasNekoTests) launchNeko(nekoFile);
-		if(hasCPPTests) launchCPP(cppFile);
-		if(hasJavaTests) launchJava(javaFile);
+		if(nekoFile != null) launchNeko(nekoFile);
+		if(cppFile != null) launchCPP(cppFile);
+		if(javaFile != null) launchJava(javaFile);
 		if(hasBrowserTests) launchFile(indexPage);
 		else resultMonitor.sendMessage("quit");
 		var platformResults:Bool = Thread.readMessage(true);

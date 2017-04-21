@@ -233,12 +233,10 @@ class TestRunner implements IAsyncDelegateObserver {
 
     function executeTestCases() {
         for(c in clients) {
-            if(Std.is(c, IAdvancedTestResultClient)) {
-                if(activeHelper.hasNext()) {
-                    var cl:IAdvancedTestResultClient = cast c;
-                    cl.setCurrentTestClass(activeHelper.className);
-                }
-            }
+            if(Std.is(c, IAdvancedTestResultClient) && activeHelper.hasNext()) {
+				var cl:IAdvancedTestResultClient = cast c;
+				cl.setCurrentTestClass(activeHelper.className);
+			}
         }
         for(testCaseData in activeHelper)         {
             if(testCaseData.result.ignore) {
@@ -296,9 +294,7 @@ class TestRunner implements IAsyncDelegateObserver {
 
     function clientCompletionHandler(resultClient:ITestResultClient) {
         if(++clientCompleteCount == clients.length) {
-            if(completionHandler != null) {
-                Timer.delay(completionHandler.bind(passCount == testCount), 10);
-            }
+            if(completionHandler != null) Timer.delay(completionHandler.bind(passCount == testCount), 10);
             running = false;
         }
     }
