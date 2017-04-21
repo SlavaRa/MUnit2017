@@ -40,8 +40,7 @@ import massive.munit.util.Timer;
  * 
  * @author Mike Stead
  */
-class AsyncDelegate 
-{
+class AsyncDelegate {
 	/**
 	 * Default timeout period in milliseconds.
 	 */

@@ -158,9 +158,9 @@ class RichPrintClient extends PrintClientBase
 	function getTestClassResultType():TestResultType
 	{
 		if(errorCount > 0) return TestResultType.ERROR;
-		else if(failCount > 0) return TestResultType.FAIL;
-		else if (ignoreCount > 0) return TestResultType.IGNORE; 
-		else return TestResultType.PASS; 
+		if(failCount > 0) return TestResultType.FAIL;
+		if(ignoreCount > 0) return TestResultType.IGNORE; 
+		return TestResultType.PASS; 
 	}
 
 
@@ -241,11 +241,6 @@ class RichPrintClient extends PrintClientBase
 		}
 	}
 
-	override function printReports()
-	{
-		super.printReports();
-	}
-
 	override function printFinalStatistics(result:Bool, testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float)
 	{
 		super.printFinalStatistics(result, testCount, passCount, failCount, errorCount, ignoreCount, time);
@@ -270,14 +265,11 @@ class RichPrintClient extends PrintClientBase
 	function customTrace(value, ?info:haxe.PosInfos)
 	{
 		addTrace(value, info);
-
 		var traces = getTraces();
 		var t = traces[traces.length-1];
 		external.trace(t);
 	}
 	
-	////// PRINT APIS //////
-
 	override public function print(value:Dynamic)
 	{
 		super.print(value);
@@ -288,10 +280,5 @@ class RichPrintClient extends PrintClientBase
 		#elseif (neko || cpp || php || java)
 			Sys.print(value);
 		#end
-	}
-
-	override public function printLine(value:Dynamic, ?indent:Int = 0)
-	{
-		super.printLine(value, indent);
 	}
 }

@@ -287,9 +287,7 @@ interface ExternalPrintClient
 	function addMissingCoverageClass(className:String, percent:Float=0):Void;
 	function addCoverageReportSection(name:String, value:String):Void;
 	function addCoverageSummary(value:String):Void;
-	
 	function printSummary(value:String):Void;
-		
 }
 
 class ExternalPrintClientJS implements ExternalPrintClient
@@ -421,9 +419,6 @@ class ExternalPrintClientJS implements ExternalPrintClient
 		#end
 		return false;
 	}
-
-	
-
 
 	public function convertToJavaScript(method:String, ?args:Array<Dynamic>):String
 	{

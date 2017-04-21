@@ -140,11 +140,6 @@ class PrintClient extends PrintClientBase
 		addTrace(value, info);
 	}
 	
-	override public function reportFinalStatistics(testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float):Dynamic
-	{
-		return super.reportFinalStatistics(testCount, passCount, failCount, errorCount, ignoreCount, time);
-	}
-
 	override public function print(value:Dynamic)
 	{
 		super.print(value);
@@ -162,10 +157,4 @@ class PrintClient extends PrintClientBase
 			external.print(value);
 		#end
 	}
-
-	override public function printLine(value:Dynamic, ?indent:Int = 0)
-	{
-		super.printLine(value, indent);
-	}
-
 }
