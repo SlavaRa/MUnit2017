@@ -89,6 +89,9 @@ import haxe.CallStack;
  * @see TestSuite
  */
 class TestRunner implements IAsyncDelegateObserver {
+	
+	static var emptyParams:Array<Dynamic> = [];
+	
     /**
      * Handler called when all tests have been executed and all clients
      * have completed processing the results.
@@ -98,14 +101,14 @@ class TestRunner implements IAsyncDelegateObserver {
     public var clientCount(get, null):Int;
     function get_clientCount():Int return clients.length;
 	
-    public var running(default, null):Bool;
+    public var running(default, null):Bool = false;
     var testCount:Int;
     var failCount:Int;
     var errorCount:Int;
     var passCount:Int;
     var ignoreCount:Int;
     var clientCompleteCount:Int;
-    var clients:Array<ITestResultClient>;
+    var clients:Array<ITestResultClient> = [];
     var activeHelper:TestClassHelper;
     var testSuites:Array<TestSuite>;
     var asyncPending:Bool;
@@ -120,7 +123,6 @@ class TestRunner implements IAsyncDelegateObserver {
         return asyncFactory = value;
     }
 
-    var emptyParams:Array<Dynamic>;
     var startTime:Float;
     var testStartTime:Float;
     var isDebug(default, null):Bool;
@@ -131,11 +133,8 @@ class TestRunner implements IAsyncDelegateObserver {
      * @param	resultClient	a result client to interpret test results
      */
     public function new(resultClient:ITestResultClient) {
-        clients = new Array<ITestResultClient>();
         addResultClient(resultClient);
         asyncFactory = createAsyncFactory();
-        running = false;
-
         #if (testDebug || testdebug)
         isDebug = true;
         #else
@@ -149,8 +148,7 @@ class TestRunner implements IAsyncDelegateObserver {
      * @param	resultClient			a result client to interpret test results
      */
     public function addResultClient(resultClient:ITestResultClient) {
-        for (client in clients) if (client == resultClient) return;
-
+        for(client in clients) if(client == resultClient) return;
         resultClient.completionHandler = clientCompletionHandler;
         clients.push(resultClient);
     }
@@ -172,7 +170,6 @@ class TestRunner implements IAsyncDelegateObserver {
      */
     public function run(testSuiteClasses:Array<Class<TestSuite>>) {
         if (running) return;
-
         running = true;
         asyncPending = false;
         asyncDelegate = null;
@@ -184,13 +181,8 @@ class TestRunner implements IAsyncDelegateObserver {
         suiteIndex = 0;
         clientCompleteCount = 0;
         Assert.assertionCount = 0; // don't really like this static but can't see way around it atm. ms 17/12/10
-        emptyParams = new Array();
-        testSuites = new Array<TestSuite>();
         startTime = Timer.stamp();
-
-        for (suiteType in testSuiteClasses)
-            testSuites.push(Type.createInstance(suiteType, emptyParams));
-
+        testSuites = [for(suiteType in testSuiteClasses) Type.createInstance(suiteType, emptyParams)];
         #if (neko || cpp || java) 
 		var self = this;
 		var runThread:Thread = Thread.create(function() {

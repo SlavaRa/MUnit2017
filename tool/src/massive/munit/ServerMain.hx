@@ -99,7 +99,7 @@ class ServerMain {
 				Sys.sleep(0.1);
 			}
 		} while(!writeSuccess && writeAttempts++ < MAX_WRITE_ATTEMPTS);
-		if(writeAttempts >= MAX_WRITE_ATTEMPTS) neko.Web.logMessage("ERROR: Server could not write test result to results.txt file");
+		if(writeAttempts >= MAX_WRITE_ATTEMPTS) neko.Web.logMessage('${ERROR}: Server could not write test result to results.txt file');
 	}
 	
 	function writeJUnitReportData(data:String, dir:File):String {
@@ -133,8 +133,8 @@ class ServerMain {
 		var lines = data.split("\n");
 		lines.reverse();
 		for(line in lines) {	
-			if(line.indexOf("PASSED") == 0) return PASSED;
-			if(line.indexOf("FAILED") == 0) return FAILED;
+			if(line.indexOf(PASSED) == 0) return PASSED;
+			if(line.indexOf(FAILED) == 0) return FAILED;
 		}
 		return ERROR;
 	}
