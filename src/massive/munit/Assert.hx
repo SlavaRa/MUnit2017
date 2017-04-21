@@ -214,20 +214,13 @@ class Assert
 		{
 			code();
 			fail("Expected exception wasn't thrown!", info);
-			return null; // needed to compile
 		}
 		catch (e:Dynamic)
 		{
-			if (Std.is(e, expectedType))
-			{
-				return e;
-			}
-			else
-			{
-				Assert.fail('Expected exception of type ${Type.getClassName(expectedType)} but got ${Type.getClassName(Type.getClass(e))}: ${e}');
-				return null; // needed to compile
-			}
+			if(Std.is(e, expectedType)) return e;
+			Assert.fail('Expected exception of type ${Type.getClassName(expectedType)} but got ${Type.getClassName(Type.getClass(e))}: ${e}');
 		}
+		return null; // needed to compile
 	}
 
 	/**
@@ -236,7 +229,7 @@ class Assert
 	  * @param	msg				message describing the assertion which failed
 	  * @throws	AssertionException	thrown automatically
 	  */	
-	public static function fail(msg:String, ?info:PosInfos) throw new AssertionException(msg, info);
+	public static inline function fail(msg:String, ?info:PosInfos) throw new AssertionException(msg, info);
 	
 	static inline function equals(a:Dynamic, b:Dynamic) return switch(Type.typeof(a)) {
 		case TEnum(_): Type.enumEq(a, b);

@@ -32,9 +32,7 @@ import massive.munit.TestResult;
 import massive.munit.client.PrintClientBase;
 import massive.munit.util.MathUtil;
 
-
-class RichPrintClient extends PrintClientBase
-{
+class RichPrintClient extends PrintClientBase {
 	/**
 	 * Default id of this client.
 	 */
@@ -43,106 +41,64 @@ class RichPrintClient extends PrintClientBase
 	var testClassResultType:TestResultType;
 	var external:ExternalPrintClient;
 	
-	public function new()
-	{
+	public function new() {
 		super();
 		id = DEFAULT_ID;
 	}
 
-	override function init():Void
-	{
+	override function init() {
 		super.init();
-
 		originalTrace = haxe.Log.trace;
 		haxe.Log.trace = customTrace;
-
 		external = new ExternalPrintClientJS();
 	}
 
-	////// TEST CLASS LIFECYCLE //////
-	override function initializeTestClass()
-	{
+	override function initializeTestClass() {
 		super.initializeTestClass();
 		external.createTestClass(currentTestClass);
 		external.printToTestClassSummary("Class: " + currentTestClass + " ");
 	}
 
-	override function updateTestClass(result:TestResult)
-	{
+	override function updateTestClass(result:TestResult) 	{
 		super.updateTestClass(result);
-
 		var value = serializeTestResult(result);
-		switch(result.type)
-		{
+		switch(result.type) {
 			case PASS:
-			{
 				external.printToTestClassSummary(".");
 				external.addTestPass(value);
-			}
 			case FAIL:
-			{
 				external.printToTestClassSummary("!");
 				external.addTestFail(value);
-			}
 			case ERROR:
-			{
 				external.printToTestClassSummary("x");
 				external.addTestError(value);
-			}
 			case IGNORE:
-			{
 				external.printToTestClassSummary(",");
 				external.addTestIgnore(value);
-			}
-			case UNKNOWN: null;
+			case UNKNOWN:
 		}
 	}
 
-	function serializeTestResult(result:TestResult):String
-	{
+	function serializeTestResult(result:TestResult):String {
 		var summary = result.name;
-
-		if(result.description != null && result.description != "")
-		{
+		if(result.description != null && result.description != "") {
 			summary += " - " + result.description + " -";
 		}
-
 		summary += " (" + MathUtil.round(result.executionTime, 4) + "s)";
-
-		var str = null;
-		if(result.error != null)
-		{
-			str = "Error: " + summary + "\n" + Std.string(result.error);
-		}
-		else if(result.failure != null)
-		{
-			str = "Failure: " + summary +  "\n" + Std.string(result.failure);
-		}
-		else if(result.ignore)
-		{
-			str = "Ignore: " + summary;
-		}
-		else if(result.passed)
-		{
-			//str = str;
-		}
-
-		return str;
+		if(result.error != null) return "Error: " + summary + "\n" + Std.string(result.error);
+		if(result.failure != null) return "Failure: " + summary +  "\n" + Std.string(result.failure);
+		if(result.ignore) return "Ignore: " + summary;
+		return null;
 	}
 
 	/**
 	* summarises result for currently executing test class
 	* and update visual state of test class
 	*/
-	override function finalizeTestClass()
-	{
+	override function finalizeTestClass() {
 		super.finalizeTestClass();
 		testClassResultType = getTestClassResultType();
-
-		var code:Int =
-		
-		switch(testClassResultType)
-		{
+		var code:Int = switch(testClassResultType) {
 			case PASS: 0;
 			case FAIL: 1;
 			case ERROR: 2;
@@ -155,8 +111,7 @@ class RichPrintClient extends PrintClientBase
 
 	// We print exceptions captured (failures or errors) after all tests 
 	// have completed for a test class.
-	function getTestClassResultType():TestResultType
-	{
+	function getTestClassResultType():TestResultType {
 		if(errorCount > 0) return TestResultType.ERROR;
 		if(failCount > 0) return TestResultType.FAIL;
 		if(ignoreCount > 0) return TestResultType.IGNORE; 
@@ -164,22 +119,14 @@ class RichPrintClient extends PrintClientBase
 	}
 
 
-	override public function setCurrentTestClassCoverage(result:CoverageResult):Void
-	{
+	override public function setCurrentTestClassCoverage(result:CoverageResult) {
 		super.setCurrentTestClassCoverage(result);
-
 		external.printToTestClassSummary(" [" + result.percent + "%]");
-
 		if(result.percent == 100) return;
-
 		external.addTestClassCoverage(result.className, result.percent);
-		for(item in result.blocks)
-		{
-			external.addTestClassCoverageItem(item);
-		}
+		for(item in result.blocks) external.addTestClassCoverageItem(item);
 	}
 	
-	////// FINAL REPORTS //////
 	override public function reportFinalCoverage(?percent:Float=0, missingCoverageResults:Array<CoverageResult>, summary:String,
 		?classBreakdown:String=null,
 		?packageBreakdown:String=null,
@@ -212,73 +159,52 @@ class RichPrintClient extends PrintClientBase
 		}		
 	}
 
-	function trim(output:String):String
-	{
-		while(output.indexOf("\n") == 0)
-		{
-			output = output.substr(1);
-		}
-		
-		while(output.lastIndexOf("\n") == output.length-2)
-		{
-			output = output.substr(0, output.length-2);
-		}
-
+	function trim(output:String):String {
+		while(output.indexOf("\n") == 0)  output = output.substr(1);
+		while(output.lastIndexOf("\n") == output.length - 2) output = output.substr(0, output.length - 2);
 		return output;
 	}
 
-	function printMissingCoverage(missingCoverageResults:Array<CoverageResult>)
-	{
+	function printMissingCoverage(missingCoverageResults:Array<CoverageResult>) {
 		if(missingCoverageResults == null || missingCoverageResults.length == 0) return;
-
-		for(result in missingCoverageResults)
-		{
+		for(result in missingCoverageResults) {
 			external.addMissingCoverageClass(result.className, result.percent);
-			for(item in result.blocks)
-			{
-				external.addTestClassCoverageItem(item);
-			}
+			for(item in result.blocks) external.addTestClassCoverageItem(item);
 		}
 	}
 
-	override function printFinalStatistics(result:Bool, testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float)
-	{
+	override function printFinalStatistics(result:Bool, testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float) {
 		super.printFinalStatistics(result, testCount, passCount, failCount, errorCount, ignoreCount, time);
-
-		var resultString = result ? "PASSED" : "FAILED";
-		resultString += "\n" + "Tests: " + testCount
-			+ "  Passed: " + passCount
-			+ "  Failed: " + failCount
-			+ " Errors: " + errorCount
-			+ " Ignored: " + ignoreCount
-			+ " Time: " + MathUtil.round(time, 5);
-
-		external.printSummary(resultString);
+		var sb = new StringBuf();
+		sb.add(result ? "PASSED" : "FAILED");
+		sb.add("\nTests: "); sb.add(testCount);
+		sb.add("  Passed: "); sb.add(passCount);
+		sb.add("  Failed: "); sb.add(failCount);
+		sb.add(" Errors: "); sb.add(errorCount);
+		sb.add(" Ignored: "); sb.add(ignoreCount);
+		sb.add(" Time: "); sb.add(MathUtil.round(time, 5));
+		external.printSummary(sb.toString());
 	}
 
-	override function printOverallResult(result:Bool)
-	{
+	override function printOverallResult(result:Bool) {
 		super.printOverallResult(result);
 		external.setResult(result);
 	}
 
-	function customTrace(value, ?info:haxe.PosInfos)
-	{
+	function customTrace(value, ?info:haxe.PosInfos) {
 		addTrace(value, info);
 		var traces = getTraces();
-		var t = traces[traces.length-1];
+		var t = traces[traces.length - 1];
 		external.trace(t);
 	}
 	
-	override public function print(value:Dynamic)
-	{
+	override public function print(value:Dynamic) {
 		super.print(value);
-
 		#if (js || flash)
-			//external.queue(ExternalPrintClientJS.PRINT, value);
-			return;
+		//external.queue(ExternalPrintClientJS.PRINT, value);
+		return;
 		#elseif (neko || cpp || php || java)
-			Sys.print(value);
+		Sys.print(value);
 		#end
 	}
 }

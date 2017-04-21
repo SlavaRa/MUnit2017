@@ -282,7 +282,7 @@ class TestClassHelper {
 		return -1;
 	}
 
-	static function nullFunc() {}
+	public static function nullFunc() {}
 }
 
 typedef TestCaseData = {
