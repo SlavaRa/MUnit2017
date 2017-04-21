@@ -27,6 +27,7 @@
 ****/
 
 package massive.munit;
+import haxe.Constraints.Function;
 import haxe.rtti.Meta;
 
 /**
@@ -113,22 +114,22 @@ class TestClassHelper {
 	/**
 	 * The life cycle method to be called once, before tests in the class are executed.
 	 */
-	public var beforeClass(default, null):Dynamic;
+	public var beforeClass(default, null):Function;
 	
 	/**
 	 * The life cycle method to be called once, after tests in the class are executed.
 	 */
-	public var afterClass(default, null):Dynamic;
+	public var afterClass(default, null):Function;
 	
 	/**
 	 * The life cycle method to be called once, before each test in the class is executed.
 	 */
-	public var before(default, null):Dynamic;
+	public var before(default, null):Function;
 	
 	/**
 	 * The life cycle method to be called once, after each test in the class is executed.
 	 */
-	public var after(default, null):Dynamic;
+	public var after(default, null):Function;
 	
 	private var tests:Array<TestCaseData>;
 	private var index:Int;
@@ -258,7 +259,7 @@ class TestClassHelper {
 		}
 	}
 	
-	function searchForMatchingTags(fieldName:String, func:Dynamic, funcMeta:Dynamic) {
+	function searchForMatchingTags(fieldName:String, func:Function, funcMeta:Dynamic) {
 		for (tag in META_TAGS) {
 			if(!Reflect.hasField(funcMeta, tag)) continue;
 			var args:Array<String> = Reflect.field(funcMeta, tag);
@@ -310,7 +311,7 @@ class TestClassHelper {
 }
 
 typedef TestCaseData = {
-	var test:Dynamic;
+	var test:Function;
 	var scope:Dynamic;
 	var result:TestResult;
 }
