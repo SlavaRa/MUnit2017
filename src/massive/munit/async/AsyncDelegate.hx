@@ -29,6 +29,7 @@
 
 
 package massive.munit.async;
+import haxe.Constraints.Function;
 import haxe.PosInfos;
 import massive.munit.util.Timer;
 
@@ -67,25 +68,25 @@ class AsyncDelegate
 	public var timeoutDelay(default, null):Int;
 	public var timedOut(default, null):Bool;
 	private var testCase:Dynamic;
-	private var handler:Dynamic;
+	private var handler:Function;
 	private var timer:Timer;
 	public var canceled(default, null):Bool;
 	private var deferredTimer:Timer;
 
-	/* An array of values to be passed as parameters to the test class handler.
+	/**
+	 * An array of values to be passed as parameters to the test class handler.
 	 * This should be populated inside the delegateHandler when it's called.
 	 */ 
 	private var params:Array<Dynamic>;
 	
 	/**
 	 * Class constructor.
-	 * 
 	 * @param	testCase			test case instance where the async test originated
 	 * @param	handler				the handler in the test case for a successful async response
 	 * @param	?timeout			[optional] number of milliseconds to wait before timing out. Defaults to 400
 	 * @param	?info				[optional] pos infos of the test which requests an instance of this delegate
 	 */
-	public function new(testCase:Dynamic, handler:Dynamic, ?timeout:Int, ?info:PosInfos)
+	public function new(testCase:Dynamic, handler:Function, ?timeout:Int, ?info:PosInfos)
 	{
 		this.testCase = testCase;
 		this.handler = handler;
@@ -121,17 +122,11 @@ class AsyncDelegate
 	private function responseHandler(?params:Array<Dynamic>):Dynamic
 	{	
 		if (timedOut || canceled) return null;
-
 		timer.stop();
-	
 		if(deferredTimer != null) deferredTimer.stop();
-		
-		if (params == null) params = [];
-		this.params = params;
-		
+		this.params = params != null ? params.copy() : [];
 		// defer callback to force async runner
 		if (observer != null) Timer.delay(delayActualResponseHandler, 1);
-
 		return null;
 	}
 

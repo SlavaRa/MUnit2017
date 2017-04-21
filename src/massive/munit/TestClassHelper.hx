@@ -80,7 +80,6 @@ class TestClassHelper {
 		
 	/**
 	 * Param for META_TAG_TEST, marking test method in class as asynchronous.
-     *
      * @deprecated As of 0.9.1.4, use @AsyncTest instead.
 	 */
 	public inline static var META_PARAM_ASYNC_TEST:String = "Async";
