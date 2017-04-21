@@ -147,12 +147,10 @@ class TestClassHelper {
 		tests = [];
 		index = 0;
 		className = Type.getClassName(type);
-		
 		beforeClass = nullFunc;
 		afterClass = nullFunc;
 		before = nullFunc;
 		after = nullFunc;
-		
 		parse(type);
 	}
 	
@@ -171,7 +169,7 @@ class TestClassHelper {
 	 * 
 	 * @return	if another test is available it's returned, otherwise returns null
 	 */
-	public function next():Dynamic
+	public function next():TestCaseData
 	{
 		return hasNext() ? tests[index++] : null;
 	}
@@ -181,7 +179,7 @@ class TestClassHelper {
 	 * 
 	 * @return	current test in the iterable list of tests
 	 */
-	public function current():Dynamic
+	public function current():TestCaseData
 	{
 		return (index <= 0) ? tests[0] : tests[index - 1];
 	}
@@ -189,7 +187,6 @@ class TestClassHelper {
 	private function parse(type:Class<Dynamic>):Void
 	{
 		test = Type.createEmptyInstance(type);
-		
 		var inherintanceChain = getInheritanceChain(type);
 		var fieldMeta = collateFieldMeta(inherintanceChain);
 		scanForTests(fieldMeta);
@@ -212,12 +209,10 @@ class TestClassHelper {
 			var clazz = inherintanceChain.pop(); // start at root
 			var newMeta = Meta.getFields(clazz);			
 			var markedFieldNames = Reflect.fields(newMeta);
-			
 			for (fieldName in markedFieldNames)
 			{
 				var recordedFieldTags = Reflect.field(meta, fieldName);
 				var newFieldTags = Reflect.field(newMeta, fieldName);
-				
 				var newTagNames = Reflect.fields(newFieldTags);
 				if (recordedFieldTags == null)
 				{
@@ -225,9 +220,7 @@ class TestClassHelper {
 					// some later and this could impact other tests which
 					// extends the same class.
 					var tagsCopy = {};
-					for (tagName in newTagNames)
-						Reflect.setField(tagsCopy, tagName, Reflect.field(newFieldTags, tagName));
-						
+					for (tagName in newTagNames) Reflect.setField(tagsCopy, tagName, Reflect.field(newFieldTags, tagName));
 					Reflect.setField(meta, fieldName, tagsCopy);
 				}
 				else
@@ -235,17 +228,13 @@ class TestClassHelper {
 					var ignored = false;
 					for (tagName in newTagNames)
 					{
-						if (tagName == META_TAG_IGNORE)
-							ignored = true;
-						
+						if (tagName == META_TAG_IGNORE) ignored = true;
 						// TODO: Support @TestDebug ignore scenarios too. ms 4.9.2011
-						
 						// @Test in subclass takes precendence over @Ignore in parent
 						if (!ignored && (tagName == META_TAG_TEST || 
 										tagName == META_TAG_ASYNC_TEST) && 
 										Reflect.hasField(recordedFieldTags, META_TAG_IGNORE))
 							Reflect.deleteField(recordedFieldTags, META_TAG_IGNORE);
-						
 						var tagValue = Reflect.field(newFieldTags, tagName);
 						Reflect.setField(recordedFieldTags, tagName, tagValue);
 					}
@@ -269,47 +258,26 @@ class TestClassHelper {
 		}
 	}
 	
-	function searchForMatchingTags(fieldName:String, func:Dynamic, funcMeta:Dynamic)
-	{
-		for (tag in META_TAGS)
-		{
-			if (Reflect.hasField(funcMeta, tag))
-			{
-				var args:Array<String> = Reflect.field(funcMeta, tag);
-				var description = (args != null) ? args[0] : "";
-				var isAsync = (args != null && description == META_PARAM_ASYNC_TEST); // deprecated support for @Test("Async")
-				var isIgnored = Reflect.hasField(funcMeta, META_TAG_IGNORE);
-				
-				if (isAsync) 
-				{
-					description = "";
-				}
-				else if (isIgnored)
-				{
-					args = Reflect.field(funcMeta, META_TAG_IGNORE);
-					description = (args != null) ? args[0] : "";
-				}
-				
-				switch(tag)
-				{
-					case META_TAG_BEFORE_CLASS:
-						beforeClass = func;
-					case META_TAG_AFTER_CLASS:
-						afterClass = func;
-					case META_TAG_BEFORE:
-						before = func;
-					case META_TAG_AFTER:
-						after = func;
-					case META_TAG_ASYNC_TEST:
-						if (!isDebug)
-							addTest(fieldName, func, test, true, isIgnored, description);
-					case META_TAG_TEST:
-						if (!isDebug)
-							addTest(fieldName, func, test, isAsync, isIgnored, description);
-					case META_TAG_TEST_DEBUG:
-						if (isDebug)
-							addTest(fieldName, func, test, isAsync, isIgnored, description);
-				}
+	function searchForMatchingTags(fieldName:String, func:Dynamic, funcMeta:Dynamic) {
+		for (tag in META_TAGS) {
+			if(!Reflect.hasField(funcMeta, tag)) continue;
+			var args:Array<String> = Reflect.field(funcMeta, tag);
+			var description = (args != null) ? args[0] : "";
+			var isAsync = (args != null && description == META_PARAM_ASYNC_TEST); // deprecated support for @Test("Async")
+			var isIgnored = Reflect.hasField(funcMeta, META_TAG_IGNORE);
+			if (isAsync) description = "";
+			else if (isIgnored) {
+				args = Reflect.field(funcMeta, META_TAG_IGNORE);
+				description = (args != null) ? args[0] : "";
+			}
+			switch(tag) {
+				case META_TAG_BEFORE_CLASS: beforeClass = func;
+				case META_TAG_AFTER_CLASS: afterClass = func;
+				case META_TAG_BEFORE: before = func;
+				case META_TAG_AFTER: after = func;
+				case META_TAG_ASYNC_TEST: if(!isDebug) addTest(fieldName, func, test, true, isIgnored, description);
+				case META_TAG_TEST: if(!isDebug) addTest(fieldName, func, test, isAsync, isIgnored, description);
+				case META_TAG_TEST_DEBUG: if(isDebug) addTest(fieldName, func, test, isAsync, isIgnored, description);
 			}
 		}
 	}

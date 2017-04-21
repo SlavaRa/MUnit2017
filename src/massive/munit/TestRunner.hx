@@ -198,7 +198,6 @@ class TestRunner implements IAsyncDelegateObserver {
 			var mainThead:Thread = Thread.readMessage(true);
 			mainThead.sendMessage("done");
 		});
-
 		runThread.sendMessage(Thread.current());
 		Thread.readMessage(true);
         #else
@@ -310,11 +309,9 @@ class TestRunner implements IAsyncDelegateObserver {
     }
 
     function clientCompletionHandler(resultClient:ITestResultClient) {
-        if (++clientCompleteCount == clients.length) {
-            if (completionHandler != null) {
-                var successful:Bool = (passCount == testCount);
-                var handler:Dynamic = completionHandler;
-                Timer.delay(function() { handler(successful); }, 10);
+        if(++clientCompleteCount == clients.length) {
+            if(completionHandler != null) {
+                Timer.delay(completionHandler.bind(passCount == testCount), 10);
             }
             running = false;
         }

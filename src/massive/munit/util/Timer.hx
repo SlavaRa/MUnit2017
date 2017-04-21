@@ -75,11 +75,10 @@ class Timer
 	private var runThread:Thread;
 	#end
 
-	public function new(time_ms:Int)
-	{
+	public function new(time_ms:Int) {
 		#if flash
 			var me = this;
-			id = untyped _global["setInterval"](function() { me.run(); },time_ms);
+			id = untyped _global["setInterval"](me.run, time_ms);
 		#elseif nodejs
 			var arr :Array<Dynamic> = untyped global.haxe_timers = global.haxe_timers == null ? [] : global.haxe_timers;
 			var me 	= this;
@@ -88,15 +87,14 @@ class Timer
 		#elseif js
 			id = arr.length;
 			arr[id] = this;
-			timerId = untyped window.setInterval("massive.munit.util.Timer.arr["+id+"].run();",time_ms);
+			timerId = untyped window.setInterval("massive.munit.util.Timer.arr[" + id + "].run();", time_ms);
 		#elseif (neko || cpp || java)
 			var me = this;
-			runThread = Thread.create(function() { me.runLoop(time_ms); } );
+			runThread = Thread.create(me.runLoop.bind(time_ms));
 		#end
 	}
 
-	public function stop()
-	{
+	public function stop() {
 		#if(php || flash || js )
 			if (id == null) return;
 		#end
