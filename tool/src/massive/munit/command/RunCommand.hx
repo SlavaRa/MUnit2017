@@ -64,10 +64,12 @@ class RunCommand extends MUnitTargetCommandBase {
 	var hasCPPTests:Bool;
 	var hasJavaTests:Bool;
 	var hasCSTests:Bool;
+	var hasLUATests:Bool;
 	var nekoFile:File;
 	var cppFile:File;
 	var javaFile:File;
 	var csFile:File;
+	var luaFile:File;
 	var serverTimeoutTimeSec:Int;
 	var resultExitCode:Bool;
 
@@ -121,6 +123,7 @@ class RunCommand extends MUnitTargetCommandBase {
 					case cpp: hasCPPTests = true;
 					case java: hasJavaTests = true;
 					case cs: hasCSTests = true;
+					case lua: hasLUATests = true;
 					case _:
 				}
 			}
@@ -189,6 +192,9 @@ class RunCommand extends MUnitTargetCommandBase {
 				case cs:
 					hasCSTests = true;
 					csFile = file;
+				case lua:
+					hasLUATests = true;
+					luaFile = file;
 				case _:
 					hasBrowserTests = true;
 					var pageName = target.type;
@@ -272,6 +278,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		if(cppFile != null) launchCPP(cppFile);
 		if(javaFile != null) launchJava(javaFile);
 		if(csFile != null) launchCS(csFile);
+		if(luaFile != null) launchLUA(luaFile);
 		if(hasBrowserTests) launchFile(indexPage);
 		else resultMonitor.sendMessage("quit");
 		var platformResults:Bool = Thread.readMessage(true);
@@ -463,6 +470,16 @@ class RunCommand extends MUnitTargetCommandBase {
 		file.copyTo(reportRunnerFile);
 		FileSys.setCwd(config.dir.nativePath);
 		var exitCode = FileSys.isWindows ? runProgram(file.nativePath) : runProgram('mono', [file.nativePath]);
+		FileSys.setCwd(console.originalDir.nativePath);
+		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
+		return exitCode;
+	}
+	
+	function launchLUA(file:File):Int {
+		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
+		file.copyTo(reportRunnerFile);
+		FileSys.setCwd(config.dir.nativePath);
+		var exitCode = runProgram('lua', [reportRunnerFile.nativePath]);
 		FileSys.setCwd(console.originalDir.nativePath);
 		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
 		return exitCode;

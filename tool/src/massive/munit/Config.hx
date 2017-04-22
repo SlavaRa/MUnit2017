@@ -44,7 +44,7 @@ class Config {
 	public var classPaths:Array<File>;
 	public var targets:Array<Target> = [];
 	public var targetTypes:Array<TargetType>;
-	public var defaultTargetTypes:Array<TargetType> = [as3, js, neko, cpp, java, cs];
+	public var defaultTargetTypes:Array<TargetType> = [as3, js, neko, cpp, java, cs, lua];
 	public var coveragePackages:Array<String>;
 	public var coverageIgnoredClasses:Array<String>;
 	

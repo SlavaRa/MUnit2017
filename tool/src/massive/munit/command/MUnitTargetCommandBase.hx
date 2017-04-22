@@ -38,6 +38,7 @@ class MUnitTargetCommandBase extends MUnitCommand
 		if(console.getOption(cpp) == "true") result.push(cpp);
 		if(console.getOption(java) == "true") result.push(java);
 		if(console.getOption(cs) == "true") result.push(cs);
+		if(console.getOption(lua) == "true") result.push(lua);
 		return result;
 	}
 

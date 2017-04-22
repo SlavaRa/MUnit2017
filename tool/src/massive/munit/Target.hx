@@ -10,11 +10,11 @@ class Target {
 	public var flags:StringMap<String> = new StringMap();
 	public var debug:Bool = false;
 	public var executableFile:File;
-
+	
 	public function new() {}
 	
 	public function toString():String return 'Target ${type} ${file.toString()}';
-
+	
 	public function toHxmlString():String {
 		var output = "haxe";
 		var lines = hxml.split("\n");
@@ -36,4 +36,5 @@ abstract TargetType(String) from String to String {
 	var cpp = "cpp";
 	var java = "java";
 	var cs = "cs";
+	var lua = "lua";
 }
