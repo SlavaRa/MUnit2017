@@ -26,8 +26,6 @@
 * or implied, of Massive Interactive.
 ****/
 
-
-
 package massive.munit.util;
 
 /**
@@ -35,11 +33,7 @@ package massive.munit.util;
  * 
  * @author Mike Stead
  */
-class MathUtil 
-{
-	public function new() 
-	{}
-	
+class MathUtil {
 	/**
 	 * Round a floating point number to a given decimal place.
 	 * 
@@ -47,8 +41,7 @@ class MathUtil
 	 * @param	precision		precision to round the value to
 	 * @return	the rounded value
 	 */
-	public static function round(value:Float, precision:Int):Float
-	{
+	public static inline function round(value:Float, precision:Int):Float {
 		value = value * Math.pow(10, precision);
 		return Math.round(value) / Math.pow(10, precision);
 	}	
