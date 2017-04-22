@@ -36,8 +36,6 @@ install:
 #    else
 #      haxelib install hxcpp;
 #    fi
-  - pip install .
-  - pip install -r requirements.txt
   - python --version;
   - haxelib install hxcpp;
   - haxelib install hxjava;
