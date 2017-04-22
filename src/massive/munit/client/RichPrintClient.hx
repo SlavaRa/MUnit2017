@@ -141,22 +141,22 @@ class RichPrintClient extends PrintClientBase {
 		if(executionFrequency != null)
 		{
 			external.addCoverageReportSection("Code Execution Frequency", trim(executionFrequency));
-		}		
+		}
 
 		if(classBreakdown != null)
 		{
 			external.addCoverageReportSection("Class Breakdown", trim(classBreakdown));
-		}		
+		}
 
 		if(packageBreakdown != null)
 		{
 			external.addCoverageReportSection("Package Breakdown", trim(packageBreakdown));
-		}		
+		}
 
 		if(packageBreakdown != null)
 		{
 			external.addCoverageReportSection("Summary", trim(summary));
-		}		
+		}
 	}
 
 	function trim(output:String):String {
@@ -200,7 +200,7 @@ class RichPrintClient extends PrintClientBase {
 	
 	override public function print(value:Dynamic) {
 		super.print(value);
-		#if (neko || cpp || php || java)
+		#if (neko || cpp || php || java || cs)
 		Sys.print(value);
 		#end
 	}

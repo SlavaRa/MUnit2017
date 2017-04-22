@@ -3,46 +3,20 @@ import massive.munit.util.Timer;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import massive.munit.client.HTTPClient;
+
 /**
  * Auto generated MassiveUnit Test Class  for massive.munit.client.URLRequest 
  */
-class URLRequestTest 
-{
-	var instance:URLRequest; 
-	
-	public function new() 
-	{
-	}
-	
-	@BeforeClass
-	public function beforeClass():Void
-	{
-	}
-	
-	@AfterClass
-	public function afterClass():Void
-	{
-	}
-	
-	@Before
-	public function setup():Void
-	{
-	}
-	
-	@After
-	public function tearDown():Void
-	{
-	}
+class URLRequestTest {
+	public function new() {}
 	
 	@Test
-	public function testConstructor():Void
-	{
+	public function testConstructor() {
 		var url = "http://www.example.org";
-		instance = new URLRequest(url);
+		var instance = new URLRequest(url);
 		Assert.isNotNull(instance.client);
-		#if (js || neko || cpp || java)
+		#if (js || neko || cpp || java || cs)
 		Assert.areEqual(url, instance.client.url);
-		#elseif flash
 		#end
 	}
 }

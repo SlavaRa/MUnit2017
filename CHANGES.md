@@ -1,3 +1,6 @@
+## MUnit2017 v 1.1.0
+- Added cs support
+
 ## MUnit2017 v 1.0.0
 - Added java support
 - Dropped support for Haxe 2
