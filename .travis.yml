@@ -3,6 +3,9 @@ language: haxe
 haxe:
   - development
   - 3.4.2
+  
+python:
+  - "3.5"
 
 os:
   - linux
@@ -14,17 +17,13 @@ addons:
   apt:
     packages:
     - mono-complete
-    - python3
 
 before_install:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then 
       brew update;
       brew install mono;
-      brew uninstall python;
-      brew install python3;
     fi
   - mono --version;
-  - python --version;
 
 install:
 #  - yes | haxelib install test.hxml
@@ -37,6 +36,9 @@ install:
 #    else
 #      haxelib install hxcpp;
 #    fi
+  - pip install .
+  - pip install -r requirements.txt
+  - python --version;
   - haxelib install hxcpp;
   - haxelib install hxjava;
   - haxelib install hxcs;
