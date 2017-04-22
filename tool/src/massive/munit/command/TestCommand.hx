@@ -48,11 +48,11 @@ class TestCommand extends MUnitTargetCommandBase {
 		//append code coverage
 		if(missingClassPaths()) testsAborted = true;
 	}
-
-	// In v0.9.0.3 we made a significant change to the required format of test.hxml. 
+	
+	// In v0.9.0.3 we made a significant change to the required format of test.hxml.
 	// This ensures everything is in place
 	function invalidHxmlFormat():Bool {
-		var contents:String = config.hxml.readString();		
+		var contents:String = config.hxml.readString();
 		var lines:Array<String> = contents.split("\n");
 		var invalid = false;
 		for(line in lines) {
@@ -63,7 +63,7 @@ class TestCommand extends MUnitTargetCommandBase {
 		}
 		return invalid;
 	}
-
+	
 	//In v0.9.5.0 we added classpaths to .munit file to support mcover code coverage
 	function missingClassPaths():Bool {
 		if(includeCoverage && (config.classPaths == null || config.classPaths.length == 0)) {
@@ -72,7 +72,7 @@ class TestCommand extends MUnitTargetCommandBase {
 		}
 		return false;
 	}
-
+	
 	override public function execute():Void {
 		if(testsAborted) return;
 		var targets = config.targets;
@@ -87,16 +87,16 @@ class TestCommand extends MUnitTargetCommandBase {
 				}
 				validateTestMainCoverageConfiguration(target);
 				//ingore lib if testing MCOVER (causes compiler errors from dup src path)
-				if(!target.flags.exists("MCOVER_DEBUG")) target.hxml += "-lib mcover\n";	
+				if(!target.flags.exists("MCOVER_DEBUG")) target.hxml += "-lib mcover\n";
 				target.hxml += "-D MCOVER\n";
 				var coverPackages = config.coveragePackages != null ? config.coveragePackages.join("','") : "";
 				var coverIgnoredClasses = config.coverageIgnoredClasses != null ? config.coverageIgnoredClasses.join("','") : "";
 				target.hxml += "--macro mcover.MCover.coverage(['" + coverPackages + "'],['" + clsPaths.join("','") + "'],['" + coverIgnoredClasses + "'])\n";	
 			}
-			if(target.type == TargetType.as3) target.hxml = updateSwfHeader(target.hxml);
+			if(target.type == as3) target.hxml = updateSwfHeader(target.hxml);
 			if(console.getOption("debug") == "true") {
 				target.hxml += "-D testDebug\n";
-				target.hxml += "-D debug\n";				
+				target.hxml += "-D debug\n";
 			}
 			switch(target.type) {
 				case cpp | java | cs: target.executableFile.deleteFile();
@@ -112,7 +112,7 @@ class TestCommand extends MUnitTargetCommandBase {
 		}
 		Log.debug("All targets compiled successfully");
 	}
-
+	
 	function updateSwfHeader(hxml:String):String {
 		var result:String = "";
 		var lines:Array<String> = hxml.split("\n");
@@ -124,7 +124,7 @@ class TestCommand extends MUnitTargetCommandBase {
 		}
 		return result;
 	}
-
+	
 	/**
 	 * Checks the contents of the test main to ensure it is correctly configured for mcover.
 	 * Prints a warning (or error) if not correctly set up.
