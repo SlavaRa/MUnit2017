@@ -23,7 +23,7 @@ before_install:
       brew python 3.5;
     fi
   - mono --version;
-  - python --version
+  - python --version;
 
 install:
 #  - yes | haxelib install test.hxml
