@@ -141,22 +141,22 @@ class RichPrintClient extends PrintClientBase {
 		if(executionFrequency != null)
 		{
 			external.addCoverageReportSection("Code Execution Frequency", trim(executionFrequency));
-		}		
+		}
 
 		if(classBreakdown != null)
 		{
 			external.addCoverageReportSection("Class Breakdown", trim(classBreakdown));
-		}		
+		}
 
 		if(packageBreakdown != null)
 		{
 			external.addCoverageReportSection("Package Breakdown", trim(packageBreakdown));
-		}		
+		}
 
 		if(packageBreakdown != null)
 		{
 			external.addCoverageReportSection("Summary", trim(summary));
-		}		
+		}
 	}
 
 	function trim(output:String):String {

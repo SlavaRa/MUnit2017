@@ -101,7 +101,6 @@ class ReportCommand extends MUnitTargetCommandBase
 		if (dest != null)
 		{
 			destDir = config.dir.resolveDirectory(dest);
-
 		}
 		else
 		{

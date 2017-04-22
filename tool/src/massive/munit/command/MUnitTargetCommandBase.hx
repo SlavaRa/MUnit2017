@@ -28,7 +28,7 @@ class MUnitTargetCommandBase extends MUnitCommand
 		setFilteredTargets();
 		hxml = config.hxml;
 		targetTypes = config.targetTypes;
-		targets = config.targets;	
+		targets = config.targets;
 	}
 
 	function getTargetsFromConsole():Array<TargetType> {
@@ -79,7 +79,7 @@ class MUnitTargetCommandBase extends MUnitCommand
 			if (!hxml.exists)
 			{
 				error("Default hxml file path does not exist. Please run munit config.");
-			}			
+			}
 		}
 	}
 
@@ -116,7 +116,7 @@ class MUnitTargetCommandBase extends MUnitCommand
 	*/
 	function getTargetsFromHXML(hxml:File):Array<Target>
 	{
-		var contents:String = hxml.readString();		
+		var contents:String = hxml.readString();
 		var lines:Array<String> = contents.split("\n");
 		var target:Target = new Target();
 		

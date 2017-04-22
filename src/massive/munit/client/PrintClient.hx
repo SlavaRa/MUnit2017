@@ -78,7 +78,7 @@ class PrintClient extends PrintClientBase
 	{
 		super.init();
 
-		#if nodejs		
+		#if nodejs
 		#elseif (js || flash)
 			external = new ExternalPrintClientJS();
 			#if flash
