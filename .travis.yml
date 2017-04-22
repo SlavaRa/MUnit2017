@@ -4,6 +4,9 @@ haxe:
   - development
   - 3.4.2
 
+mono:
+  - latest
+
 os:
   - linux
   - osx
