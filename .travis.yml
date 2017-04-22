@@ -21,6 +21,7 @@ before_install:
       brew install mono;
     fi
   - mono --version;
+  - python --version
 
 install:
 #  - yes | haxelib install test.hxml
