@@ -1,3 +1,4 @@
+[![TravisCI Build Status](https://travis-ci.org/SlavaRa/MUnit2017.svg?branch=master)](https://travis-ci.org/SlavaRa/MUnit2017)
 
 MUnit is a metadata driven unit testing framework for cross-platform Haxe development.
 
