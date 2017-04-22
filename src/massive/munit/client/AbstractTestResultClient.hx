@@ -258,28 +258,23 @@ class AbstractTestResultClient implements IAdvancedTestResultClient implements I
 	/**
 	 * returns the current class trace statements
 	 */
-	function getTraces():Array<String> return traces.concat([]);
+	function getTraces():Array<String> return traces.copy();
 
-	function sortTestResults(a:TestResult, b:TestResult):Int
-	{
-		var aInt:Int = switch(a.type)
-		{
+	inline function sortTestResults(a:TestResult, b:TestResult):Int {
+		var aInt:Int = switch(a.type) {
 			case ERROR: 2;
 			case FAIL: 1;
 			case IGNORE: 0;
 			case PASS: -1;
 			default:-2;
 		}
-
-		var bInt:Int = switch(b.type)
-		{
+		var bInt:Int = switch(b.type) {
 			case ERROR: 2;
 			case FAIL: 1;
 			case IGNORE: 0;
 			case PASS: -1;
 			default:-2;
 		}
-		
 		return aInt - bInt;
 	}
 }

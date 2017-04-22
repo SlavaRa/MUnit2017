@@ -52,6 +52,10 @@
  */
 package massive.munit.util;
 
+#if cs
+typedef Timer = haxe.Timer;
+#else
+
 #if neko
 import neko.vm.Thread;
 #elseif cpp
@@ -61,8 +65,7 @@ import java.vm.Thread;
 #end
 
 @:expose('massive.munit.util.Timer')
-class Timer 
-{
+class Timer {
 	#if (php)
 	#else
 
@@ -75,11 +78,10 @@ class Timer
 	private var runThread:Thread;
 	#end
 
-	public function new(time_ms:Int)
-	{
+	public function new(time_ms:Int) {
 		#if flash
 			var me = this;
-			id = untyped _global["setInterval"](function() { me.run(); },time_ms);
+			id = untyped _global["setInterval"](me.run, time_ms);
 		#elseif nodejs
 			var arr :Array<Dynamic> = untyped global.haxe_timers = global.haxe_timers == null ? [] : global.haxe_timers;
 			var me 	= this;
@@ -88,15 +90,14 @@ class Timer
 		#elseif js
 			id = arr.length;
 			arr[id] = this;
-			timerId = untyped window.setInterval("massive.munit.util.Timer.arr["+id+"].run();",time_ms);
+			timerId = untyped window.setInterval("massive.munit.util.Timer.arr[" + id + "].run();", time_ms);
 		#elseif (neko || cpp || java)
 			var me = this;
-			runThread = Thread.create(function() { me.runLoop(time_ms); } );
+			runThread = Thread.create(me.runLoop.bind(time_ms));
 		#end
 	}
 
-	public function stop()
-	{
+	public function stop() {
 		#if(php || flash || js )
 			if (id == null) return;
 		#end
@@ -124,32 +125,24 @@ class Timer
 	public dynamic function run() {}
 
 	#if (neko || cpp || java)
-	private function runLoop(time_ms)
-	{
+	function runLoop(time_ms:Int) {
 		var shouldStop = false;
-		while(!shouldStop)
-		{
+		while(!shouldStop) {
 			Sys.sleep(time_ms / 1000);
-			try
-			{
+			try {
 				run();
-			}
-			catch(ex:Dynamic)
-			{
+			} catch(ex:Dynamic) {
 				trace(ex);
 			}
-
 			var msg = Thread.readMessage(false);
 			if(msg == "stop") shouldStop = true;
 		}
 	}
 	#end
 
-	public static function delay(f:Void->Void, time_ms:Int):Timer
-	{
+	public static function delay(f:Void->Void, time_ms:Int):Timer {
 		var t = new Timer(time_ms);
-		t.run = function()
-		{
+		t.run = function() {
 			t.stop();
 			f();
 		};
@@ -158,18 +151,13 @@ class Timer
 	#end
 
 	/**
-	 *	Returns a timestamp, in seconds
-	 */
-	public static function stamp():Float
-	{
-		#if flash
-			return flash.Lib.getTimer() / 1000;
-		#elseif (neko || cpp || java)
-			return Sys.time();
-		#elseif js
-			return Date.now().getTime() / 1000;
-		#else
-			return 0;
-		#end
+		Returns a timestamp, in seconds with fractions.
+
+		The value itself might differ depending on platforms, only differences
+		between two values make sense.
+	**/
+	public static inline function stamp():Float {
+		return haxe.Timer.stamp();
 	}
 }
+#end

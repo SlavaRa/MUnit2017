@@ -26,8 +26,6 @@
 * or implied, of Massive Interactive.
 ****/
 
-
-
 package massive.munit.client;
 
 import massive.haxe.util.ReflectUtil;
@@ -35,101 +33,63 @@ import massive.munit.ITestResultClient.CoverageResult;
 import massive.munit.TestResult;
 import massive.munit.util.MathUtil;
 
-class PrintClientBase extends AbstractTestResultClient
-{
+class PrintClientBase extends AbstractTestResultClient {
 	/**
 	 * Default id of this client.
 	 */
 	public static inline var DEFAULT_ID:String = "simple";
+	var divider1:String = "------------------------------";
+	var divider2:String = "==============================";
 	public var verbose:Bool;
 	var includeIgnoredReport:Bool;
-	var divider:String;
-	var divider2:String;
 
-	public function new(?includeIgnoredReport:Bool = true)
-	{
+	public function new(includeIgnoredReport:Bool = true) {
 		super();
 		id = DEFAULT_ID;
 		verbose = false;
 		this.includeIgnoredReport = includeIgnoredReport;
 		printLine("MUnit Results");
-		printLine(divider);
+		printLine(divider1);
 	}
 
-	override function init():Void
-	{
-		super.init();
-		divider = "------------------------------";
-		divider2 = "==============================";
-	}
-
-	////// TEST CLASS LIFECYCLE //////
-
-	override function initializeTestClass()
-	{
+	override function initializeTestClass() {
 		super.initializeTestClass();
 		printLine("Class: " + currentTestClass + " ");
 	}
 
-	override function updateTestClass(result:TestResult)
-	{
+	override function updateTestClass(result:TestResult) {
 		super.updateTestClass(result);
 		if(verbose) printLine(" " + result.name + ": " + result.type +" ");
-		else
-		{
-			switch(result.type)
-			{
+		else {
+			switch(result.type) {
 				case PASS: print(".");
 				case FAIL: print("!");
 				case ERROR: print ("x");
 				case IGNORE: print(",");
-				case UNKNOWN: null;
+				case UNKNOWN:
 			}
 		}
 	}
 
-	override function finalizeTestClass()
-	{
+	override function finalizeTestClass() {
 		super.finalizeTestClass();
-
-		for(item in getTraces())
-		{
-			printLine("TRACE: " + item, 1);
-		}
-
-		for(result in currentClassResults)
-		{
-			switch(result.type)
-			{
+		for(item in getTraces()) printLine("TRACE: " + item, 1);
+		for(result in currentClassResults) {
+			switch(result.type) {
 				case ERROR: printLine("ERROR: " + Std.string(result.error), 1);
 				case FAIL: printLine("FAIL: " + Std.string(result.failure), 1);
 				case IGNORE:
-				{
 					var ingoredString = result.location;
 					if(result.description != null) ingoredString += " - " + result.description;
 					printLine("IGNORE: " + ingoredString, 1);
-				}
-				case PASS, UNKNOWN: null;
+				case PASS, UNKNOWN:
 			}
 		}
 	}
-	/////////  COVERAGE
 
-	override public function setCurrentTestClassCoverage(result:CoverageResult):Void
-	{	
+	override public function setCurrentTestClassCoverage(result:CoverageResult) {	
 		super.setCurrentTestClassCoverage(result);
 		print(" [" + result.percent + "%]");
-
-		// if(result.percent == 100) return;
-		// printLine("COVERAGE: " + result.className, 1);	
-		// for(item in result.blocks)
-		// {
-		// 	var lines = item.split("\n");
-		// 	for(line in lines)
-		// 	{
-		// 		printLine(line, 2);
-		// 	}
-		// }
 	}
 	
 	override public function reportFinalCoverage(?percent:Float=0, missingCoverageResults:Array<CoverageResult>, summary:String,
@@ -139,76 +99,43 @@ class PrintClientBase extends AbstractTestResultClient
 		):Void
 	{
 		super.reportFinalCoverage(percent, missingCoverageResults, summary,classBreakdown,packageBreakdown,executionFrequency);
-
 		printLine("");
-		printLine(divider);
+		printLine(divider1);
 		printLine("COVERAGE REPORT");
-		printLine(divider);
-
-		if(missingCoverageResults != null && missingCoverageResults.length >0)
-		{	
+		printLine(divider1);
+		if(missingCoverageResults != null && missingCoverageResults.length > 0) {
 			printLine("MISSING CODE BLOCKS:");
-			for(result in missingCoverageResults)
-			{
+			for(result in missingCoverageResults) {
 				printLine(result.className + " [" + result.percent + "%]", 1);
-				for(item in result.blocks)
-				{
-					printIndentedLines(item, 2);
-				}
+				for(item in result.blocks) printIndentedLines(item, 2);
 				printLine("");
 			}
 		}
-
-		if(executionFrequency != null)
-		{
+		if(executionFrequency != null) {
 			printLine("CODE EXECUTION FREQUENCY:");
 			printIndentedLines(executionFrequency, 1);
-		
 			printLine("");
-		}		
-
-		if(classBreakdown != null)
-		{
-			printIndentedLines(classBreakdown, 0);
 		}
-
-		if(packageBreakdown != null)
-		{
-			printIndentedLines(packageBreakdown, 0);
-		}
-
-		if(summary != null)
-		{
-			printIndentedLines(summary, 0);
-		}
+		if(classBreakdown != null) printIndentedLines(classBreakdown, 0);
+		if(packageBreakdown != null) printIndentedLines(packageBreakdown, 0);
+		if(summary != null) printIndentedLines(summary, 0);
 	}
 
-	function printIndentedLines(value:String, indent:Int=1):Void
-	{
+	function printIndentedLines(value:String, indent:Int = 1) {
 		var lines = value.split("\n");
-		for(line in lines)
-		{
-			printLine(line, indent);
-		}
+		for(line in lines) printLine(line, indent);
 	}
 
-	////// FINAL REPORTS //////
 	override function printReports() printFinalIgnoredStatistics(ignoreCount);
 
-	function printFinalIgnoredStatistics(count:Int)
-	{
+	function printFinalIgnoredStatistics(count:Int) {
 		if (!includeIgnoredReport || count == 0) return;
-
 		var items = Lambda.filter(totalResults, filterIngored); 
-		
 		if(items.length == 0) return;
-
 		printLine("");
 		printLine("Ignored (" + count + "):");
-		printLine(divider);
-
-		for(result in items)
-		{
+		printLine(divider1);
+		for(result in items) {
 			var ingoredString = result.location;
 			if(result.description != null) ingoredString += " - " + result.description;
 			printLine("IGNORE: " + ingoredString, 1);
@@ -216,47 +143,39 @@ class PrintClientBase extends AbstractTestResultClient
 		printLine("");
 	}
 
-	function filterIngored(result:TestResult):Bool
-	{
-		return result.type == IGNORE;
-	}
+	function filterIngored(result:TestResult):Bool  return result.type == IGNORE;
 
-	override function printFinalStatistics(result:Bool, testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float)
-	{
+	override function printFinalStatistics(result:Bool, testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float) {
 		printLine(divider2);
-		var resultString = result ? "PASSED" : "FAILED";
-		resultString += "\n" + "Tests: " + testCount
-			+ "  Passed: " + passCount
-			+ "  Failed: " + failCount
-			+ " Errors: " + errorCount
-			+ " Ignored: " + ignoreCount
-			+ " Time: " + MathUtil.round(time, 5);
-
-		printLine(resultString);
+		var sb = new StringBuf();
+		sb.add(result ? "PASSED" : "FAILED");
+		sb.add("\nTests: "); sb.add(testCount);
+		sb.add("  Passed: "); sb.add(passCount);
+		sb.add("  Failed: "); sb.add(failCount);
+		sb.add(" Errors: "); sb.add(errorCount);
+		sb.add(" Ignored: "); sb.add(ignoreCount);
+		sb.add(" Time: "); sb.add(MathUtil.round(time, 5));
+		printLine(sb.toString());
 		printLine("");	
 	}
 
 	override function printOverallResult(result:Bool) printLine("");
 	
-	////// PRINT APIS //////
 	public function print(value:Dynamic) output += Std.string(value);
 
-	public function printLine(value:Dynamic, ?indent:Int = 0)
-	{
+	public function printLine(value:Dynamic, ?indent:Int = 0) {
 		value = Std.string(value);
 		value = indentString(value, indent);
 		print("\n" + value);
 	}
 
-	function indentString(value:String, ?indent:Int=0):String
-	{
-		if(indent > 0) value = StringTools.lpad("", " ", indent*4) + value;
+	function indentString(value:String, ?indent:Int = 0):String {
+		if(indent > 0) value = StringTools.lpad("", " ", indent * 4) + value;
 		return value;
 	}
 }
 
-interface ExternalPrintClient
-{
+interface ExternalPrintClient {
 	//COMMON
 	function queue(methodName:String, ?args:Dynamic):Bool;
 	function setResult(value:Bool):Void;
@@ -279,17 +198,15 @@ interface ExternalPrintClient
 	function addTestError(value:String):Void;
 	function addTestIgnore(value:String):Void;
 
-	function addTestClassCoverage(className:String, percent:Float=0):Void;
+	function addTestClassCoverage(className:String, percent:Float = 0):Void;
 	function addTestClassCoverageItem(value:String):Void;
 
 	//OVERALL STATS APIS
-	function createCoverageReport(percent:Float=0):Void;
-	function addMissingCoverageClass(className:String, percent:Float=0):Void;
+	function createCoverageReport(percent:Float = 0):Void;
+	function addMissingCoverageClass(className:String, percent:Float = 0):Void;
 	function addCoverageReportSection(name:String, value:String):Void;
 	function addCoverageSummary(value:String):Void;
-	
 	function printSummary(value:String):Void;
-		
 }
 
 class ExternalPrintClientJS implements ExternalPrintClient
@@ -302,7 +219,7 @@ class ExternalPrintClientJS implements ExternalPrintClient
 				throw new MUnitException("ExternalInterface not available");
 			}
 
-			if(flashInitialised != true)
+			if(!flashInitialised)
 			{
 				flashInitialised = true;
 				flash.Lib.current.stage.addEventListener(flash.events.Event.ENTER_FRAME, enterFrameHandler);
@@ -337,7 +254,7 @@ class ExternalPrintClientJS implements ExternalPrintClient
 
 			externalInterfaceCounter = 0;
 			
-			var tempArray = externalInterfaceQueue.concat([]);
+			var tempArray = externalInterfaceQueue.copy();
 			externalInterfaceQueue = [];
 
 			for(jsCode in tempArray)
@@ -347,8 +264,6 @@ class ExternalPrintClientJS implements ExternalPrintClient
 		}
 	#end
 
-
-	// SIMPLE CLIENT APIS
 	public function print(value:String) queue("munitPrint", value);
 
 	public function printLine(value:String) queue("munitPrintLine", value);
@@ -356,8 +271,6 @@ class ExternalPrintClientJS implements ExternalPrintClient
 	public function setResult(value:Bool) queue("setResult", value);	
 
 	public function setResultBackground(value:Bool) queue("setResultBackground", value);	
-
-	//RICH CLIENT APIs
 
 	public function trace(value:Dynamic) queue("munitTrace", value);	
 
@@ -375,96 +288,55 @@ class ExternalPrintClientJS implements ExternalPrintClient
 
 	public function addTestIgnore(value:String):Void queue("addTestIgnore", value);
 
-	public function addTestClassCoverage(className:String, percent:Float=0):Void queue("addTestCoverageClass", [className, percent]);
+	public function addTestClassCoverage(className:String, percent:Float = 0):Void queue("addTestCoverageClass", [className, percent]);
 
 	public function addTestClassCoverageItem(value:String):Void queue("addTestCoverageItem", value);
 
-	//// COVERAGE REPORTING APIS
+	public function createCoverageReport(percent:Float = 0):Void queue("createCoverageReport", percent);
 
-	public function createCoverageReport(percent:Float=0):Void queue("createCoverageReport", percent);
-
-	public function addMissingCoverageClass(className:String, percent:Float=0):Void queue("addMissingCoverageClass", [className,percent]);
+	public function addMissingCoverageClass(className:String, percent:Float = 0):Void queue("addMissingCoverageClass", [className, percent]);
 
 	public function addCoverageReportSection(name:String, value:String):Void queue("addCoverageReportSection", [name, value]);
 	
 	public function addCoverageSummary(value:String):Void queue("addCoverageSummary", value);
 
-	//// FINAL SUMMARY
-
 	public function printSummary(value:String):Void queue("printSummary", value);
 
-	///// OTHER
-
-	public function queue(method:String, ?args:Dynamic):Bool
-	{
-		var a:Array<Dynamic> = [];
-		if(Std.is(args, Array))
-		{
-			a = a.concat(cast(args, Array<Dynamic>));
-		}
-		else
-		{
-			a.push(args);
-		}
-
+	public function queue(method:String, ?args:Dynamic):Bool {
 		#if (!js && !flash)
-			//throw new MUnitException("Cannot call from non JS/Flash targets");
-			return false;
+		//throw new MUnitException("Cannot call from non JS/Flash targets");
+		return false;
 		#end
-
+		var a:Array<Dynamic> = [];
+		if(Std.is(args, Array)) a = a.concat(cast(args, Array<Dynamic>));
+		else a.push(args);
 		var jsCode = convertToJavaScript(method, a);
-
 		#if js		
-			return js.Lib.eval(jsCode);
+		return js.Lib.eval(jsCode);
 		#elseif flash
-			externalInterfaceQueue.push(jsCode);
+		externalInterfaceQueue.push(jsCode);
 		#end
 		return false;
 	}
 
-	
-
-
-	public function convertToJavaScript(method:String, ?args:Array<Dynamic>):String
-	{
-		var htmlArgs:Array<String> = [];
-
-		for(arg in args)
-		{
-			var html = serialiseToHTML(Std.string(arg));
-			htmlArgs.push(html);
-		}
-		var jsCode:String;
-
-		if(htmlArgs == null || htmlArgs.length == 0)
-		{
-			jsCode = "addToQueue(\"" + method + "\")";
-		}
-		else
-		{
-			jsCode = "addToQueue(\"" + method + "\"";
-
-			for(arg in htmlArgs)
-			{
-				jsCode += ",\"" + arg + "\"";
-			}
-			jsCode += ")";
-		}
-		return jsCode;
+	public function convertToJavaScript(method:String, ?args:Array<Dynamic>):String {
+		var htmlArgs:Array<String> = args != null && args.length > 0 ? [for(arg in args) serialiseToHTML(Std.string(arg))] : null;
+		if(htmlArgs == null) return "addToQueue(\"" + method + "\")";
+		var result:String = "addToQueue(\"" + method + "\"";
+		for(arg in htmlArgs) result += ",\"" + arg + "\"";
+		result += ")";
+		return result;
 	}
 
-	public function serialiseToHTML(value:Dynamic):String
-	{
+	public function serialiseToHTML(value:Dynamic):String {
 		#if js
 		value = untyped js.Boot.__string_rec(value, "");
 		#end
-
-		var v:String = StringTools.htmlEscape(value);
-		v = v.split("\n").join("<br/>");
-		v = v.split(" ").join("&nbsp;");
-		v = v.split("\"").join("\\\'");
-
-		return v;
+		var result = StringTools.htmlEscape(value);
+		result = result.split("\n").join("<br/>");
+		result = result.split(" ").join("&nbsp;");
+		result = result.split("\"").join("\\\'");
+		return result;
 	}
 }
 

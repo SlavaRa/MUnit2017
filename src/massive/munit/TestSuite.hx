@@ -62,17 +62,13 @@ class TestSuite
 	 * what we'd seen, and it allowed the framework (and tools around the framework) to be simplified.
 	 */	
 
-	private var tests:Array<Dynamic>;
-	private var index:Int;
+	private var tests:Array<Dynamic> = [];
+	private var index:Int = 0;
 	
 	/**
 	 * Class constructor.
 	 */
-	public function new() 
-	{
-		tests = new Array<Dynamic>();
-		index = 0;
-	}
+	public function new() {}
 	
 	/**
 	 * Add a class which contains test methods.
@@ -114,13 +110,9 @@ class TestSuite
 		if (index > 0) index--;
 	}
 	
-	private function sortTests():Void
-	{
-		tests.sort(sortByName);
-	}
+	inline function sortTests() tests.sort(sortByName);
 	
-	private function sortByName(x, y):Int
-	{
+	inline function sortByName(x, y):Int {
 		var xName:String = Type.getClassName(x);
 		var yName:String = Type.getClassName(y);
 		if (xName == yName) return 0;

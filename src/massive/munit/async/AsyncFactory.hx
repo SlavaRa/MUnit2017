@@ -30,6 +30,7 @@
 
 package massive.munit.async;
 
+import haxe.Constraints.Function;
 import haxe.PosInfos;
 
 /**
@@ -58,8 +59,7 @@ import haxe.PosInfos;
  * 
  * @author Mike Stead
  */
-class AsyncFactory 
-{
+class AsyncFactory {
 	/**
 	 * Observer for all AsyncDelegates this factory creates.
 	 */
@@ -69,14 +69,13 @@ class AsyncFactory
 	 * The number of AsyncDelegates created by this factory.
 	 */
 	public var asyncDelegateCount(default, null):Int;
-		
+	
 	/**
 	 * Class constructor.
 	 * 
 	 * @param	observer			an observer for all AsyncDelegate this factory creates
 	 */
-	public function new(observer:IAsyncDelegateObserver) 
-	{
+	public function new(observer:IAsyncDelegateObserver)  {
 		this.observer = observer;
 		asyncDelegateCount = 0;
 	}
@@ -90,12 +89,10 @@ class AsyncFactory
 	 * @param	?info				[optional] pos infos of the test which requests an instance of this delegate
 	 * @return	a delegate function for handling the asynchronous response from an async test case
 	 */
-	public function createHandler(testCase:Dynamic, handler:Dynamic, ?timeout:Int, ?info:PosInfos):Dynamic
-	{
-		var delegate:AsyncDelegate = new AsyncDelegate(testCase, handler, timeout, info);
+	public function createHandler(testCase:Dynamic, handler:Function, ?timeout:Int, ?info:PosInfos):Dynamic {
+		var delegate = new AsyncDelegate(testCase, handler, timeout, info);
 		delegate.observer = observer;
 		asyncDelegateCount++;
-
 		observer.asyncDelegateCreatedHandler(delegate);
 		return delegate.delegateHandler;
 	}

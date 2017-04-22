@@ -40,45 +40,33 @@ class ReportCommand extends MUnitTargetCommandBase
 		getMinCoverage();
 	}
 
-	function getTargetTypes()
-	{
+	function getTargetTypes() {
 		//first get from console
 		targetTypes = getTargetsFromConsole();
-
-		if (targetTypes.length == 0)
-		{
+		if (targetTypes.length == 0) {
 			//look up generated results summary
 			var file =  reportDir.resolveFile("test/results.txt");
-
-			if (file.exists)
-			{
+			if(file.exists) {
 				var contents = file.readString();
 				var lines = contents.split("\n");
-
 				var reg:EReg = new EReg("under (.*) using", "g");
-				for(line in lines)
-				{ 
+				for(line in lines) { 
 					line = StringTools.trim(line);
-					if (reg.match(line))
-					{
-						switch(reg.matched(1))
-						{
+					if (reg.match(line)) {
+						switch(reg.matched(1)) {
 							case TargetType.js: targetTypes.push(TargetType.js);
 							case TargetType.as3: targetTypes.push(TargetType.as3);
 							case TargetType.neko: targetTypes.push(TargetType.neko);
 							case TargetType.cpp: targetTypes.push(TargetType.cpp);
 							case TargetType.java: targetTypes.push(TargetType.java);
+							case TargetType.cs: targetTypes.push(TargetType.cs);
 						}
 					}
 				}
 			}
 		}
-
 		//last option is to get from default target types
-		if (targetTypes.length == 0)
-		{
-			targetTypes = config.targetTypes.concat([]);
-		}
+		if (targetTypes.length == 0) targetTypes = config.targetTypes.copy();
 	}
 
 	function getReportFormatType()

@@ -23,7 +23,7 @@ class ConsoleMock extends Console
 	{
 		if(mockArgs != null)
 		{
-			systemArgs = mockArgs.concat([]);
+			systemArgs = mockArgs.copy();
 		}
 		
 		super.parseArguments(systemArgs);

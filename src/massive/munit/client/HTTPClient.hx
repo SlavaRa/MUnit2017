@@ -187,6 +187,7 @@ class HTTPClient implements IAdvancedTestResultClient
 		#elseif cpp return "cpp";
 		#elseif php return "php";
 		#elseif java return "java";
+		#elseif cs return "cs";
 		#end
 		return "unknown";
 	}
@@ -227,8 +228,7 @@ class HTTPClient implements IAdvancedTestResultClient
 
 // TODO This is a simple wrapper so we can post data. Should get propper one into mlib.
 
-class URLRequest
-{
+class URLRequest {
 	public var onData:Dynamic->Void;
 	public var onError:Dynamic->Void;
 	public var data:Dynamic;
@@ -236,55 +236,50 @@ class URLRequest
 	var url:String;
 	var headers:StringMap<String>;
 
-	#if (js || neko || cpp || java)
-		public var client:Http;
+	#if (js || neko || cpp || java || cs)
+	public var client:Http;
 	#elseif flash
-		public var client:flash.LoadVars;
+	public var client:flash.LoadVars;
 	#end
 
-
-	public function new(url:String)
-	{
+	public function new(url:String) {
 		this.url = url;
 		createClient(url);
 		setHeader("Content-Type", "text/plain");
 	}
 
-	function createClient(url:String)
-	{
-		#if (js || neko || cpp || java)
-			client = new Http(url);
+	function createClient(url:String) {
+		#if (js || neko || cpp || java || cs)
+		client = new Http(url);
 		#elseif flash			
-			client = new flash.LoadVars();
+		client = new flash.LoadVars();
 		#end		
 	}
 
-	public function setHeader(name:String, value:String)
-	{
-		#if (js || neko || cpp || java)
-			client.setHeader(name, value);
+	public function setHeader(name:String, value:String) {
+		#if (js || neko || cpp || java || cs)
+		client.setHeader(name, value);
 		#elseif flash
-			client.addRequestHeader(name, value);
+		client.addRequestHeader(name, value);
 		#end
 	}
 
-	public function send()
-	{
-		#if (js || neko || cpp || java)
-			client.onData = onData;
-			client.onError = onError;
+	public function send() {
+		#if (js || neko || cpp || java || cs)
+		client.onData = onData;
+		client.onError = onError;
 			#if js
-				client.setPostData(data);
+			client.setPostData(data);
 			#else
-				client.setParameter("data", data);
+			client.setParameter("data", data);
 			#end
-			client.request(true);
+		client.request(true);
 		#elseif flash
-			var result = new flash.LoadVars();
-			result.onData = internalOnData;
+		var result = new flash.LoadVars();
+		result.onData = internalOnData;
 
-			client.data = data;
-			client.sendAndLoad(url, result, "POST");
+		client.data = data;
+		client.sendAndLoad(url, result, "POST");
 		#end		
 	}
 

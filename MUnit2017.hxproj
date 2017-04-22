@@ -17,6 +17,7 @@
   <classpaths>
     <class path="src" />
     <class path="tool\src" />
+    <class path="test" />
   </classpaths>
   <!-- Build options -->
   <build>

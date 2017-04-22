@@ -26,10 +26,8 @@
 * or implied, of Massive Interactive.
 ****/
 
-
-
 package massive.munit;
-
+import haxe.Constraints.Function;
 import haxe.rtti.Meta;
 
 /**
@@ -44,9 +42,8 @@ import haxe.rtti.Meta;
  * 
  * @author Mike Stead
  */
-
-class TestClassHelper 
-{
+class TestClassHelper {
+	
 	/**
 	 * Meta tag marking method to be called before all tests in a class.
 	 */
@@ -84,7 +81,6 @@ class TestClassHelper
 		
 	/**
 	 * Param for META_TAG_TEST, marking test method in class as asynchronous.
-     *
      * @deprecated As of 0.9.1.4, use @AsyncTest instead.
 	 */
 	public inline static var META_PARAM_ASYNC_TEST:String = "Async";
@@ -118,46 +114,41 @@ class TestClassHelper
 	/**
 	 * The life cycle method to be called once, before tests in the class are executed.
 	 */
-	public var beforeClass(default, null):Dynamic;
+	public var beforeClass(default, null):Function;
 	
 	/**
 	 * The life cycle method to be called once, after tests in the class are executed.
 	 */
-	public var afterClass(default, null):Dynamic;
+	public var afterClass(default, null):Function;
 	
 	/**
 	 * The life cycle method to be called once, before each test in the class is executed.
 	 */
-	public var before(default, null):Dynamic;
+	public var before(default, null):Function;
 	
 	/**
 	 * The life cycle method to be called once, after each test in the class is executed.
 	 */
-	public var after(default, null):Dynamic;
+	public var after(default, null):Function;
 	
-	private var tests:Array<TestCaseData>;
-	private var index:Int;
 	public var className(default, null):String;
-	private var isDebug:Bool;
+	var tests:Array<TestCaseData> = [];
+	var index:Int = 0;
+	var isDebug:Bool;
 
 	/**
 	 * Class constructor.
 	 * 
 	 * @param	type			type of test class this helper is wrapping
 	 */
-	public function new(type:Class<Dynamic>, ?isDebug:Bool=false) 
-	{
+	public function new(type:Class<Dynamic>, ?isDebug:Bool = false) {
 		this.type = type;
 		this.isDebug = isDebug;
-		tests = [];
-		index = 0;
 		className = Type.getClassName(type);
-		
 		beforeClass = nullFunc;
 		afterClass = nullFunc;
 		before = nullFunc;
 		after = nullFunc;
-		
 		parse(type);
 	}
 	
@@ -166,8 +157,7 @@ class TestClassHelper
 	 * 
 	 * @return	true if there is one or more tests available, false if not.
 	 */
-	public function hasNext():Bool
-	{
+	public function hasNext():Bool {
 		return index < tests.length;
 	}
 	
@@ -176,7 +166,7 @@ class TestClassHelper
 	 * 
 	 * @return	if another test is available it's returned, otherwise returns null
 	 */
-	public function next():Dynamic
+	public function next():TestCaseData
 	{
 		return hasNext() ? tests[index++] : null;
 	}
@@ -186,71 +176,53 @@ class TestClassHelper
 	 * 
 	 * @return	current test in the iterable list of tests
 	 */
-	public function current():Dynamic
+	public function current():TestCaseData
 	{
 		return (index <= 0) ? tests[0] : tests[index - 1];
 	}
 	
-	private function parse(type:Class<Dynamic>):Void
-	{
+	function parse(type:Class<Dynamic>) {
 		test = Type.createEmptyInstance(type);
-		
 		var inherintanceChain = getInheritanceChain(type);
 		var fieldMeta = collateFieldMeta(inherintanceChain);
 		scanForTests(fieldMeta);
 		tests.sort(sortTestsByName); // not pc as allows for possible test dependencies but useful for report consistency
 	}
-		
-	function getInheritanceChain(clazz:Class<Dynamic>):Array<Class<Dynamic>>
-	{
+	
+	function getInheritanceChain(clazz:Class<Dynamic>):Array<Class<Dynamic>> {
 		var inherintanceChain = [clazz];
 		while ((clazz = Type.getSuperClass(clazz)) != null)
 			inherintanceChain.push(clazz);
 		return inherintanceChain;
 	}
 	
-	function collateFieldMeta(inherintanceChain:Array<Class<Dynamic>>):Dynamic
-	{
+	function collateFieldMeta(inherintanceChain:Array<Class<Dynamic>>):Dynamic {
 		var meta = {};
-		while (inherintanceChain.length > 0)
-		{
+		while(inherintanceChain.length > 0) {
 			var clazz = inherintanceChain.pop(); // start at root
 			var newMeta = Meta.getFields(clazz);			
 			var markedFieldNames = Reflect.fields(newMeta);
-			
-			for (fieldName in markedFieldNames)
-			{
+			for(fieldName in markedFieldNames) {
 				var recordedFieldTags = Reflect.field(meta, fieldName);
 				var newFieldTags = Reflect.field(newMeta, fieldName);
-				
 				var newTagNames = Reflect.fields(newFieldTags);
-				if (recordedFieldTags == null)
-				{
+				if(recordedFieldTags == null) {
 					// need to create copy of tags as may need to remove
 					// some later and this could impact other tests which
 					// extends the same class.
 					var tagsCopy = {};
-					for (tagName in newTagNames)
-						Reflect.setField(tagsCopy, tagName, Reflect.field(newFieldTags, tagName));
-						
+					for (tagName in newTagNames) Reflect.setField(tagsCopy, tagName, Reflect.field(newFieldTags, tagName));
 					Reflect.setField(meta, fieldName, tagsCopy);
-				}
-				else
-				{
+				} else {
 					var ignored = false;
-					for (tagName in newTagNames)
-					{
-						if (tagName == META_TAG_IGNORE)
-							ignored = true;
-						
+					for(tagName in newTagNames) {
+						if(tagName == META_TAG_IGNORE) ignored = true;
 						// TODO: Support @TestDebug ignore scenarios too. ms 4.9.2011
-						
 						// @Test in subclass takes precendence over @Ignore in parent
-						if (!ignored && (tagName == META_TAG_TEST || 
+						if(!ignored && (tagName == META_TAG_TEST || 
 										tagName == META_TAG_ASYNC_TEST) && 
 										Reflect.hasField(recordedFieldTags, META_TAG_IGNORE))
 							Reflect.deleteField(recordedFieldTags, META_TAG_IGNORE);
-						
 						var tagValue = Reflect.field(newFieldTags, tagName);
 						Reflect.setField(recordedFieldTags, tagName, tagValue);
 					}
@@ -260,96 +232,61 @@ class TestClassHelper
 		return meta;
 	}
 	
-	function scanForTests(fieldMeta:Dynamic)
-	{
+	function scanForTests(fieldMeta:Dynamic) {
 		var fieldNames = Reflect.fields(fieldMeta);
-		for (fieldName in fieldNames)
-		{
-			var f:Dynamic = Reflect.field(test, fieldName);
-			if (Reflect.isFunction(f))
-			{
-				var funcMeta:Dynamic = Reflect.field(fieldMeta, fieldName);
-				searchForMatchingTags(fieldName, f, funcMeta);
+		for(fieldName in fieldNames) {
+			var f = Reflect.field(test, fieldName);
+			if(!Reflect.isFunction(f)) continue;
+			var funcMeta = Reflect.field(fieldMeta, fieldName);
+			searchForMatchingTags(fieldName, f, funcMeta);
+		}
+	}
+	
+	function searchForMatchingTags(fieldName:String, func:Function, funcMeta:Dynamic) {
+		for(tag in META_TAGS) {
+			if(!Reflect.hasField(funcMeta, tag)) continue;
+			var args:Array<String> = Reflect.field(funcMeta, tag);
+			var description = (args != null) ? args[0] : "";
+			var isAsync = (args != null && description == META_PARAM_ASYNC_TEST); // deprecated support for @Test("Async")
+			var isIgnored = Reflect.hasField(funcMeta, META_TAG_IGNORE);
+			if(isAsync) description = "";
+			else if(isIgnored) {
+				args = Reflect.field(funcMeta, META_TAG_IGNORE);
+				description = (args != null) ? args[0] : "";
+			}
+			switch(tag) {
+				case META_TAG_BEFORE_CLASS: beforeClass = func;
+				case META_TAG_AFTER_CLASS: afterClass = func;
+				case META_TAG_BEFORE: before = func;
+				case META_TAG_AFTER: after = func;
+				case META_TAG_ASYNC_TEST: if(!isDebug) addTest(fieldName, func, test, true, isIgnored, description);
+				case META_TAG_TEST: if(!isDebug) addTest(fieldName, func, test, isAsync, isIgnored, description);
+				case META_TAG_TEST_DEBUG: if(isDebug) addTest(fieldName, func, test, isAsync, isIgnored, description);
 			}
 		}
 	}
 	
-	function searchForMatchingTags(fieldName:String, func:Dynamic, funcMeta:Dynamic)
-	{
-		for (tag in META_TAGS)
-		{
-			if (Reflect.hasField(funcMeta, tag))
-			{
-				var args:Array<String> = Reflect.field(funcMeta, tag);
-				var description = (args != null) ? args[0] : "";
-				var isAsync = (args != null && description == META_PARAM_ASYNC_TEST); // deprecated support for @Test("Async")
-				var isIgnored = Reflect.hasField(funcMeta, META_TAG_IGNORE);
-				
-				if (isAsync) 
-				{
-					description = "";
-				}
-				else if (isIgnored)
-				{
-					args = Reflect.field(funcMeta, META_TAG_IGNORE);
-					description = (args != null) ? args[0] : "";
-				}
-				
-				switch(tag)
-				{
-					case META_TAG_BEFORE_CLASS:
-						beforeClass = func;
-					case META_TAG_AFTER_CLASS:
-						afterClass = func;
-					case META_TAG_BEFORE:
-						before = func;
-					case META_TAG_AFTER:
-						after = func;
-					case META_TAG_ASYNC_TEST:
-						if (!isDebug)
-							addTest(fieldName, func, test, true, isIgnored, description);
-					case META_TAG_TEST:
-						if (!isDebug)
-							addTest(fieldName, func, test, isAsync, isIgnored, description);
-					case META_TAG_TEST_DEBUG:
-						if (isDebug)
-							addTest(fieldName, func, test, isAsync, isIgnored, description);
-				}
-			}
-		}
-	}
-	
-	private function addTest(field:String, 
-							testFunction:Dynamic, 
-							testInstance:Dynamic, 
-							isAsync:Bool, 
-							isIgnored:Bool, 
-							description:String):Void
-	{
-		var result:TestResult = new TestResult();
+	function addTest(field:String, testFunction:Function, testInstance:Dynamic, isAsync:Bool, isIgnored:Bool, description:String) {
+		var result = new TestResult();
 		result.async = isAsync;
 		result.ignore = isIgnored;
 		result.className = className;
 		result.description = description;
 		result.name = field;
-		var data:TestCaseData = { test:testFunction, scope:testInstance, result:result };
-		tests.push(data);
+		tests.push({test:testFunction, scope:testInstance, result:result});
 	}
 	
-	private function sortTestsByName(x:TestCaseData, y:TestCaseData):Int
-	{
-		if (x.result.name == y.result.name) return 0;
-		if (x.result.name > y.result.name) return 1;
-		else return -1;
+	inline function sortTestsByName(x:TestCaseData, y:TestCaseData):Int {
+		if(x.result.name == y.result.name) return 0;
+		if(x.result.name > y.result.name) return 1;
+		return -1;
 	}
 
-	private function nullFunc():Void
-	{}
+	public static function nullFunc() {}
 }
 
-typedef TestCaseData =
-{
-	var test:Dynamic;
+typedef TestCaseData = {
+	var test:Function;
 	var scope:Dynamic;
 	var result:TestResult;
 }

@@ -10,9 +10,9 @@ Installation
 
 To install you must have [Haxe](http://www.haxe.org) installed
 
-Then just use haxelib to download the latest version
+To install latest build from git:
 
-	haxelib install munit
+    haxelib git munit https://github.com/SlavaRa/MUnit2017.git src
 
 To check that it is all installed and to view the help run:
 
@@ -21,17 +21,13 @@ To check that it is all installed and to view the help run:
 
 **Please note:** After upgrading you may be required to update the TestMain.hx in existing project before being able to test
 
-To install latest build from git:
-
-    haxelib git munit https://github.com/SlavaRa/MUnit2017.git src
-
 Features
 ---------------------
 
 ### Cross Platform
 
 MUnit has been designed for cross platform Haxe development.
-It currently supports js, swf, neko, c++ and java, and the tool chain works on PC and OSX
+It currently supports js, swf, neko, c++, java and cs and the tool chain works on PC and OSX
 
 
 ### Test Metadata
