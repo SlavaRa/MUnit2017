@@ -97,8 +97,8 @@ class TestResult {
 	function get_type():TestResultType {
 		if(error != null) return ERROR;
 		if(failure != null) return FAIL;
-		if(ignore == true) return IGNORE;
-		if(passed == true) return PASS;
+		if(ignore) return IGNORE;
+		if(passed) return PASS;
 		return UNKNOWN;
 	}
 

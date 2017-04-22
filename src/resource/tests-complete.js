@@ -577,10 +577,10 @@ massive_munit_TestResult.prototype = {
 		if(this.failure != null) {
 			return massive_munit_TestResultType.FAIL;
 		}
-		if(this.ignore == true) {
+		if(this.ignore) {
 			return massive_munit_TestResultType.IGNORE;
 		}
-		if(this.passed == true) {
+		if(this.passed) {
 			return massive_munit_TestResultType.PASS;
 		}
 		return massive_munit_TestResultType.UNKNOWN;

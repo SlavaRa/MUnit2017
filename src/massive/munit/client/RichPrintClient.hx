@@ -200,10 +200,7 @@ class RichPrintClient extends PrintClientBase {
 	
 	override public function print(value:Dynamic) {
 		super.print(value);
-		#if (js || flash)
-		//external.queue(ExternalPrintClientJS.PRINT, value);
-		return;
-		#elseif (neko || cpp || php || java)
+		#if (neko || cpp || php || java)
 		Sys.print(value);
 		#end
 	}
