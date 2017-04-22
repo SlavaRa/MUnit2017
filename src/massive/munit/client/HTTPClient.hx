@@ -185,9 +185,9 @@ class HTTPClient implements IAdvancedTestResultClient
 		#elseif js return "js";
 		#elseif neko return "neko";
 		#elseif cpp return "cpp";
-		#elseif php return "php";
 		#elseif java return "java";
 		#elseif cs return "cs";
+		#elseif php return "php";
 		#end
 		return "unknown";
 	}
@@ -232,40 +232,40 @@ class URLRequest {
 	public var onData:Dynamic->Void;
 	public var onError:Dynamic->Void;
 	public var data:Dynamic;
-
+	
 	var url:String;
 	var headers:StringMap<String>;
-
-	#if (js || neko || cpp || java || cs)
+	
+	#if (js || neko || cpp || java || cs || php)
 	public var client:Http;
 	#elseif flash
 	public var client:flash.LoadVars;
 	#end
-
+	
 	public function new(url:String) {
 		this.url = url;
 		createClient(url);
 		setHeader("Content-Type", "text/plain");
 	}
-
+	
 	function createClient(url:String) {
-		#if (js || neko || cpp || java || cs)
+		#if (js || neko || cpp || java || cs || php)
 		client = new Http(url);
-		#elseif flash			
+		#elseif flash
 		client = new flash.LoadVars();
-		#end		
+		#end
 	}
-
+	
 	public function setHeader(name:String, value:String) {
-		#if (js || neko || cpp || java || cs)
+		#if (js || neko || cpp || java || cs || php)
 		client.setHeader(name, value);
 		#elseif flash
 		client.addRequestHeader(name, value);
 		#end
 	}
-
+	
 	public function send() {
-		#if (js || neko || cpp || java || cs)
+		#if (js || neko || cpp || java || cs || php)
 		client.onData = onData;
 		client.onError = onError;
 			#if js
@@ -277,12 +277,11 @@ class URLRequest {
 		#elseif flash
 		var result = new flash.LoadVars();
 		result.onData = internalOnData;
-
 		client.data = data;
 		client.sendAndLoad(url, result, "POST");
-		#end		
+		#end
 	}
-
+	
 	#if flash
 		function internalOnData(value:String)
 		{

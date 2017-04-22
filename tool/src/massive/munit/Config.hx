@@ -33,7 +33,6 @@ class Config {
 	public var currentVersion(default, null):String;
 	public var configVersion(default, null):String;
 	public var dir(default, null):File;
-	private var configFile:File;
 	public var exists(default, null):Bool;
 	public var bin(default, null):File;
 	public var report(default, null):File;
@@ -44,9 +43,10 @@ class Config {
 	public var classPaths:Array<File>;
 	public var targets:Array<Target> = [];
 	public var targetTypes:Array<TargetType>;
-	public var defaultTargetTypes:Array<TargetType> = [TargetType.as3, TargetType.js, TargetType.neko, TargetType.cpp, TargetType.java, TargetType.cs];
+	public var defaultTargetTypes:Array<TargetType> = [as3, js, neko, cpp, java, cs, php];
 	public var coveragePackages:Array<String>;
 	public var coverageIgnoredClasses:Array<String>;
+	var configFile:File;
 	
 	public function new(dir:File, currentVersion:String):Void {
 		this.dir = dir;
@@ -61,7 +61,7 @@ class Config {
 		if(file == null) file = configFile;
 		parseConfig(file.readString());
 	}
-
+	
 	function parseConfig(string:String) {
 		var lines:Array<String>  = string.split("\n");
 		for(line in lines) {
@@ -141,21 +141,21 @@ class Config {
 		hxml = file;
 		save();
 	}
-
+	
 	public function updateResources(file:File) {
 		if(!file.exists) throw "Directory does not exist " + file;
 		if(!file.isDirectory) throw "File is not a directory " + file;
 		resources = file;
 		save();
 	}
-
+	
 	public function updateTemplates(file:File) {
 		if(!file.exists) throw "Directory does not exist " + file;
 		if(!file.isDirectory) throw "File is not a directory " + file;
 		templates = file;
 		save();
 	}
-
+	
 	public function updateClassPaths(classPaths:Array<File>) {
 		for(file in classPaths) {
 			if(!file.exists) throw "Class path does not exist " + file;
@@ -164,25 +164,24 @@ class Config {
 		this.classPaths = classPaths;
 		save();
 	}
-
+	
 	public function updateCoveragePackages(coveragePackages:Array<String>) {
 		this.coveragePackages = coveragePackages;
 		save();
 	}
-
+	
 	public function updateCoverageIgnoredClasses(coverageIgnoredClasses:Array<String>) {
 		this.coverageIgnoredClasses = coverageIgnoredClasses;
 		save();
 	}
-
-	public function toString():String
-	{
+	
+	public function toString():String {
 		var str:String = "";
 		if(currentVersion != null) str += "version=" + currentVersion + "\n";
 		if(src != null) str += "src=" + dir.getRelativePath(src) + "\n";
 		if(bin != null) str += "bin=" + dir.getRelativePath(bin) + "\n";
 		if(report != null) str += "report=" + dir.getRelativePath(report) + "\n";
-		if(hxml != null) str += "hxml=" + dir.getRelativePath(hxml) + "\n";	
+		if(hxml != null) str += "hxml=" + dir.getRelativePath(hxml) + "\n";
 		if(classPaths != null) {
 			var value = "";
 			for(path in classPaths) {
@@ -191,15 +190,15 @@ class Config {
 			}
 			str += "classPaths=" + value + "\n";
 		}
-		if(resources != null) str += "resources=" + dir.getRelativePath(resources) + "\n";	
-		if(templates != null) str += "templates=" + dir.getRelativePath(templates) + "\n";	
+		if(resources != null) str += "resources=" + dir.getRelativePath(resources) + "\n";
+		if(templates != null) str += "templates=" + dir.getRelativePath(templates) + "\n";
 		if(coveragePackages != null) str += "coveragePackages=" + coveragePackages.join(",") + "\n";
 		if(coverageIgnoredClasses != null) str += "coverageIgnoredClasses=" + coverageIgnoredClasses.join(",") + "\n";
 		return str;
 	}
 	
 	public function save() {
-		configFile.writeString(toString());	
+		configFile.writeString(toString());
 		if(!exists) exists = true;
 	}
 	
