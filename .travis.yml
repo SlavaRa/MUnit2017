@@ -21,7 +21,7 @@ before_install:
       brew update;
       brew install mono;
       brew install python3;
-      echo 'export PATH="/usr/local/opt/openssl/bin:$PATH"' >> ~/.bash_profile
+      echo 'export PATH="/usr/local/opt/openssl/bin:$PATH"' >> ~/.bash_profile;
     fi
   - mono --version;
   - python --version;
