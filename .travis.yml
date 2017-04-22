@@ -29,6 +29,7 @@ install:
   - haxelib install hxcs;
   - haxelib install mlib;
   - haxelib install mcover;
+  - mono --version;
 
 script:
   - haxe build.hxml
