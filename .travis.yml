@@ -10,6 +10,11 @@ os:
 
 sudo: false
 
+before_install:
+  - sudo apt-get -qq update;
+  - sudo apt-get install -y mono
+  - mono --version;
+
 install:
 #  - yes | haxelib install test.hxml
 #  - if [ "${TRAVIS_HAXE_VERSION}" = "development" ]; then
@@ -26,9 +31,6 @@ install:
   - haxelib install hxcs;
   - haxelib install mlib;
   - haxelib install mcover;
-  - apt-get -qq update;
-  - apt-get install -y mono
-  - mono --version;
 
 script:
   - haxe build.hxml
