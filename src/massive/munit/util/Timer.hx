@@ -52,6 +52,10 @@
  */
 package massive.munit.util;
 
+#if cs
+typedef Timer = haxe.Timer;
+#else
+
 #if neko
 import neko.vm.Thread;
 #elseif cpp
@@ -61,8 +65,7 @@ import java.vm.Thread;
 #end
 
 @:expose('massive.munit.util.Timer')
-class Timer 
-{
+class Timer {
 	#if (php)
 	#else
 
@@ -157,3 +160,4 @@ class Timer
 		return haxe.Timer.stamp();
 	}
 }
+#end

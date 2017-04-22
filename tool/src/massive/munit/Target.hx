@@ -35,4 +35,5 @@ abstract TargetType(String) from String to String {
 	var neko = "neko";
 	var cpp = "cpp";
 	var java = "java";
+	var cs = "cs";
 }

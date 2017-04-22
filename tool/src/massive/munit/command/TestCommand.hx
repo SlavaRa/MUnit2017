@@ -99,15 +99,15 @@ class TestCommand extends MUnitTargetCommandBase {
 				target.hxml += "-D debug\n";				
 			}
 			switch(target.type) {
-				case cpp | java: target.executableFile.deleteFile();
-				default:
+				case cpp | java | cs: target.executableFile.deleteFile();
+				case _:
 			}
 			Log.debug("Compile " + target.type + " -- " + target);
 			if(HaxeWrapper.compile(target.hxml) > 0) error("Error compiling hxml for " + target.type + "\n" + target);
 			var tmp = config.bin.resolveFile(".temp/" + target.type + ".txt");
 			switch(target.type) {
-				case cpp | java: tmp.writeString(target.executableFile, false);
-				default: tmp.writeString(target.file, false);
+				case cpp | java | cs: tmp.writeString(target.executableFile, false);
+				case _: tmp.writeString(target.file, false);
 			}
 		}
 		Log.debug("All targets compiled successfully");
