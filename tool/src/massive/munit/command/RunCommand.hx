@@ -68,6 +68,7 @@ class RunCommand extends MUnitTargetCommandBase {
 	var cppFile:File;
 	var javaFile:File;
 	var csFile:File;
+	var pythonFile:File;
 	var serverTimeoutTimeSec:Int;
 	var resultExitCode:Bool;
 
@@ -189,6 +190,7 @@ class RunCommand extends MUnitTargetCommandBase {
 				case cs:
 					hasCSTests = true;
 					csFile = file;
+				case python: pythonFile = file;
 				case _:
 					hasBrowserTests = true;
 					var pageName = target.type;
@@ -272,6 +274,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		if(cppFile != null) launchCPP(cppFile);
 		if(javaFile != null) launchJava(javaFile);
 		if(csFile != null) launchCS(csFile);
+		if(pythonFile != null) launchPython(csFile);
 		if(hasBrowserTests) launchFile(indexPage);
 		else resultMonitor.sendMessage("quit");
 		var platformResults:Bool = Thread.readMessage(true);
@@ -427,7 +430,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		}
 		return 0;
 	}
-
+	
 	function launchNeko(file:File):Int {
 		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
 		file.copyTo(reportRunnerFile);
@@ -463,6 +466,16 @@ class RunCommand extends MUnitTargetCommandBase {
 		file.copyTo(reportRunnerFile);
 		FileSys.setCwd(config.dir.nativePath);
 		var exitCode = FileSys.isWindows ? runProgram(file.nativePath) : runProgram('mono', [file.nativePath]);
+		FileSys.setCwd(console.originalDir.nativePath);
+		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
+		return exitCode;
+	}
+	
+	function launchPython(file:File):Int {
+		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
+		file.copyTo(reportRunnerFile);
+		FileSys.setCwd(config.dir.nativePath);
+		var exitCode = runProgram('python', [reportRunnerFile.nativePath]);
 		FileSys.setCwd(console.originalDir.nativePath);
 		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
 		return exitCode;
