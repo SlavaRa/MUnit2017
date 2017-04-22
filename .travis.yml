@@ -4,9 +4,6 @@ haxe:
   - development
   - 3.4.2
 
-mono:
-  - latest
-
 os:
   - linux
   - osx
@@ -29,6 +26,8 @@ install:
   - haxelib install hxcs;
   - haxelib install mlib;
   - haxelib install mcover;
+  - sudo apt-get -qq update;
+  - sudo apt-get install -y mono
   - mono --version;
 
 script:
