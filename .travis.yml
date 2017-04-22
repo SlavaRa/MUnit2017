@@ -14,11 +14,13 @@ addons:
   apt:
     packages:
     - mono-complete
+    - python 3.5
 
 before_install:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then 
       brew update;
       brew install mono;
+      brew python 3.5 
     fi
   - mono --version;
   - python --version
