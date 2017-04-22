@@ -13,7 +13,7 @@ sudo: false
 addons:
   apt:
     packages:
-    - mono
+    - mono-complete
 
 before_install:
   - mono --version;
