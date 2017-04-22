@@ -10,9 +10,12 @@ os:
 
 sudo: false
 
+addons:
+  apt:
+    packages:
+    - mono
+
 before_install:
-  - apt-get update -qq
-  - apt-get install mono -y
   - mono --version;
 
 install:
