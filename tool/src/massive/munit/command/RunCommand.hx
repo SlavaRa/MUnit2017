@@ -178,18 +178,10 @@ class RunCommand extends MUnitTargetCommandBase {
 		for(target in targets) {
 			var file = target.file;
 			switch(target.type) {
-				case neko:
-					hasNekoTests = true;
-					nekoFile = file;
-				case cpp:
-					hasCPPTests = true;
-					cppFile = file;
-				case java:
-					hasJavaTests = true;
-					javaFile = file;
-				case cs:
-					hasCSTests = true;
-					csFile = file;
+				case neko: nekoFile = file;
+				case cpp: cppFile = file;
+				case java: javaFile = file;
+				case cs: csFile = file;
 				case python: pythonFile = file;
 				case _:
 					hasBrowserTests = true;
@@ -274,7 +266,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		if(cppFile != null) launchCPP(cppFile);
 		if(javaFile != null) launchJava(javaFile);
 		if(csFile != null) launchCS(csFile);
-		if(pythonFile != null) launchPython(csFile);
+		if(pythonFile != null) launchPython(pythonFile);
 		if(hasBrowserTests) launchFile(indexPage);
 		else resultMonitor.sendMessage("quit");
 		var platformResults:Bool = Thread.readMessage(true);
