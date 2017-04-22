@@ -28,6 +28,7 @@
 
 package massive.munit;
 
+import haxe.Constraints.Function;
 import haxe.PosInfos;
 import massive.munit.Assert;
 import massive.munit.TestClassHelper.TestCaseData;
@@ -204,14 +205,11 @@ class TestRunner implements IAsyncDelegateObserver {
             for(testClass in suite) {
                 if(activeHelper == null || activeHelper.type != testClass) {
                     activeHelper = new TestClassHelper(testClass, isDebug);
-					if(!Reflect.compareMethods(activeHelper.beforeClass, TestClassHelper.nullFunc))
-						Reflect.callMethod(activeHelper.test, activeHelper.beforeClass, emptyParams);
+					tryCallMethod(activeHelper.test, activeHelper.beforeClass, emptyParams);
                 }
                 executeTestCases();
-                if(!asyncPending) {
-					if(!Reflect.compareMethods(activeHelper.beforeClass, TestClassHelper.nullFunc))
-						Reflect.callMethod(activeHelper.test, activeHelper.afterClass, emptyParams);
-                } else {
+                if(!asyncPending) tryCallMethod(activeHelper.test, activeHelper.afterClass, emptyParams);
+                else {
                     suite.repeat();
                     suiteIndex = i;
                     return;
@@ -244,12 +242,10 @@ class TestRunner implements IAsyncDelegateObserver {
                 for(c in clients) c.addIgnore(cast testCaseData.result);
             } else {
                 testCount++; // note we don't include ignored in final test count
-				if(!Reflect.compareMethods(activeHelper.before, TestClassHelper.nullFunc))
-					Reflect.callMethod(activeHelper.test, activeHelper.before, emptyParams);
+				tryCallMethod(activeHelper.test, activeHelper.before, emptyParams);
                 testStartTime = Timer.stamp();
                 executeTestCase(testCaseData, testCaseData.result.async);
-                if(!asyncPending && !Reflect.compareMethods(activeHelper.after, TestClassHelper.nullFunc))
-					Reflect.callMethod(activeHelper.test, activeHelper.after, emptyParams);
+				if(!asyncPending) tryCallMethod(activeHelper.test, activeHelper.after, emptyParams);
                 else break;
             }
         }
@@ -311,8 +307,7 @@ class TestRunner implements IAsyncDelegateObserver {
         asyncPending = false;
         asyncDelegate = null;
         executeTestCase(testCaseData, false);
-		if(!Reflect.compareMethods(activeHelper.after, TestClassHelper.nullFunc))
-			Reflect.callMethod(activeHelper.test, activeHelper.after, emptyParams);
+		tryCallMethod(activeHelper.test, activeHelper.after, emptyParams);
         execute();
     }
 
@@ -331,12 +326,16 @@ class TestRunner implements IAsyncDelegateObserver {
         asyncDelegate = null;
         errorCount++;
         for(c in clients) c.addError(result);
-		if(!Reflect.compareMethods(activeHelper.after, TestClassHelper.nullFunc))
-			Reflect.callMethod(activeHelper.test, activeHelper.after, emptyParams);
+		tryCallMethod(activeHelper.test, activeHelper.after, emptyParams);
         execute();
     }
 
     public function asyncDelegateCreatedHandler(delegate:AsyncDelegate) asyncDelegate = delegate;
 
     inline function createAsyncFactory():AsyncFactory return new AsyncFactory(this);
+	
+	static inline function tryCallMethod(o:Dynamic, func:Function, args:Array<Dynamic>):Dynamic {
+		if(Reflect.compareMethods(func, TestClassHelper.nullFunc)) return null;
+		return Reflect.callMethod(o, func, args);
+	}
 }
