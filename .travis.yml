@@ -23,6 +23,7 @@ install:
 #    fi
   - haxelib install hxcpp;
   - haxelib install hxjava;
+  - haxelib install hxcs;
   - haxelib install mlib;
   - haxelib install mcover;
 
