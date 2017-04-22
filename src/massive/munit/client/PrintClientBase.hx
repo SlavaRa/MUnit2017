@@ -26,8 +26,6 @@
 * or implied, of Massive Interactive.
 ****/
 
-
-
 package massive.munit.client;
 
 import massive.haxe.util.ReflectUtil;
@@ -68,7 +66,7 @@ class PrintClientBase extends AbstractTestResultClient {
 				case FAIL: print("!");
 				case ERROR: print ("x");
 				case IGNORE: print(",");
-				case UNKNOWN: null;
+				case UNKNOWN:
 			}
 		}
 	}
@@ -200,12 +198,12 @@ interface ExternalPrintClient {
 	function addTestError(value:String):Void;
 	function addTestIgnore(value:String):Void;
 
-	function addTestClassCoverage(className:String, percent:Float=0):Void;
+	function addTestClassCoverage(className:String, percent:Float = 0):Void;
 	function addTestClassCoverageItem(value:String):Void;
 
 	//OVERALL STATS APIS
-	function createCoverageReport(percent:Float=0):Void;
-	function addMissingCoverageClass(className:String, percent:Float=0):Void;
+	function createCoverageReport(percent:Float = 0):Void;
+	function addMissingCoverageClass(className:String, percent:Float = 0):Void;
 	function addCoverageReportSection(name:String, value:String):Void;
 	function addCoverageSummary(value:String):Void;
 	function printSummary(value:String):Void;
@@ -221,7 +219,7 @@ class ExternalPrintClientJS implements ExternalPrintClient
 				throw new MUnitException("ExternalInterface not available");
 			}
 
-			if(flashInitialised != true)
+			if(!flashInitialised)
 			{
 				flashInitialised = true;
 				flash.Lib.current.stage.addEventListener(flash.events.Event.ENTER_FRAME, enterFrameHandler);
@@ -266,8 +264,6 @@ class ExternalPrintClientJS implements ExternalPrintClient
 		}
 	#end
 
-
-	// SIMPLE CLIENT APIS
 	public function print(value:String) queue("munitPrint", value);
 
 	public function printLine(value:String) queue("munitPrintLine", value);
@@ -275,8 +271,6 @@ class ExternalPrintClientJS implements ExternalPrintClient
 	public function setResult(value:Bool) queue("setResult", value);	
 
 	public function setResultBackground(value:Bool) queue("setResultBackground", value);	
-
-	//RICH CLIENT APIs
 
 	public function trace(value:Dynamic) queue("munitTrace", value);	
 
@@ -294,93 +288,55 @@ class ExternalPrintClientJS implements ExternalPrintClient
 
 	public function addTestIgnore(value:String):Void queue("addTestIgnore", value);
 
-	public function addTestClassCoverage(className:String, percent:Float=0):Void queue("addTestCoverageClass", [className, percent]);
+	public function addTestClassCoverage(className:String, percent:Float = 0):Void queue("addTestCoverageClass", [className, percent]);
 
 	public function addTestClassCoverageItem(value:String):Void queue("addTestCoverageItem", value);
 
-	//// COVERAGE REPORTING APIS
+	public function createCoverageReport(percent:Float = 0):Void queue("createCoverageReport", percent);
 
-	public function createCoverageReport(percent:Float=0):Void queue("createCoverageReport", percent);
-
-	public function addMissingCoverageClass(className:String, percent:Float=0):Void queue("addMissingCoverageClass", [className,percent]);
+	public function addMissingCoverageClass(className:String, percent:Float = 0):Void queue("addMissingCoverageClass", [className, percent]);
 
 	public function addCoverageReportSection(name:String, value:String):Void queue("addCoverageReportSection", [name, value]);
 	
 	public function addCoverageSummary(value:String):Void queue("addCoverageSummary", value);
 
-	//// FINAL SUMMARY
-
 	public function printSummary(value:String):Void queue("printSummary", value);
 
-	///// OTHER
-
-	public function queue(method:String, ?args:Dynamic):Bool
-	{
-		var a:Array<Dynamic> = [];
-		if(Std.is(args, Array))
-		{
-			a = a.concat(cast(args, Array<Dynamic>));
-		}
-		else
-		{
-			a.push(args);
-		}
-
+	public function queue(method:String, ?args:Dynamic):Bool {
 		#if (!js && !flash)
-			//throw new MUnitException("Cannot call from non JS/Flash targets");
-			return false;
+		//throw new MUnitException("Cannot call from non JS/Flash targets");
+		return false;
 		#end
-
+		var a:Array<Dynamic> = [];
+		if(Std.is(args, Array)) a = a.concat(cast(args, Array<Dynamic>));
+		else a.push(args);
 		var jsCode = convertToJavaScript(method, a);
-
 		#if js		
-			return js.Lib.eval(jsCode);
+		return js.Lib.eval(jsCode);
 		#elseif flash
-			externalInterfaceQueue.push(jsCode);
+		externalInterfaceQueue.push(jsCode);
 		#end
 		return false;
 	}
 
-	public function convertToJavaScript(method:String, ?args:Array<Dynamic>):String
-	{
-		var htmlArgs:Array<String> = [];
-
-		for(arg in args)
-		{
-			var html = serialiseToHTML(Std.string(arg));
-			htmlArgs.push(html);
-		}
-		var jsCode:String;
-
-		if(htmlArgs == null || htmlArgs.length == 0)
-		{
-			jsCode = "addToQueue(\"" + method + "\")";
-		}
-		else
-		{
-			jsCode = "addToQueue(\"" + method + "\"";
-
-			for(arg in htmlArgs)
-			{
-				jsCode += ",\"" + arg + "\"";
-			}
-			jsCode += ")";
-		}
-		return jsCode;
+	public function convertToJavaScript(method:String, ?args:Array<Dynamic>):String {
+		var htmlArgs:Array<String> = args != null && args.length > 0 ? [for(arg in args) serialiseToHTML(Std.string(arg))] : null;
+		if(htmlArgs == null) return "addToQueue(\"" + method + "\")";
+		var result:String = "addToQueue(\"" + method + "\"";
+		for(arg in htmlArgs) result += ",\"" + arg + "\"";
+		result += ")";
+		return result;
 	}
 
-	public function serialiseToHTML(value:Dynamic):String
-	{
+	public function serialiseToHTML(value:Dynamic):String {
 		#if js
 		value = untyped js.Boot.__string_rec(value, "");
 		#end
-
-		var v:String = StringTools.htmlEscape(value);
-		v = v.split("\n").join("<br/>");
-		v = v.split(" ").join("&nbsp;");
-		v = v.split("\"").join("\\\'");
-
-		return v;
+		var result = StringTools.htmlEscape(value);
+		result = result.split("\n").join("<br/>");
+		result = result.split(" ").join("&nbsp;");
+		result = result.split("\"").join("\\\'");
+		return result;
 	}
 }
 
