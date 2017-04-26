@@ -15,7 +15,6 @@ class MUnitTargetCommandBase extends MUnitCommand
 	override public function initialise():Void
 	{
 		super.initialise();
-
 		//append code coverage
 		var coverage:String  = console.getOption("-coverage");
 		includeCoverage = coverage == "true";
@@ -39,6 +38,7 @@ class MUnitTargetCommandBase extends MUnitCommand
 		if(console.getOption(cpp) == "true") result.push(cpp);
 		if(console.getOption(java) == "true") result.push(java);
 		if(console.getOption(cs) == "true") result.push(cs);
+		if(console.getOption(python) == "true") result.push(python);
 		if(console.getOption(php) == "true") result.push(php);
 		return result;
 	}

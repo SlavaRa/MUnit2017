@@ -48,8 +48,8 @@ class TestCommand extends MUnitTargetCommandBase {
 		//append code coverage
 		if(missingClassPaths()) testsAborted = true;
 	}
-
-	// In v0.9.0.3 we made a significant change to the required format of test.hxml. 
+	
+	// In v0.9.0.3 we made a significant change to the required format of test.hxml.
 	// This ensures everything is in place
 	function invalidHxmlFormat():Bool {
 		var contents:String = config.hxml.readString();
@@ -63,7 +63,7 @@ class TestCommand extends MUnitTargetCommandBase {
 		}
 		return invalid;
 	}
-
+	
 	//In v0.9.5.0 we added classpaths to .munit file to support mcover code coverage
 	function missingClassPaths():Bool {
 		if(includeCoverage && (config.classPaths == null || config.classPaths.length == 0)) {
@@ -72,7 +72,7 @@ class TestCommand extends MUnitTargetCommandBase {
 		}
 		return false;
 	}
-
+	
 	override public function execute():Void {
 		if(testsAborted) return;
 		var targets = config.targets;

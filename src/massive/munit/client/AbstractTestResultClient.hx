@@ -33,7 +33,7 @@ package massive.munit.client;
 import massive.munit.ITestResultClient;
 import massive.munit.TestResult;
 
-class AbstractTestResultClient implements IAdvancedTestResultClient implements ICoverageTestResultClient
+class AbstractTestResultClient implements ICoverageTestResultClient
 {
 	/**
 	 * The unique identifier for the client.

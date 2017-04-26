@@ -69,6 +69,7 @@ class RunCommand extends MUnitTargetCommandBase {
 	var cppFile:File;
 	var javaFile:File;
 	var csFile:File;
+	var pythonFile:File;
 	var phpFile:File;
 	var serverTimeoutTimeSec:Int;
 	var resultExitCode:Bool;
@@ -180,21 +181,12 @@ class RunCommand extends MUnitTargetCommandBase {
 		for(target in targets) {
 			var file = target.file;
 			switch(target.type) {
-				case neko:
-					hasNekoTests = true;
-					nekoFile = file;
-				case cpp:
-					hasCPPTests = true;
-					cppFile = file;
-				case java:
-					hasJavaTests = true;
-					javaFile = file;
-				case cs:
-					hasCSTests = true;
-					csFile = file;
-				case php:
-					hasPHPTests = true;
-					phpFile = file;
+				case neko: nekoFile = file;
+				case cpp: cppFile = file;
+				case java: javaFile = file;
+				case cs: csFile = file;
+				case python: pythonFile = file;
+				case php: phpFile = file;
 				case _:
 					hasBrowserTests = true;
 					var pageName = target.type;
@@ -278,6 +270,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		if(cppFile != null) launchCPP(cppFile);
 		if(javaFile != null) launchJava(javaFile);
 		if(csFile != null) launchCS(csFile);
+		if(pythonFile != null) launchPython(pythonFile);
 		if(phpFile != null) launchPHP(phpFile);
 		if(hasBrowserTests) launchFile(indexPage);
 		else resultMonitor.sendMessage("quit");
@@ -475,6 +468,16 @@ class RunCommand extends MUnitTargetCommandBase {
 		return exitCode;
 	}
 	
+	function launchPython(file:File):Int {
+		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
+		file.copyTo(reportRunnerFile);
+		FileSys.setCwd(config.dir.nativePath);
+		var exitCode = runProgram('python3', [file.nativePath]);
+		FileSys.setCwd(console.originalDir.nativePath);
+		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
+		return exitCode;
+	}
+	
 	function launchPHP(file:File):Int {
 		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
 		file.copyTo(reportRunnerFile);
@@ -498,6 +501,16 @@ class RunCommand extends MUnitTargetCommandBase {
 		var error:String = null;
 		try {
 			exitCode = process.exitCode();
+			if(exitCode > 0) {
+				var sb = new StringBuf();
+				try {
+					while(true) {
+						sb.add(process.stderr.readLine());
+						sb.add("\n");
+					}
+				} catch(e:haxe.io.Eof) {}
+				error = sb.toString();
+			}
 		} catch(e:Dynamic) {
 			exitCode = 1;
 			error = Std.string(e).split("\n").join("\n\t");

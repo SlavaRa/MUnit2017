@@ -200,7 +200,7 @@ class RichPrintClient extends PrintClientBase {
 	
 	override public function print(value:Dynamic) {
 		super.print(value);
-		#if (neko || cpp || java || cs || php)
+		#if (neko || cpp || java || cs || python || php)
 		Sys.print(value);
 		#end
 	}
