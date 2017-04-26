@@ -511,5 +511,4 @@ class RunCommand extends MUnitTargetCommandBase {
 		}
 		return exitCode;
 	}
-	}
 }
