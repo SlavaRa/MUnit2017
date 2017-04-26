@@ -170,7 +170,7 @@ class TestRunner implements IAsyncDelegateObserver {
      * @param	testSuiteClasses
      */
     public function run(testSuiteClasses:Array<Class<TestSuite>>) {
-        if (running) return;
+        if(running) return;
         running = true;
         asyncPending = false;
         asyncDelegate = null;
@@ -188,7 +188,7 @@ class TestRunner implements IAsyncDelegateObserver {
 		var self = this;
 		var runThread:Thread = Thread.create(function() {
 			self.execute();
-			while (self.running) Sys.sleep(.2);
+			while(self.running) Sys.sleep(.2);
 			var mainThead:Thread = Thread.readMessage(true);
 			mainThead.sendMessage("done");
 		});
