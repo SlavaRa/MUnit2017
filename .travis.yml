@@ -15,16 +15,18 @@ addons:
     packages:
     - mono-complete
     - python3
+	- php
 
 before_install:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       brew update;
       brew install mono;
       brew install python3;
+	  brew install php;
     fi
   - mono --version;
   - python3 --version;
-  - php -v
+  - php -v;
 
 install:
 #  - yes | haxelib install test.hxml
