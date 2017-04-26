@@ -1,3 +1,6 @@
+## MUnit2017 v 1.2.0
+- Added python support
+
 ## MUnit2017 v 1.1.0
 - Added cs support
 

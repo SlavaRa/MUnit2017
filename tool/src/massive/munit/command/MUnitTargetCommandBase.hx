@@ -15,7 +15,6 @@ class MUnitTargetCommandBase extends MUnitCommand
 	override public function initialise():Void
 	{
 		super.initialise();
-
 		//append code coverage
 		var coverage:String  = console.getOption("-coverage");
 		includeCoverage = coverage == "true";
@@ -33,13 +32,13 @@ class MUnitTargetCommandBase extends MUnitCommand
 
 	function getTargetsFromConsole():Array<TargetType> {
 		var result = new Array();
-		if (console.getOption("swf") == "true") result.push(TargetType.as3);
-		else if (console.getOption(TargetType.as3) == "true") result.push(TargetType.as3);
-		if (console.getOption(TargetType.js) == "true") result.push(TargetType.js);
-		if (console.getOption(TargetType.neko) == "true") result.push(TargetType.neko);
-		if (console.getOption(TargetType.cpp) == "true") result.push(TargetType.cpp);
-		if (console.getOption(TargetType.java) == "true") result.push(TargetType.java);
-		if (console.getOption(TargetType.cs) == "true") result.push(TargetType.cs);
+		if(console.getOption("swf") == "true" || console.getOption(as3) == "true") result.push(as3);
+		if(console.getOption(js) == "true") result.push(js);
+		if(console.getOption(neko) == "true") result.push(neko);
+		if(console.getOption(cpp) == "true") result.push(cpp);
+		if(console.getOption(java) == "true") result.push(java);
+		if(console.getOption(cs) == "true") result.push(cs);
+		if(console.getOption(python) == "true") result.push(python);
 		return result;
 	}
 

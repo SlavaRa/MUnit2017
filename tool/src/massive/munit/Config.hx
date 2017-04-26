@@ -44,7 +44,7 @@ class Config {
 	public var classPaths:Array<File>;
 	public var targets:Array<Target> = [];
 	public var targetTypes:Array<TargetType>;
-	public var defaultTargetTypes:Array<TargetType> = [TargetType.as3, TargetType.js, TargetType.neko, TargetType.cpp, TargetType.java, TargetType.cs];
+	public var defaultTargetTypes:Array<TargetType> = [as3, js, neko, cpp, java, cs, python];
 	public var coveragePackages:Array<String>;
 	public var coverageIgnoredClasses:Array<String>;
 	
@@ -175,14 +175,13 @@ class Config {
 		save();
 	}
 
-	public function toString():String
-	{
+	public function toString():String {
 		var str:String = "";
 		if(currentVersion != null) str += "version=" + currentVersion + "\n";
 		if(src != null) str += "src=" + dir.getRelativePath(src) + "\n";
 		if(bin != null) str += "bin=" + dir.getRelativePath(bin) + "\n";
 		if(report != null) str += "report=" + dir.getRelativePath(report) + "\n";
-		if(hxml != null) str += "hxml=" + dir.getRelativePath(hxml) + "\n";	
+		if(hxml != null) str += "hxml=" + dir.getRelativePath(hxml) + "\n";
 		if(classPaths != null) {
 			var value = "";
 			for(path in classPaths) {
@@ -191,8 +190,8 @@ class Config {
 			}
 			str += "classPaths=" + value + "\n";
 		}
-		if(resources != null) str += "resources=" + dir.getRelativePath(resources) + "\n";	
-		if(templates != null) str += "templates=" + dir.getRelativePath(templates) + "\n";	
+		if(resources != null) str += "resources=" + dir.getRelativePath(resources) + "\n";
+		if(templates != null) str += "templates=" + dir.getRelativePath(templates) + "\n";
 		if(coveragePackages != null) str += "coveragePackages=" + coveragePackages.join(",") + "\n";
 		if(coverageIgnoredClasses != null) str += "coverageIgnoredClasses=" + coverageIgnoredClasses.join(",") + "\n";
 		return str;
