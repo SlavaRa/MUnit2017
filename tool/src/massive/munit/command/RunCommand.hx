@@ -483,14 +483,19 @@ class RunCommand extends MUnitTargetCommandBase {
 			}
 		} catch(e:haxe.io.Eof) {}
 		var exitCode:Int = 0;
-		var error:String = "";
+		var error:String = null;
 		try {
 			exitCode = process.exitCode();
-			try {
-				while(true) {
-					error += process.stderr.readLine();
-				}
-			} catch(e:haxe.io.Eof) {}
+			if(exitCode > 0) {
+				var sb = new StringBuf();
+				try {
+					while(true) {
+						sb.add(process.stderr.readLine());
+						sb.add("\n");
+					}
+				} catch(e:haxe.io.Eof) {}
+				error = sb.toString();
+			}
 		} catch(e:Dynamic) {
 			exitCode = 1;
 			error = Std.string(e).split("\n").join("\n\t");
@@ -498,7 +503,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		var stfErrString = process.stderr.readAll().toString().split("\n").join("\n\t");
 		if(stfErrString == null) stfErrString = "";
 		if(exitCode > 0 || stfErrString.length > 0) {
-			if(error.length > 0) error += "\n\t";
+			if(error != null) error += "\n\t";
 			Sys.println("Error running '" + name + "'\n\t" + error);
 		}
 		return exitCode;
