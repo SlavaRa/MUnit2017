@@ -474,7 +474,6 @@ class RunCommand extends MUnitTargetCommandBase {
 	}
 	
 	function runProgram(name:String, ?args:Array<String>) {
-		Sys.println('Run ${name} ${args.join(", ")}');
 		var process = new Process(name, args);
 		try {
 			while(true) {
