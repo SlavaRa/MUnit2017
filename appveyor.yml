@@ -1,5 +1,7 @@
 version: "{build}"
 skip_tags: true
+install:
+- cinst haxe
 before_build:
 - haxe -version
 - python3 --version
