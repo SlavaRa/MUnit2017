@@ -6,7 +6,7 @@ install:
 before_build:
 - haxe -version
 - python --version
-- set /P python3=<where python
+- set /P python3=<which python
 - python3 --version
 #- php -v
 build_script:
