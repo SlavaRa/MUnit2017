@@ -14,21 +14,6 @@ class TimerTest
 	var stamp:Float;
 	var handler:Void->Void;
 	
-	public function new() 
-	{
-		
-	}
-	
-	@BeforeClass
-	public function beforeClass():Void
-	{
-	}
-	
-	@AfterClass
-	public function afterClass():Void
-	{
-	}
-	
 	@Before
 	public function setup():Void
 	{
@@ -38,9 +23,7 @@ class TimerTest
 	@After
 	public function tearDown():Void
 	{
-		if(instance != null)
-			instance.stop();
-		
+		if(instance != null) instance.stop();
 		handler = null;
 	}
 	
@@ -63,16 +46,13 @@ class TimerTest
 		Assert.isTrue(count > 1);
 	}
 
-
 	@AsyncTest
 	public function shouldStopTimer(factory:AsyncFactory):Void
 	{
 		handler = factory.createHandler(this, onStoppedTimer);
-	
 		instance = new Timer(10);
 		instance.run = timerHandler;
 		instance.stop();
-
 		Timer.delay(handler, 200);
 	}
 
@@ -109,30 +89,24 @@ class TimerTest
 	}
 
 	#if js
-		@AsyncTest
-		public function shouldClearOutIntervals(factory:AsyncFactory):Void
+	@AsyncTest
+	public function shouldClearOutIntervals(factory:AsyncFactory):Void
+	{
+		var timer:Timer;
+		handler = factory.createHandler(this, onMegaTimerDelay);
+		for(i in 1...102)
 		{
-			var timer:Timer;
-
-			handler = factory.createHandler(this, onMegaTimerDelay);
-
-			for(i in 1...102)
-			{
-				timer = Timer.delay(timerHandler, i);
-			}
-
-			Timer.delay(handler, 200);
+			timer = Timer.delay(timerHandler, i);
 		}
+		Timer.delay(handler, 200);
+	}
 
-		function onMegaTimerDelay()
-		{
-			Assert.isTrue(untyped Timer.arr.length < 100);
-		}
+	function onMegaTimerDelay()
+	{
+		Assert.isTrue(untyped Timer.arr.length < 100);
+	}
 
 	#end
-
-
-	//-------------
 
 	function timerHandler()
 	{

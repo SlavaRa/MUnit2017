@@ -7,6 +7,7 @@ import massive.munit.util.MathUtil;
  * Auto generated MassiveUnit Test Class  for massive.munit.util.MathUtil 
  */
 class MathUtilTest {
+	
 	@Test
 	public function shouldRoundValue() {
 		Assert.areEqual(1.44, MathUtil.round(1.444444, 2));

@@ -31,16 +31,12 @@ import massive.munit.async.AsyncFactory;
 import massive.munit.async.AsyncTestSuiteStub;
 
 /**
- * ...
  * @author Mike Stead
  */
 class TestRunnerTest
 {
     private var runner:TestRunner;
     private var client:TestResultClientStub;
-
-    public function new()
-    {}
 
     @Before
     public function setup():Void
@@ -98,7 +94,6 @@ class TestRunnerTest
         Assert.areEqual(0, client.finalErrorCount);
         Assert.areEqual(1, client.testClasses.length);
         Assert.isNull(client.currentTestClass);
-
         Assert.areEqual("massive.munit.TestClassStub", client.testClasses[client.testClasses.length-1]);
     }
 
@@ -106,7 +101,6 @@ class TestRunnerTest
     public function testDebug(factory:AsyncFactory):Void
     {
         var suites = new Array<Class<massive.munit.TestSuite>>();
-
         suites.push(TestSuiteStub);
         runner.completionHandler = factory.createHandler(this, completionHandler, 5000);
         runner.debug(suites);
@@ -116,7 +110,6 @@ class TestRunnerTest
     public function noDebugTestsDuringDebugShouldNotRun(factory:AsyncFactory):Void
     {
         var suites = new Array<Class<massive.munit.TestSuite>>();
-
         suites.push(DebuglessTestSuiteStub);
         runner.completionHandler = factory.createHandler(this, debugCompletetionHandler, 5000);
         runner.debug(suites);
@@ -130,7 +123,6 @@ class TestRunnerTest
     public function testAsyncAssertionTests(factory:AsyncFactory):Void
     {
         var suites = new Array<Class<massive.munit.TestSuite>>();
-
         suites.push(AsyncTestSuiteStub);
         runner.completionHandler = factory.createHandler(this, asyncCompletionHandler, 5000);
         runner.run(suites);
@@ -149,7 +141,6 @@ class TestRunnerTest
         Assert.areEqual(2, client.finalErrorCount);
         Assert.areEqual(2, client.testClasses.length);
         Assert.isNull(client.currentTestClass);
-
         Assert.areEqual("massive.munit.async.AsyncTestClassStub2", client.testClasses[client.testClasses.length-1]);
         Assert.areEqual("massive.munit.async.AsyncTestClassStub", client.testClasses[client.testClasses.length-2]);
     }

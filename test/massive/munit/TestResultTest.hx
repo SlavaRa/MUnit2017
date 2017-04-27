@@ -28,16 +28,12 @@
 package massive.munit;
 import massive.haxe.util.ReflectUtil;
 import massive.munit.TestResult;
+
 /**
- * ...
  * @author Mike Stead
  */
-
 class TestResultTest 
 {
-	public function new() 
-	{}
-	
 	@Test
 	public function testConstructor():Void
 	{
@@ -50,7 +46,6 @@ class TestResultTest
 		Assert.isFalse(result.async);
 		Assert.isNull(result.error);
 		Assert.isNull(result.failure);
-
 		Assert.areEqual(TestResultType.UNKNOWN, result.type);
 	}
 	
@@ -59,14 +54,11 @@ class TestResultTest
 	{
 		var result:TestResult = new TestResult();
 		var positionInfo = ReflectUtil.here();
-		
 		result.name = positionInfo.methodName;
 		Assert.areEqual("#" + positionInfo.methodName, result.location);
-		
 		result = new TestResult();
 		result.className = positionInfo.className;
 		Assert.areEqual(positionInfo.className + "#", result.location);
-		
 		result = new TestResult();
 		result.name = positionInfo.methodName;
 		result.className = positionInfo.className;
@@ -78,16 +70,12 @@ class TestResultTest
 	{
 		var result:TestResult = new TestResult();
 		Assert.areEqual(TestResultType.UNKNOWN, result.type);
-
 		result.passed = true;
 		Assert.areEqual(TestResultType.PASS, result.type);
-
 		result.ignore = true;
 		Assert.areEqual(TestResultType.IGNORE, result.type);
-
 		result.failure = new AssertionException("fail");
 		Assert.areEqual(TestResultType.FAIL, result.type);
-
 		result.error = "error";
 		Assert.areEqual(TestResultType.ERROR, result.type);
 	}
