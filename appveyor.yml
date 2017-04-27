@@ -2,9 +2,10 @@ version: "{build}"
 skip_tags: true
 install:
 - cinst haxe
-- cinst python3
 before_build:
 - haxe -version
+- python --version
+- SET python3=python
 - python3 --version
 - php -v
 build_script:
