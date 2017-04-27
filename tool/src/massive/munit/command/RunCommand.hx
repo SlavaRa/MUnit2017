@@ -60,11 +60,6 @@ class RunCommand extends MUnitTargetCommandBase {
 	var killBrowser:Bool;
 	var indexPage:File;
 	var hasBrowserTests:Bool;
-	var hasNekoTests:Bool;
-	var hasCPPTests:Bool;
-	var hasJavaTests:Bool;
-	var hasCSTests:Bool;
-	var hasPHPTests:Bool;
 	var nekoFile:File;
 	var cppFile:File;
 	var javaFile:File;
@@ -117,17 +112,7 @@ class RunCommand extends MUnitTargetCommandBase {
 			//update as this will be the actual executable for cpp/php targets
 			target.file = File.current.resolveFile(tmp.readString());
 			if(!target.file.exists) print("WARNING: File for target type '" + target.type + "' not found: " + target.toString());
-			else {
-				tempTargets.push(target);
-				switch(type) {
-					case neko: hasNekoTests = true;
-					case cpp: hasCPPTests = true;
-					case java: hasJavaTests = true;
-					case cs: hasCSTests = true;
-					case php: hasPHPTests = true;
-					case _:
-				}
-			}
+			else tempTargets.push(target);
 		}
 		targets = config.targets = tempTargets;
 		Log.debug(targets.length + " targets");
@@ -170,10 +155,10 @@ class RunCommand extends MUnitTargetCommandBase {
 	}
 	
 	function resetOutputDirectories() {
-		if(!reportRunnerDir.exists) reportRunnerDir.createDirectory();
-		else reportRunnerDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
-		if(!reportTestDir.exists) reportTestDir.createDirectory();
-		else reportTestDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
+		for(it in [reportRunnerDir, reportTestDir]) {
+			if(!it.exists) it.createDirectory();
+			else it.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
+		}
 	}
 	
 	function generateTestRunnerPages() {
