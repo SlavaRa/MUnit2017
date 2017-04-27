@@ -24,6 +24,7 @@ before_install:
     fi
   - mono --version;
   - python3 --version;
+  - php -v;
 
 install:
 #  - yes | haxelib install test.hxml

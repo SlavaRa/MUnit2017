@@ -52,7 +52,7 @@
  */
 package massive.munit.util;
 
-#if (cs || python)
+#if (cs || python || php)
 typedef Timer = haxe.Timer;
 #else
 
@@ -66,64 +66,60 @@ import java.vm.Thread;
 
 @:expose('massive.munit.util.Timer')
 class Timer {
-	#if (php)
-	#else
-
-	private var id:Null<Int>;
-
+	
+	var id:Null<Int>;
 	#if js
-	private static var arr = new Array<Timer>();
-	private var timerId:Int;
+	static var arr = new Array<Timer>();
+	var timerId:Int;
 	#elseif (neko || cpp || java)
-	private var runThread:Thread;
+	var runThread:Thread;
 	#end
-
+	
 	public function new(time_ms:Int) {
 		#if flash
-			var me = this;
-			id = untyped _global["setInterval"](me.run, time_ms);
+		var me = this;
+		id = untyped _global["setInterval"](me.run, time_ms);
 		#elseif nodejs
-			var arr :Array<Dynamic> = untyped global.haxe_timers = global.haxe_timers == null ? [] : global.haxe_timers;
-			var me 	= this;
-			me.id = arr.length;
-			arr[me.id] = me;
+		var arr :Array<Dynamic> = untyped global.haxe_timers = global.haxe_timers == null ? [] : global.haxe_timers;
+		var me 	= this;
+		me.id = arr.length;
+		arr[me.id] = me;
 		#elseif js
-			id = arr.length;
-			arr[id] = this;
-			timerId = untyped window.setInterval("massive.munit.util.Timer.arr[" + id + "].run();", time_ms);
+		id = arr.length;
+		arr[id] = this;
+		timerId = untyped window.setInterval("massive.munit.util.Timer.arr[" + id + "].run();", time_ms);
 		#elseif (neko || cpp || java)
-			var me = this;
-			runThread = Thread.create(me.runLoop.bind(time_ms));
+		var me = this;
+		runThread = Thread.create(me.runLoop.bind(time_ms));
 		#end
 	}
-
+	
 	public function stop() {
-		#if(php || flash || js )
-			if (id == null) return;
+		#if(flash || js)
+		if (id == null) return;
 		#end
 		#if flash
-			untyped _global["clearInterval"](id);
+		untyped _global["clearInterval"](id);
 		#elseif nodejs
-			untyped clearInterval(timerId);
+		untyped clearInterval(timerId);
 		#elseif js
-			untyped window.clearInterval(timerId);
-			arr[id] = null;
-			if (id > 100 && id == arr.length - 1) 
-			{
-				// compact array
-				var p = id - 1;
-				while(p >= 0 && arr[p] == null) p--;
-				arr = arr.slice(0, p + 1);
-			}
+		untyped window.clearInterval(timerId);
+		arr[id] = null;
+		if (id > 100 && id == arr.length - 1) {
+			// compact array
+			var p = id - 1;
+			while(p >= 0 && arr[p] == null) p--;
+			arr = arr.slice(0, p + 1);
+		}
 		#elseif (neko || cpp || java)
-			run = function() {};
-			runThread.sendMessage("stop");
+		run = function() {};
+		runThread.sendMessage("stop");
 		#end
 		id = null;
 	}
-
+	
 	public dynamic function run() {}
-
+	
 	#if (neko || cpp || java)
 	function runLoop(time_ms:Int) {
 		var shouldStop = false;
@@ -139,7 +135,7 @@ class Timer {
 		}
 	}
 	#end
-
+	
 	public static function delay(f:Void->Void, time_ms:Int):Timer {
 		var t = new Timer(time_ms);
 		t.run = function() {
@@ -148,8 +144,7 @@ class Timer {
 		};
 		return t;
 	}
-	#end
-
+	
 	/**
 		Returns a timestamp, in seconds with fractions.
 
