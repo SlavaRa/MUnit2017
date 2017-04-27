@@ -40,7 +40,6 @@ import js.Lib;
  * Auto generated Test Application.
  * Refer to munit command line tool for more information (haxelib run munit)
  */
-
 class TestMain
 {
 	static function main(){	new TestMain();}
@@ -69,21 +68,17 @@ class TestMain
 		updates the background color and closes the current browser
 		for flash and html targets (useful for continous integration servers)
 	*/
-	private function completionHandler(successful:Bool):Void
-	{
-		try
-		{
+	private function completionHandler(successful:Bool):Void {
+		try {
 			#if flash
-				flash.external.ExternalInterface.call("testResult", successful);
+			flash.external.ExternalInterface.call("testResult", successful);
 			#elseif js
-				js.Lib.eval("testResult(" + successful + ");");
-			#elseif (neko || cpp || php || java || cs || python)
-				Sys.exit(0);
+			js.Lib.eval("testResult(" + successful + ");");
+			#elseif (neko || cpp || java || cs || python || php)
+			Sys.exit(0);
 			#end
 		}
 		// if run from outside browser can get error which we can ignore
-		catch (e:Dynamic)
-		{
-		}
+		catch(e:Dynamic) {}
 	}
 }

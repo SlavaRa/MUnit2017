@@ -26,8 +26,6 @@
 * or implied, of Massive Interactive.
 ****/
 
-
-
 package massive.munit;
 import haxe.CallStack;
 import massive.haxe.util.ReflectUtil;
@@ -37,64 +35,47 @@ import massive.haxe.util.ReflectUtil;
  * 
  * @author Mike Stead
  */
-class UnhandledException extends MUnitException
-{
+class UnhandledException extends MUnitException {
+	
 	/**
 	 * @param source	exception which went unhandled
      * @param location 	test location which triggered exception
 	 */
-	public function new(source:Dynamic, testLocation:String) 
-	{
-		super(source.toString() + formatLocation(source, testLocation), null);
+	public function new(source:Dynamic, testLocation:String) {
+		super(Std.string(source) + formatLocation(source, testLocation), null);
 		type = ReflectUtil.here().className;
 	}
 	
-	function formatLocation(source:Dynamic, testLocation:String):String
-	{
+	function formatLocation(source:Dynamic, testLocation:String):String {
 		var stackTrace = " at " + testLocation;
-
 		var stack = getStackTrace(source);
-
-		if (stack !=  "")
-			stackTrace += " " + stack.substr(1); // remove first "\t"
-
+		if(stack != "") stackTrace += " " + stack.substr(1); // remove first "\t"
 		return stackTrace;
 	}
 	
-	function getStackTrace(source:Dynamic):String
-	{
+	function getStackTrace(source:Dynamic):String {
 		var s = "";
 		#if flash
-			if (Std.is(source, flash.errors.Error))
-			{
-				if(flash.system.Capabilities.isDebugger)
-				{
-					var lines = source.getStackTrace().split("\n");
-					lines.shift(); // remove repeated error name
-					s = lines.join("\n");
-				}
-			}
+		if(Std.is(source, flash.errors.Error) && flash.system.Capabilities.isDebugger)
+			var lines = source.getStackTrace().split("\n");
+			lines.shift(); // remove repeated error name
+			s = lines.join("\n");
+		}
 		#end
-		if (s == "")
-		{
+		if(s == "") {
 			var stack:Array<haxe.StackItem> = CallStack.exceptionStack();
-			while (stack.length > 0)
-			{
-				switch (stack.shift()) 
-				{
+			while (stack.length > 0) {
+				switch (stack.shift()) {
 					case FilePos(_, file, line): s += "\tat " + file + " (" + line + ")\n";
 					case Method(classname, method): s += "\tat " + classname + "#" + method + "\n";
 					default:
 				}
 	        }
 		}
-
 		#if nodejs
 		// you might want to use source-map-support package to get haxe sources in the traceback
-		if (s == "")
-			s = untyped source.stack;
+		if(s == "") s = untyped source.stack;
 		#end
-
         return s;
 	}
 }

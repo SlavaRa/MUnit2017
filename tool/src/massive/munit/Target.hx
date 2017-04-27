@@ -37,4 +37,5 @@ abstract TargetType(String) from String to String {
 	var java = "java";
 	var cs = "cs";
 	var python = "python";
+	var php = "php";
 }
