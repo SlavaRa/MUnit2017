@@ -2,6 +2,7 @@ version: "{build}"
 skip_tags: true
 install:
 - cinst haxe
+- cinst php
 before_build:
 - haxe -version
 - python --version
