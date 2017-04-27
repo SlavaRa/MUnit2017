@@ -60,11 +60,6 @@ class RunCommand extends MUnitTargetCommandBase {
 	var killBrowser:Bool;
 	var indexPage:File;
 	var hasBrowserTests:Bool;
-	var hasNekoTests:Bool;
-	var hasCPPTests:Bool;
-	var hasJavaTests:Bool;
-	var hasCSTests:Bool;
-	var hasPHPTests:Bool;
 	var nekoFile:File;
 	var cppFile:File;
 	var javaFile:File;
@@ -117,17 +112,7 @@ class RunCommand extends MUnitTargetCommandBase {
 			//update as this will be the actual executable for cpp/php targets
 			target.file = File.current.resolveFile(tmp.readString());
 			if(!target.file.exists) print("WARNING: File for target type '" + target.type + "' not found: " + target.toString());
-			else {
-				tempTargets.push(target);
-				switch(type) {
-					case neko: hasNekoTests = true;
-					case cpp: hasCPPTests = true;
-					case java: hasJavaTests = true;
-					case cs: hasCSTests = true;
-					case php: hasPHPTests = true;
-					case _:
-				}
-			}
+			else tempTargets.push(target);
 		}
 		targets = config.targets = tempTargets;
 		Log.debug(targets.length + " targets");
@@ -170,10 +155,10 @@ class RunCommand extends MUnitTargetCommandBase {
 	}
 	
 	function resetOutputDirectories() {
-		if(!reportRunnerDir.exists) reportRunnerDir.createDirectory();
-		else reportRunnerDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
-		if(!reportTestDir.exists) reportTestDir.createDirectory();
-		else reportTestDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
+		for(it in [reportRunnerDir, reportTestDir]) {
+			if(!it.exists) it.createDirectory();
+			else it.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
+		}
 	}
 	
 	function generateTestRunnerPages() {
@@ -428,61 +413,22 @@ class RunCommand extends MUnitTargetCommandBase {
 		return 0;
 	}
 	
-	function launchNeko(file:File):Int {
-		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
-		file.copyTo(reportRunnerFile);
-		FileSys.setCwd(config.dir.nativePath);
-		var exitCode = runProgram('neko', [reportRunnerFile.nativePath]);
-		FileSys.setCwd(console.originalDir.nativePath);
-		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
-		return exitCode;
-	}
+	inline function launchNeko(file:File):Int return launch(file, 'neko', [file.nativePath]);
 	
-	function launchCPP(file:File):Int {
-		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
-		file.copyTo(reportRunnerFile);
-		FileSys.setCwd(config.dir.nativePath);
-		var exitCode = runProgram(file.nativePath);
-		FileSys.setCwd(console.originalDir.nativePath);
-		if (exitCode > 0) error('Error ($exitCode) running $file', exitCode);
-		return exitCode;
-	}
+	inline function launchCPP(file:File):Int return launch(file, file.nativePath);
 	
-	function launchJava(file:File):Int {
-		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
-		file.copyTo(reportRunnerFile);
-		FileSys.setCwd(config.dir.nativePath);
-		var exitCode = runProgram('java', ['-jar', reportRunnerFile.nativePath]);
-		FileSys.setCwd(console.originalDir.nativePath);
-		if (exitCode > 0) error('Error ($exitCode) running $file', exitCode);
-		return exitCode;
-	}
+	inline function launchJava(file:File):Int return launch(file, 'java', ['-jar', file.nativePath]);
 	
-	function launchCS(file:File):Int {
-		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
-		file.copyTo(reportRunnerFile);
-		FileSys.setCwd(config.dir.nativePath);
-		var exitCode = FileSys.isWindows ? runProgram(file.nativePath) : runProgram('mono', [file.nativePath]);
-		FileSys.setCwd(console.originalDir.nativePath);
-		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
-		return exitCode;
-	}
+	inline function launchCS(file:File):Int return FileSys.isWindows ? launch(file, file.nativePath) : launch(file, 'mono', [file.nativePath]);
 	
-	function launchPython(file:File):Int {
-		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
-		file.copyTo(reportRunnerFile);
-		FileSys.setCwd(config.dir.nativePath);
-		var exitCode = runProgram(FileSys.isWindows ? 'python' : 'python3', [file.nativePath]);
-		FileSys.setCwd(console.originalDir.nativePath);
-		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
-		return exitCode;
-	}
+	inline function launchPython(file:File):Int return launch(file, FileSys.isWindows ? 'python' : 'python3', [file.nativePath]);
 	
-	function launchPHP(file:File):Int {
-		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
-		file.copyTo(reportRunnerFile);
+	inline function launchPHP(file:File):Int return launch(file, 'php', [file.nativePath]);
+	
+	function launch(file:File, executor:String, ?args:Array<String>):Int {
+		file.copyTo(reportRunnerDir.resolvePath(file.fileName));
 		FileSys.setCwd(config.dir.nativePath);
-		var exitCode = runProgram('php', [file.nativePath]);
+		var exitCode = runProgram(executor, args);
 		FileSys.setCwd(console.originalDir.nativePath);
 		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
 		return exitCode;

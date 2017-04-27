@@ -29,21 +29,15 @@ package massive.munit;
 import massive.haxe.util.ReflectUtil;
 
 /**
- * ...
  * @author Mike Stead
  */
-
 class MUnitExceptionTest 
 {
-	public function new() 
-	{}
-
 	@Test
 	public function testConstructor():Void
 	{
 		var msg:String = "custom msg";
 		var e:MUnitException = new MUnitException(msg);
-		
 		Assert.areEqual(msg, e.message);
 		Assert.isNotNull(e.info);
 	}
@@ -54,7 +48,6 @@ class MUnitExceptionTest
 		var msg:String = "custom msg";
 		var line:Int = ReflectUtil.here().lineNumber + 1;
 		var e:MUnitException = new MUnitException(msg, ReflectUtil.here());
-		
 		var positionInfo = ReflectUtil.here();
 		var str:String = Type.getClassName(MUnitException) + ": " + msg + " at " + positionInfo.className + "#" + positionInfo.methodName + " (" + line + ")";
 		Assert.areEqual(str, e.toString());

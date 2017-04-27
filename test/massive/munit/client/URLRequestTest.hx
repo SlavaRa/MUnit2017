@@ -8,7 +8,6 @@ import massive.munit.client.HTTPClient;
  * Auto generated MassiveUnit Test Class  for massive.munit.client.URLRequest 
  */
 class URLRequestTest {
-	public function new() {}
 	
 	@Test
 	public function testConstructor() {

@@ -7,12 +7,10 @@ import massive.munit.util.Timer;
  * Collection of use cases for async test assertions used by TestRunnerTest
  * to validate that syncronous assertions/exceptions are handled correctly.
  */
-
 class AsyncTestClassStub
 {
 	static public var handlerCount:Int = 0;
-	public function new() 
-	{}
+	public function new() {}
 	
 	@BeforeClass
 	public function beforeClass():Void
@@ -20,21 +18,6 @@ class AsyncTestClassStub
 		handlerCount = 0;
 	}
 	
-	@AfterClass
-	public function afterClass():Void
-	{
-	}
-	
-	@Before
-	public function before():Void
-	{
-	}
-	
-	@After
-	public function after():Void
-	{
-	}
-
 	@AsyncTest
 	public function shouldAssertAsync(factory:AsyncFactory):Void
 	{
@@ -90,8 +73,6 @@ class AsyncTestClassStub
 		
 	}
 
-
-	//------------------
 	private function asyncHandler():Void
 	{
 		handlerCount ++;
@@ -105,10 +86,7 @@ class AsyncTestClassStub
  */
 class AsyncTestClassStub2
 {
-	public function new()
-	{
-		
-	}
+	public function new() {}
 	// @Test
 	// public function test()
 	// {
