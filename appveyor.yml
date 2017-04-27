@@ -1,0 +1,8 @@
+version: "{build}"
+skip_tags: true
+before_build:
+- haxe -version
+- python3 --version
+- php -v
+build_script:
+- haxe build.hxml
