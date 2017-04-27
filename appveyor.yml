@@ -2,7 +2,7 @@ version: "{build}"
 skip_tags: true
 install:
 - cinst haxe -y
-- cinst python3 -y
+- cinst python-x86_32 -y
 #- cinst php
 before_build:
 - haxe -version
