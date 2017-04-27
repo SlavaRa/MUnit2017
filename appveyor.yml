@@ -5,8 +5,6 @@ install:
 before_build:
 - haxe -version
 - python --version
-- SET python3=python
-- python3 --version
 - php -v
 build_script:
 - haxe build.hxml
