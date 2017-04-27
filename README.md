@@ -30,26 +30,29 @@ Features
 MUnit has been designed for cross platform Haxe development.
 It currently supports js, swf, neko, c++, java, cs, python and php and the tool chain works on PC, OSX and Linux
 
-
 ### Test Metadata
 
 Test cases use Haxe metadata to simplify creating tests (and avoid needing to extend or implement framework classes).
 
-	@Test
-	public function testExample()
-	{
-		Assert.isTrue(true);
-	}
+```haxe
+@Test
+public function testExample()
+{
+	Assert.isTrue(true);
+}
+```
 
 ### Asynchronous Tests
 
 Unlike the default haxe unit test classes, MUnit supports asynchronous testing
 
-	@AsyncTest
-	public function asyncTestExample(factory:AsyncFactory)
-	{
-		...
-	}
+```haxe
+@AsyncTest
+public function asyncTestExample(factory:AsyncFactory)
+{
+	...
+}
+```
 
 ### Tool Chain
 
@@ -63,15 +66,11 @@ MUnit is way more than just a unit test framework. It includes a command line to
 *	Auto generate stub test classes (and/or target classes)
 *	Integrated code coverage compilation with [MCover](https://github.com/massiveinteractive/MassiveCover)
 
-
-
 ## Documentation
-
 
 For detailed user guides refer to the **[wiki](https://github.com/massiveinteractive/MassiveUnit/wiki)**
 
 The API documentation is available on the [haxelib project page](http://lib.haxe.org/d/munit).
-
 
 ## How to contribute
 
