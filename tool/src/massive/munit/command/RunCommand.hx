@@ -49,7 +49,7 @@ typedef SysFile = sys.io.File;
 
 class RunCommand extends MUnitTargetCommandBase {
 	public static inline var DEFAULT_SERVER_TIMEOUT_SEC:Int = 30;
-
+	
 	var browser:String;
 	var reportDir:File;
 	var reportRunnerDir:File;
@@ -60,24 +60,21 @@ class RunCommand extends MUnitTargetCommandBase {
 	var killBrowser:Bool;
 	var indexPage:File;
 	var hasBrowserTests:Bool;
-	var hasNekoTests:Bool;
-	var hasCPPTests:Bool;
-	var hasJavaTests:Bool;
-	var hasCSTests:Bool;
-	var hasLUATests:Bool;
 	var nekoFile:File;
 	var cppFile:File;
 	var javaFile:File;
 	var csFile:File;
+	var pythonFile:File;
+	var phpFile:File;
 	var luaFile:File;
 	var serverTimeoutTimeSec:Int;
 	var resultExitCode:Bool;
-
+	
 	public function new() {
 		super();
 		killBrowser = false;
 	}
-
+	
 	override public function initialise() {
 		initialiseTargets(false);
 		locateBinDir();
@@ -89,7 +86,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		generateTestRunnerPages();
 		checkForExitOnFail();
 	}
-
+	
 	function locateBinDir() {
 		var binPath:String = console.getNextArg();
 		if(binPath == null) {
@@ -102,7 +99,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		}
 		Log.debug("binPath: " + binDir);
 	}
-
+	
 	function gatherTestRunnerFiles() {
 		if(!binDir.isDirectory || !binDir.resolveDirectory(".temp").exists) return;
 		var tempTargets = [];
@@ -116,23 +113,13 @@ class RunCommand extends MUnitTargetCommandBase {
 			//update as this will be the actual executable for cpp/php targets
 			target.file = File.current.resolveFile(tmp.readString());
 			if(!target.file.exists) print("WARNING: File for target type '" + target.type + "' not found: " + target.toString());
-			else {
-				tempTargets.push(target);
-				switch(type) {
-					case neko: hasNekoTests = true;
-					case cpp: hasCPPTests = true;
-					case java: hasJavaTests = true;
-					case cs: hasCSTests = true;
-					case lua: hasLUATests = true;
-					case _:
-				}
-			}
+			else tempTargets.push(target);
 		}
 		targets = config.targets = tempTargets;
 		Log.debug(targets.length + " targets");
 		for(target in targets) Log.debug("   " + target.file);
 	}
-
+	
 	function locateReportDir() {
 		var reportPath:String = console.getNextArg();
 		if(reportPath == null) {
@@ -145,7 +132,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		}
 		Log.debug("report: " + reportDir);
 	}
-
+	
 	function checkForCustomBrowser() {
 		reportRunnerDir = reportDir.resolveDirectory("test-runner");
 		reportTestDir = reportDir.resolveDirectory("test");
@@ -153,48 +140,40 @@ class RunCommand extends MUnitTargetCommandBase {
 		if(b != null && b != "true") browser = b;
 		Log.debug("browser: " + browser);
 	}
-
+	
 	function checkForBrowserKeepAliveFlag() {
 		if(console.getOption("kill-browser") != null) {
 			killBrowser = true;
 			Log.debug("killBrowser? " + killBrowser);
 		}
 	}
-
+	
 	function checkForExitOnFail() {
 		if(console.getOption("result-exit-code") != null) {
 			resultExitCode = true;
 			Log.debug("resultExitCode? " + resultExitCode);
 		}
 	}
-
+	
 	function resetOutputDirectories() {
 		if(!reportRunnerDir.exists) reportRunnerDir.createDirectory();
 		else reportRunnerDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
 		if(!reportTestDir.exists) reportTestDir.createDirectory();
 		else reportTestDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
 	}
-
+	
 	function generateTestRunnerPages() {
 		var pageNames = [];
 		for(target in targets) {
 			var file = target.file;
 			switch(target.type) {
-				case neko:
-					hasNekoTests = true;
-					nekoFile = file;
-				case cpp:
-					hasCPPTests = true;
-					cppFile = file;
-				case java:
-					hasJavaTests = true;
-					javaFile = file;
-				case cs:
-					hasCSTests = true;
-					csFile = file;
-				case lua:
-					hasLUATests = true;
-					luaFile = file;
+				case neko: nekoFile = file;
+				case cpp: cppFile = file;
+				case java: javaFile = file;
+				case cs: csFile = file;
+				case python: pythonFile = file;
+				case php: phpFile = file;
+				case lua: luaFile = file;
 				case _:
 					hasBrowserTests = true;
 					var pageName = target.type;
@@ -229,7 +208,7 @@ class RunCommand extends MUnitTargetCommandBase {
 			file.copyTo(reportRunnerDir.resolveFile(file.fileName));
 		}
 	}
-
+	
 	/**
 	 * Returns content from a html template.
 	 * Checks for local template before using default template
@@ -242,7 +221,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		var template = new haxe.Template(resource);
 		return template.execute(properties);
 	}
-
+	
 	override public function execute() {
 		if(FileSys.isWindows) {
 			//Windows has issue releasing port registries reliably.
@@ -278,6 +257,8 @@ class RunCommand extends MUnitTargetCommandBase {
 		if(cppFile != null) launchCPP(cppFile);
 		if(javaFile != null) launchJava(javaFile);
 		if(csFile != null) launchCS(csFile);
+		if(pythonFile != null) launchPython(pythonFile);
+		if(phpFile != null) launchPHP(phpFile);
 		if(luaFile != null) launchLUA(luaFile);
 		if(hasBrowserTests) launchFile(indexPage);
 		else resultMonitor.sendMessage("quit");
@@ -296,7 +277,7 @@ class RunCommand extends MUnitTargetCommandBase {
 			exit(1);
 		}
 	}
-
+	
 	/**
 	 * Generates an alias to the nekotools server file on osx/linux
 	 */
@@ -307,7 +288,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		serverFile.copyTo(copy);
 		return copy;
 	}
-
+	
 	function readServerOutput() {
 		// just consume server output
 		var serverProcess:Process = Thread.readMessage(true);
@@ -317,7 +298,7 @@ class RunCommand extends MUnitTargetCommandBase {
 			}
 		} catch (e:haxe.io.Eof) {}
 	}
-
+	
 	function monitorResults() {
 		var mainThread = Thread.readMessage(true);
 		var serverProcess = Thread.readMessage(true);
@@ -388,13 +369,13 @@ class RunCommand extends MUnitTargetCommandBase {
 		var platformResult:Bool = platformCount > 0 && testFailCount == 0 && testErrorCount == 0 && !serverHung;
 		mainThread.sendMessage(platformResult);
 	}
-
+	
 	function getTargetName(result:String):String return result.split("under ")[1].split(" using")[0];
-
+	
 	function checkIfTestPassed(result:String):Bool return result.indexOf(ServerMain.PASSED) != -1;
-
+	
 	function checkIfTestFailed(result:String):Bool return result.indexOf(ServerMain.FAILED) != -1;
-
+	
 	function launchFile(file:File):Int {
 		var targetLocation:String  = HTTPClient.DEFAULT_SERVER_URL + "/tmp/runner/" + file.fileName;
 		var parameters:Array<String> = [];
@@ -434,7 +415,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		}
 		return 0;
 	}
-
+	
 	function launchNeko(file:File):Int {
 		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
 		file.copyTo(reportRunnerFile);
@@ -475,6 +456,26 @@ class RunCommand extends MUnitTargetCommandBase {
 		return exitCode;
 	}
 	
+	function launchPython(file:File):Int {
+		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
+		file.copyTo(reportRunnerFile);
+		FileSys.setCwd(config.dir.nativePath);
+		var exitCode = runProgram(FileSys.isWindows ? 'python' : 'python3', [file.nativePath]);
+		FileSys.setCwd(console.originalDir.nativePath);
+		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
+		return exitCode;
+	}
+	
+	function launchPHP(file:File):Int {
+		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
+		file.copyTo(reportRunnerFile);
+		FileSys.setCwd(config.dir.nativePath);
+		var exitCode = runProgram('php', [file.nativePath]);
+		FileSys.setCwd(console.originalDir.nativePath);
+		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
+		return exitCode;
+	}
+	
 	function launchLUA(file:File):Int {
 		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
 		file.copyTo(reportRunnerFile);
@@ -498,6 +499,16 @@ class RunCommand extends MUnitTargetCommandBase {
 		var error:String = null;
 		try {
 			exitCode = process.exitCode();
+			if(exitCode > 0) {
+				var sb = new StringBuf();
+				try {
+					while(true) {
+						sb.add(process.stderr.readLine());
+						sb.add("\n");
+					}
+				} catch(e:haxe.io.Eof) {}
+				error = sb.toString();
+			}
 		} catch(e:Dynamic) {
 			exitCode = 1;
 			error = Std.string(e).split("\n").join("\n\t");

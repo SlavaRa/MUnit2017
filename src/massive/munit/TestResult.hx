@@ -87,13 +87,7 @@ class TestResult {
 	 */
 	public var error:Dynamic;
 
-	public var type(get_type, null):TestResultType;
-	
-	/**
-	 * Class constructor.
-	 */
-	public function new() {}
-
+	public var type(get_type, never):TestResultType;
 	function get_type():TestResultType {
 		if(error != null) return ERROR;
 		if(failure != null) return FAIL;
@@ -101,7 +95,11 @@ class TestResult {
 		if(passed) return PASS;
 		return UNKNOWN;
 	}
-
+	
+	/**
+	 * Class constructor.
+	 */
+	public function new() {}
 }
 
 enum TestResultType {

@@ -124,14 +124,12 @@ class PrintClient extends PrintClientBase
 	}
 	#end
 
-	override function printOverallResult(result:Bool)
-	{
+	override function printOverallResult(result:Bool) {
 		super.printOverallResult(result);
-
 		#if (nodejs)
 		#elseif (js || flash)
-			external.setResult(result);
-			external.setResultBackground(result);
+		external.setResult(result);
+		external.setResultBackground(result);
 		#end
 	}
 
@@ -147,7 +145,7 @@ class PrintClient extends PrintClientBase
 		#end
 		#if nodejs
 		untyped process.stdout.write(value);
-		#elseif (neko || cpp || php || java || cs || lua)
+		#elseif (neko || cpp || java || cs || python || php || lua)
 		Sys.print(value);
 		#elseif (js || flash)
 		external.print(value);

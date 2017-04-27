@@ -92,9 +92,9 @@ class RichPrintClient extends PrintClientBase {
 	}
 
 	/**
-	* summarises result for currently executing test class
-	* and update visual state of test class
-	*/
+	 * summarises result for currently executing test class
+	 * and update visual state of test class
+	 */
 	override function finalizeTestClass() {
 		super.finalizeTestClass();
 		testClassResultType = getTestClassResultType();
@@ -200,7 +200,7 @@ class RichPrintClient extends PrintClientBase {
 	
 	override public function print(value:Dynamic) {
 		super.print(value);
-		#if (neko || cpp || php || java || cs || lua)
+		#if (neko || cpp || java || cs || python || php || lua)
 		Sys.print(value);
 		#end
 	}

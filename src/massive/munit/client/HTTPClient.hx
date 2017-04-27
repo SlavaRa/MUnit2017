@@ -179,15 +179,15 @@ class HTTPClient implements IAdvancedTestResultClient
 		}
 	}
 
-	private function platform():String
-	{
+	function platform():String {
 		#if flash return "as3";
 		#elseif js return "js";
 		#elseif neko return "neko";
 		#elseif cpp return "cpp";
-		#elseif php return "php";
 		#elseif java return "java";
 		#elseif cs return "cs";
+		#elseif python return "python";
+		#elseif php return "php";
 		#elseif lua return "lua";
 		#end
 		return "unknown";
@@ -236,7 +236,7 @@ class URLRequest {
 	var url:String;
 	var headers:StringMap<String>;
 	
-	#if (js || neko || cpp || java || cs || lua)
+	#if (js || neko || cpp || java || cs || python || php || lua)
 	public var client:Http;
 	#elseif flash
 	public var client:flash.LoadVars;
@@ -249,7 +249,7 @@ class URLRequest {
 	}
 	
 	function createClient(url:String) {
-		#if (js || neko || cpp || java || cs || lua)
+		#if (js || neko || cpp || java || cs || python || php || lua)
 		client = new Http(url);
 		#elseif flash
 		client = new flash.LoadVars();
@@ -257,7 +257,7 @@ class URLRequest {
 	}
 	
 	public function setHeader(name:String, value:String) {
-		#if (js || neko || cpp || java || cs || lua)
+		#if (js || neko || cpp || java || cs || python || php || lua)
 		client.setHeader(name, value);
 		#elseif flash
 		client.addRequestHeader(name, value);
@@ -265,7 +265,7 @@ class URLRequest {
 	}
 	
 	public function send() {
-		#if (js || neko || cpp || java || cs || lua)
+		#if (js || neko || cpp || java || cs || python || php || lua)
 		client.onData = onData;
 		client.onError = onError;
 			#if js
@@ -283,12 +283,9 @@ class URLRequest {
 	}
 	
 	#if flash
-		function internalOnData(value:String)
-		{
-			if (value == null)
-				onError("Invalid Server Response.");
-			else
-				onData(value);
-		}
+	function internalOnData(value:String) {
+		if (value == null) onError("Invalid Server Response.");
+		else onData(value);
+	}
 	#end
 }

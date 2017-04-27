@@ -52,6 +52,8 @@ class ReportCommand extends MUnitTargetCommandBase {
 							case cpp: targetTypes.push(cpp);
 							case java: targetTypes.push(java);
 							case cs: targetTypes.push(cs);
+							case python: targetTypes.push(python);
+							case php: targetTypes.push(php);
 							case lua: targetTypes.push(lua);
 						}
 					}

@@ -38,6 +38,8 @@ class MUnitTargetCommandBase extends MUnitCommand
 		if(console.getOption(cpp) == "true") result.push(cpp);
 		if(console.getOption(java) == "true") result.push(java);
 		if(console.getOption(cs) == "true") result.push(cs);
+		if(console.getOption(python) == "true") result.push(python);
+		if(console.getOption(php) == "true") result.push(php);
 		if(console.getOption(lua) == "true") result.push(lua);
 		return result;
 	}
@@ -134,7 +136,7 @@ class MUnitTargetCommandBase extends MUnitCommand
 				continue;
 			}
 			
-			var mainReg:EReg = ~/^-main (.*)/;	
+			var mainReg:EReg = ~/^-main (.*)/;
 			if (mainReg.match(line))
 			{
 				target.main = config.src.resolveFile(mainReg.matched(1) + ".hx");
@@ -202,6 +204,11 @@ class MUnitTargetCommandBase extends MUnitCommand
 				if(target.debug) executablePath += "-debug";
 				executablePath += ".jar";
 				target.executableFile = target.file.resolveFile(executablePath);
+			case php:
+				var executablePath = "index";
+				if(target.debug) executablePath += "-debug";
+				executablePath += ".php";
+				target.executableFile = target.file.resolveFile(executablePath);
 			case _: target.executableFile = target.file;
 		}
 		output += " " + file;
@@ -218,7 +225,7 @@ class MUnitTargetCommandBase extends MUnitCommand
 			if(targetMatcher.match(line)) {
 				var result = line.substr(stype.length + 2);
 				result = switch(type) {
-					case cpp | java | cs if(includeCoverage): result + "-coverage";
+					case cpp, java, cs, php if(includeCoverage): result + "-coverage";
 					case _: result;
 				}
 				return Path.normalize(result);

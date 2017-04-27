@@ -65,18 +65,18 @@ class AsyncDelegate {
 	 */
 	public var delegateHandler(default, null):Dynamic;
 	public var timeoutDelay(default, null):Int;
-	public var timedOut(default, null):Bool;
-	private var testCase:Dynamic;
-	private var handler:Function;
-	private var timer:Timer;
-	public var canceled(default, null):Bool;
-	private var deferredTimer:Timer;
+	public var timedOut(default, null):Bool = false;
+	public var canceled(default, null):Bool = false;
+	var testCase:Dynamic;
+	var handler:Function;
+	var timer:Timer;
+	var deferredTimer:Timer;
 
 	/**
 	 * An array of values to be passed as parameters to the test class handler.
 	 * This should be populated inside the delegateHandler when it's called.
 	 */ 
-	private var params:Array<Dynamic>;
+	var params:Array<Dynamic> = [];
 	
 	/**
 	 * Class constructor.
@@ -85,16 +85,12 @@ class AsyncDelegate {
 	 * @param	?timeout			[optional] number of milliseconds to wait before timing out. Defaults to 400
 	 * @param	?info				[optional] pos infos of the test which requests an instance of this delegate
 	 */
-	public function new(testCase:Dynamic, handler:Function, ?timeout:Int, ?info:PosInfos)
-	{
+	public function new(testCase:Dynamic, handler:Function, ?timeout:Int, ?info:PosInfos) {
 		this.testCase = testCase;
 		this.handler = handler;
 		this.delegateHandler = Reflect.makeVarArgs(responseHandler);
 		this.info = info;
-		params = [];
-		timedOut = false;
-		canceled = false;
-		if (timeout == null || timeout <= 0) timeout = DEFAULT_TIMEOUT;
+		if(timeout == null || timeout <= 0) timeout = DEFAULT_TIMEOUT;
 		timeoutDelay = timeout;
 		timer = Timer.delay(timeoutHandler, timeoutDelay);
 	}
@@ -103,40 +99,35 @@ class AsyncDelegate {
 	 * Execute the remainder of the asynchronous test. This should be called after observer
 	 * has been notified of a successful asynchronous response.
 	 */
-	public function runTest():Void
-	{
+	public function runTest() {
 		Reflect.callMethod(testCase, handler, params);
 	}
 
 	/**
 	 * Cancels pending async timeout.
 	 */
-	public function cancelTest():Void
-	{
+	public function cancelTest() {
 		canceled = true;
 		timer.stop();
-		if(deferredTimer!=null) deferredTimer.stop();
+		if(deferredTimer != null) deferredTimer.stop();
 	}
 
-	private function responseHandler(?params:Array<Dynamic>):Dynamic
-	{	
-		if (timedOut || canceled) return null;
+	function responseHandler(?params:Array<Dynamic>):Dynamic {	
+		if(timedOut || canceled) return null;
 		timer.stop();
 		if(deferredTimer != null) deferredTimer.stop();
 		this.params = params != null ? params.copy() : [];
 		// defer callback to force async runner
-		if (observer != null) Timer.delay(delayActualResponseHandler, 1);
+		if(observer != null) Timer.delay(delayActualResponseHandler, 1);
 		return null;
 	}
 
-	private function delayActualResponseHandler()
-	{
+	function delayActualResponseHandler() {
 		observer.asyncResponseHandler(this);
 		observer = null; 
 	}
 
-	private function timeoutHandler():Void
-	{
+	function timeoutHandler() {
 		#if flash
 			//pushing timeout onto next frame to prevent raxe condition bug when flash framerate drops too low and timeout timer executes prior to response on same frame
 			deferredTimer = Timer.delay(actualTimeoutHandler, 1);
@@ -145,8 +136,7 @@ class AsyncDelegate {
 		#end
 	}
 
-	private function actualTimeoutHandler()
-	{
+	function actualTimeoutHandler() {
 		deferredTimer = null;
 		handler = null;
 		delegateHandler = null;
