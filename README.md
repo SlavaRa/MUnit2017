@@ -13,7 +13,7 @@ To install you must have [Haxe](http://www.haxe.org) installed
 
 To install latest build from git:
 
-    haxelib git munit https://github.com/SlavaRa/MUnit2017.git src
+    haxelib git munit https://github.com/SlavaRa/MUnit2017.git munit2017
 
 To check that it is all installed and to view the help run:
 
@@ -81,7 +81,7 @@ If you want to help, [fork it](https://github.com/massiveinteractive/MassiveUnit
 
 To install latest build from git:
 
-    haxelib git munit https://github.com/SlavaRa/MUnit2017.git src
+    haxelib git munit https://github.com/SlavaRa/MUnit2017.git munit2017
 
 
 If you want to make sure it works, make sure to run the bash script (build.sh) and check that the tests all pass on all platforms:
