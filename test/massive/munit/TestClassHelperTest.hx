@@ -32,7 +32,6 @@ using Reflect;
  * @author Mike Stead
  */
 class TestClassHelperTest {
-	public function new() {}
 
 	@Test
 	public function testConstructor() {
