@@ -25,7 +25,6 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
 package massive.munit;
 import haxe.CallStack;
 import massive.haxe.util.ReflectUtil;
@@ -49,11 +48,11 @@ class UnhandledException extends MUnitException {
 	function formatLocation(source:Dynamic, testLocation:String):String {
 		var stackTrace = " at " + testLocation;
 		var stack = getStackTrace(source);
-		if(stack != "") stackTrace += " " + stack.substr(1); // remove first "\t"
+		if(stack != null && stack.length > 1) stackTrace += " " + stack.substr(1); // remove first "\t"
 		return stackTrace;
 	}
 	
-	function getStackTrace(source:Dynamic):String {
+	function getStackTrace(source:Dynamic):Null<String> {
 		var s = "";
 		#if flash
 		if(Std.is(source, flash.errors.Error) && flash.system.Capabilities.isDebugger)
@@ -63,12 +62,12 @@ class UnhandledException extends MUnitException {
 		}
 		#end
 		if(s == "") {
-			var stack:Array<haxe.StackItem> = CallStack.exceptionStack();
-			while (stack.length > 0) {
-				switch (stack.shift()) {
+			var stack = CallStack.exceptionStack();
+			while(stack.length > 0) {
+				switch(stack.shift()) {
 					case FilePos(_, file, line): s += "\tat " + file + " (" + line + ")\n";
 					case Method(classname, method): s += "\tat " + classname + "#" + method + "\n";
-					default:
+					case _:
 				}
 	        }
 		}

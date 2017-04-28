@@ -1,4 +1,14 @@
+## JavaScript
+-main TestMain
+-cp test
+-cp src
+-lib mlib
+-lib nodejs
+-D nodejs
+-js bin/test/core/js_test.js
+
 ## Neko
+--next
 -main TestMain
 -cp test
 -cp src
