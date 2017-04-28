@@ -8,16 +8,16 @@ os:
   - linux
   - osx
 
-sudo: false
+sudo: true
 
 addons:
   apt:
     packages:
     - mono-complete
     - python3
-    - php70
-    - php70-common
-    - php70-cli
+    #- php70
+    #- php70-common
+    #- php70-cli
 
 before_install:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
@@ -29,6 +29,8 @@ before_install:
       brew tap homebrew/homebrew-php;
       brew unlink php56;
       brew install php70;
+    else
+      sudo apt-get install php7.0
     fi
   - mono --version;
   - python3 --version;
