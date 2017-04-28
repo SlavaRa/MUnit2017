@@ -31,9 +31,9 @@ import massive.haxe.util.TemplateUtil;
 import massive.sys.io.File;
 
 /**
-The ConfigCommand provides a number of ways to create and modify the configuration file (.munit) for a project.
-Either from command line args, manual input into the console, or from an external file.
-*/
+ * The ConfigCommand provides a number of ways to create and modify the configuration file (.munit) for a project.
+ * Either from command line args, manual input into the console, or from an external file.
+ */
 class ConfigCommand extends MUnitCommand
 {
 	static inline var DEFAULT_SRC:String = "test";
@@ -65,7 +65,6 @@ class ConfigCommand extends MUnitCommand
 
 	override public function initialise():Void
 	{
-
 		if(hasDeleteArg())
 		{
 			config.remove();
@@ -103,9 +102,7 @@ class ConfigCommand extends MUnitCommand
 		{
 			setDefaultValuesForMissingProperties();
 		}
-
 		writeHxmlToFile(hxml);
-
 		if(!config.exists)
 		{
 			config.createDefault(src, bin, report, hxml,classPaths,resources,templates,coveragePackages,coverageIgnoredClasses);
@@ -126,26 +123,22 @@ class ConfigCommand extends MUnitCommand
 
 	function hasDeleteArg():Bool
 	{
-		if(console.getOption("delete") != null) return true;
-		return false;
+		return console.getOption("delete") != null;
 	}
 
 	function hasFileArg():Bool
 	{
-		if(console.getOption("file") != null) return true;
-		return false;
+		return console.getOption("file") != null;
 	}
 
 	function hasResetArg():Bool
 	{
-		if(console.getOption("reset") != null) return true;
-		return false;
+		return console.getOption("reset") != null;
 	}
 
 	function hasDefaultArg():Bool
 	{
-		if(console.getOption("default") != null) return true;
-		return false;
+		return console.getOption("default") != null;
 	}
 
 	function hasInlineArgs():Bool
@@ -188,7 +181,6 @@ class ConfigCommand extends MUnitCommand
 		coveragePackages = coveragePackagesArg != null ?  coveragePackagesArg.split(",") : null;
 		coverageIgnoredClasses = coverageIgnoredClassesArg != null ?  coverageIgnoredClassesArg.split(",") : null;
 	}
-
 
 	function parseFromConsole()
 	{
@@ -274,17 +266,14 @@ class ConfigCommand extends MUnitCommand
 		if(hxml == null) hxml = convertToFile(hxmlArg, DEFAULT_HXML, "hxml");
 	}
 
-	///////////
-
-
 	function parseFromFile(filePath:String)
 	{
 		if(filePath == "true" || filePath == "")
 		{
 			error("Invalid argument. '-file' must be followed by a valid file path");
-		}	
+		}
 		
-		file = File.create(filePath, config.dir);	
+		file = File.create(filePath, config.dir);
 		
 		var label = "file";
 		if(file == null) error("invaid " + label + " path: " + filePath);
@@ -307,8 +296,6 @@ class ConfigCommand extends MUnitCommand
 		coveragePackages = tempConfig.coveragePackages;
 		coverageIgnoredClasses = tempConfig.coverageIgnoredClasses;
 	}
-
-
 	
 	function writeHxmlToFile(file:File, ?overwrite:Bool=false):Bool
 	{
@@ -330,9 +317,6 @@ class ConfigCommand extends MUnitCommand
 		return true;
 		
 	}
-
-	///// utilities
-
 
 	function convertToDirectory(arg:String, defaultValue:String, label:String):File
 	{
