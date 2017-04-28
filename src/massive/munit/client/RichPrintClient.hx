@@ -25,7 +25,6 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
 package massive.munit.client;
 import massive.munit.ITestResultClient.CoverageResult;
 import massive.munit.TestResult;
@@ -33,11 +32,12 @@ import massive.munit.client.PrintClientBase;
 import massive.munit.util.MathUtil;
 
 class RichPrintClient extends PrintClientBase {
+	
 	/**
 	 * Default id of this client.
 	 */
 	public static inline var DEFAULT_ID:String = "RichPrintClient";
-
+	
 	var testClassResultType:TestResultType;
 	var external:ExternalPrintClient;
 	
@@ -45,21 +45,21 @@ class RichPrintClient extends PrintClientBase {
 		super();
 		id = DEFAULT_ID;
 	}
-
+	
 	override function init() {
 		super.init();
 		originalTrace = haxe.Log.trace;
 		haxe.Log.trace = customTrace;
 		external = new ExternalPrintClientJS();
 	}
-
+	
 	override function initializeTestClass() {
 		super.initializeTestClass();
 		external.createTestClass(currentTestClass);
 		external.printToTestClassSummary("Class: " + currentTestClass + " ");
 	}
-
-	override function updateTestClass(result:TestResult) 	{
+	
+	override function updateTestClass(result:TestResult) {
 		super.updateTestClass(result);
 		var value = serializeTestResult(result);
 		switch(result.type) {
@@ -78,7 +78,7 @@ class RichPrintClient extends PrintClientBase {
 			case UNKNOWN:
 		}
 	}
-
+	
 	function serializeTestResult(result:TestResult):String {
 		var summary = result.name;
 		if(result.description != null && result.description != "") {
@@ -90,7 +90,7 @@ class RichPrintClient extends PrintClientBase {
 		if(result.ignore) return "Ignore: " + summary;
 		return null;
 	}
-
+	
 	/**
 	* summarises result for currently executing test class
 	* and update visual state of test class
@@ -108,7 +108,7 @@ class RichPrintClient extends PrintClientBase {
 		if(code == -1) return;
 		external.setTestClassResult(code);
 	}
-
+	
 	// We print exceptions captured (failures or errors) after all tests 
 	// have completed for a test class.
 	function getTestClassResultType():TestResultType {
@@ -117,8 +117,7 @@ class RichPrintClient extends PrintClientBase {
 		if(ignoreCount > 0) return TestResultType.IGNORE; 
 		return TestResultType.PASS; 
 	}
-
-
+	
 	override public function setCurrentTestClassCoverage(result:CoverageResult) {
 		super.setCurrentTestClassCoverage(result);
 		external.printToTestClassSummary(" [" + result.percent + "%]");
@@ -127,44 +126,39 @@ class RichPrintClient extends PrintClientBase {
 		for(item in result.blocks) external.addTestClassCoverageItem(item);
 	}
 	
-	override public function reportFinalCoverage(?percent:Float=0, missingCoverageResults:Array<CoverageResult>, summary:String,
-		?classBreakdown:String=null,
-		?packageBreakdown:String=null,
-		?executionFrequency:String=null
-		):Void
-	{
+	override public function reportFinalCoverage(?percent:Float = 0, missingCoverageResults:Array<CoverageResult>, summary:String, ?classBreakdown:String, ?packageBreakdown:String, ?executionFrequency:String) {
 		super.reportFinalCoverage(percent, missingCoverageResults, summary,classBreakdown,packageBreakdown,executionFrequency);
-
+		
 		external.createCoverageReport(percent);
 		printMissingCoverage(missingCoverageResults);
-
+		
 		if(executionFrequency != null)
 		{
 			external.addCoverageReportSection("Code Execution Frequency", trim(executionFrequency));
 		}
-
+		
 		if(classBreakdown != null)
 		{
 			external.addCoverageReportSection("Class Breakdown", trim(classBreakdown));
 		}
-
+		
 		if(packageBreakdown != null)
 		{
 			external.addCoverageReportSection("Package Breakdown", trim(packageBreakdown));
 		}
-
+		
 		if(packageBreakdown != null)
 		{
 			external.addCoverageReportSection("Summary", trim(summary));
 		}
 	}
-
+	
 	function trim(output:String):String {
 		while(output.indexOf("\n") == 0)  output = output.substr(1);
 		while(output.lastIndexOf("\n") == output.length - 2) output = output.substr(0, output.length - 2);
 		return output;
 	}
-
+	
 	function printMissingCoverage(missingCoverageResults:Array<CoverageResult>) {
 		if(missingCoverageResults == null || missingCoverageResults.length == 0) return;
 		for(result in missingCoverageResults) {
@@ -172,7 +166,7 @@ class RichPrintClient extends PrintClientBase {
 			for(item in result.blocks) external.addTestClassCoverageItem(item);
 		}
 	}
-
+	
 	override function printFinalStatistics(result:Bool, testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float) {
 		super.printFinalStatistics(result, testCount, passCount, failCount, errorCount, ignoreCount, time);
 		var sb = new StringBuf();
@@ -185,12 +179,12 @@ class RichPrintClient extends PrintClientBase {
 		sb.add(" Time: "); sb.add(MathUtil.round(time, 5));
 		external.printSummary(sb.toString());
 	}
-
+	
 	override function printOverallResult(result:Bool) {
 		super.printOverallResult(result);
 		external.setResult(result);
 	}
-
+	
 	function customTrace(value, ?info:haxe.PosInfos) {
 		addTrace(value, info);
 		var traces = getTraces();
@@ -202,6 +196,8 @@ class RichPrintClient extends PrintClientBase {
 		super.print(value);
 		#if (neko || cpp || java || cs || python || php)
 		Sys.print(value);
+		#elseif nodejs
+		js.Node.process.stdout.write(Std.string(value));
 		#end
 	}
 }
