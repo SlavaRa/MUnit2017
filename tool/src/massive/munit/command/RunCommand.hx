@@ -67,7 +67,7 @@ class RunCommand extends MUnitTargetCommandBase {
 	var javaFile:File;
 	var csFile:File;
 	var pythonFile:File;
-	var phpFile:File;
+	var phpFiles:Array<File> = [];
 	var nodejsFiles:Array<File> = [];
 	var serverTimeoutTimeSec:Int;
 	var resultExitCode:Bool;
@@ -174,7 +174,7 @@ class RunCommand extends MUnitTargetCommandBase {
 				case java: javaFile = file;
 				case cs: csFile = file;
 				case python: pythonFile = file;
-				case php: phpFile = file;
+				case php: phpFiles.push(file);
 				case js if(function() {for(it in target.flags.keys()) if(it == "nodejs") return true; return false;}()) : nodejsFiles.push(file);
 				case _:
 					hasBrowserTests = true;
@@ -260,7 +260,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		if(javaFile != null) launchJava(javaFile);
 		if(csFile != null) launchCS(csFile);
 		if(pythonFile != null) launchPython(pythonFile);
-		if(phpFile != null) launchPHP(phpFile);
+		phpFiles.iter(launchPHP);
 		nodejsFiles.iter(launchNodeJS);
 		if(hasBrowserTests) launchFile(indexPage);
 		else resultMonitor.sendMessage("quit");
@@ -273,7 +273,6 @@ class RunCommand extends MUnitTargetCommandBase {
 		tmpDir.deleteDirectory(true);
 		FileSys.setCwd(console.dir.nativePath);
 		if(!platformResults && resultExitCode) {
-			//print("TESTS FAILED");
 			Sys.stderr().writeString("TESTS FAILED\n");
 			Sys.stderr().flush();
 			exit(1);
