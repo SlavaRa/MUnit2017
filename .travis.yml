@@ -22,7 +22,7 @@ before_install:
       brew update;
       brew install mono;
       brew install python3;
-      brew install php;
+      brew install php7.0;
     fi
   - mono --version;
   - python3 --version;
