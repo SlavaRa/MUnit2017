@@ -10,14 +10,12 @@ os:
 
 sudo: required
 dist: trusty
-addons:
-  apt:
-    packages:
-    #- mono-complete
-    #- python3
-    #- php70
-    #- php70-common
-    #- php70-cli
+
+#addons:
+#  apt:
+#    packages:
+#    - mono-complete
+#    - python3
 
 before_install:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
