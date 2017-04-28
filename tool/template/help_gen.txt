@@ -7,7 +7,7 @@ usage: gen [srcPath] [hxmlPath]
 
     On subsequent runs it will only update the TestSuite to include the
     test classes insde the test source directory (All files ending in *Test.hx)
- 	
+    
     To target a single class or package use the -filter option (This will only
     include Test classes matching the string provided. 
   
@@ -16,7 +16,7 @@ usage: gen [srcPath] [hxmlPath]
     
 Optional Arguments
 
-   srcPath   : Custom test src directory path
+   srcPath  : Custom test src directory path
               (Defaults to test src path in config settings)
 
    hxmlPath : Custom hxml build file path for the tests.
