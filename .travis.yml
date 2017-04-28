@@ -1,12 +1,12 @@
 language: haxe
 
 haxe:
-  - development
+  #- development
   - 3.4.2
 
 os:
   - linux
-  - osx
+  #- osx
 
 sudo: true
 
@@ -30,7 +30,7 @@ before_install:
       brew unlink php56;
       brew install php70;
     else
-      sudo apt-get install php7.0
+      sudo apt-get install php7.0;
     fi
   - mono --version;
   - python3 --version;
