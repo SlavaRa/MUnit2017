@@ -1,12 +1,12 @@
 language: haxe
 
 haxe:
-  - development
-  - 3.4.2
-  
+- development
+- 3.4.2
+
 os:
-  - linux
-  - osx
+- linux
+- osx
 
 sudo: false
 
@@ -15,16 +15,18 @@ addons:
     packages:
     - mono-complete
     - python3
+    - php
 
 before_install:
-  - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      brew update;
-      brew install mono;
-      brew install python3;
-    fi
-  - mono --version;
-  - python3 --version;
-  - php -v;
+- if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+  brew update;
+  brew install mono;
+  brew install python3;
+  brew install php;
+fi
+- mono --version;
+- python3 --version;
+- php -v;
 
 install:
 #  - yes | haxelib install test.hxml
@@ -37,11 +39,11 @@ install:
 #    else
 #      haxelib install hxcpp;
 #    fi
-  - haxelib install hxcpp;
-  - haxelib install hxjava;
-  - haxelib install hxcs;
-  - haxelib install mlib;
-  - haxelib install mcover;
+- haxelib install hxcpp;
+- haxelib install hxjava;
+- haxelib install hxcs;
+- haxelib install mlib;
+- haxelib install mcover;
 
 script:
-  - haxe build.hxml
+- haxe build.hxml
