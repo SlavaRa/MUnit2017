@@ -30,9 +30,7 @@ before_install:
       brew unlink php56;
       brew install php70;
     else
-      sudo add-apt-repository ppa:ondrej/php;
-      yes | sudo LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php;
-      sudo apt-get install php7.0;
+      phpenv global "7.0";
     fi
   #- mono --version;
   #- python3 --version;
