@@ -15,7 +15,7 @@ addons:
     packages:
     - mono-complete
     - python3
-    - php
+    - php7.0
 
 before_install:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
