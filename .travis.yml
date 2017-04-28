@@ -24,7 +24,8 @@ before_install:
       brew update;
       brew install mono;
       brew install python3;
-      brew install php5;
+      brew tap homebrew/homebrew-php
+      brew install php56;
     fi
   - mono --version;
   - python3 --version;
