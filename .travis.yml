@@ -48,6 +48,7 @@ install:
   - haxelib install hxcpp;
   - haxelib install hxjava;
   - haxelib install hxcs;
+  - haxelib install nodejs;
   - haxelib install mlib;
   - haxelib install mcover;
 

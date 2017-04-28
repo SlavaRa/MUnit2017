@@ -10,11 +10,11 @@ class Target {
 	public var flags:StringMap<String> = new StringMap();
 	public var debug:Bool = false;
 	public var executableFile:File;
-
+	
 	public function new() {}
 	
 	public function toString():String return 'Target ${type} ${file.toString()}';
-
+	
 	public function toHxmlString():String {
 		var output = "haxe";
 		var lines = hxml.split("\n");

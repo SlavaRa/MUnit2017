@@ -25,14 +25,10 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
-
-
 package massive.munit.async;
 import haxe.Constraints.Function;
 import haxe.PosInfos;
 import massive.munit.util.Timer;
-
 
 /**
  * Sits between an asynchronous test and an observer (typically the TestRunner), notifying 

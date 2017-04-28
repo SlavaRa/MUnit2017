@@ -25,7 +25,6 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
 package massive.munit.client;
 
 import massive.haxe.util.ReflectUtil;
@@ -42,7 +41,7 @@ class PrintClientBase extends AbstractTestResultClient {
 	var divider2:String = "==============================";
 	public var verbose:Bool;
 	var includeIgnoredReport:Bool;
-
+	
 	public function new(includeIgnoredReport:Bool = true) {
 		super();
 		id = DEFAULT_ID;
@@ -51,12 +50,12 @@ class PrintClientBase extends AbstractTestResultClient {
 		printLine("MUnit Results");
 		printLine(divider1);
 	}
-
+	
 	override function initializeTestClass() {
 		super.initializeTestClass();
 		printLine("Class: " + currentTestClass + " ");
 	}
-
+	
 	override function updateTestClass(result:TestResult) {
 		super.updateTestClass(result);
 		if(verbose) printLine(" " + result.name + ": " + result.type +" ");
@@ -70,7 +69,7 @@ class PrintClientBase extends AbstractTestResultClient {
 			}
 		}
 	}
-
+	
 	override function finalizeTestClass() {
 		super.finalizeTestClass();
 		for(item in getTraces()) printLine("TRACE: " + item, 1);
@@ -86,7 +85,7 @@ class PrintClientBase extends AbstractTestResultClient {
 			}
 		}
 	}
-
+	
 	override public function setCurrentTestClassCoverage(result:CoverageResult) {	
 		super.setCurrentTestClassCoverage(result);
 		print(" [" + result.percent + "%]");
@@ -120,14 +119,14 @@ class PrintClientBase extends AbstractTestResultClient {
 		if(packageBreakdown != null) printIndentedLines(packageBreakdown, 0);
 		if(summary != null) printIndentedLines(summary, 0);
 	}
-
+	
 	function printIndentedLines(value:String, indent:Int = 1) {
 		var lines = value.split("\n");
 		for(line in lines) printLine(line, indent);
 	}
-
+	
 	override function printReports() printFinalIgnoredStatistics(ignoreCount);
-
+	
 	function printFinalIgnoredStatistics(count:Int) {
 		if (!includeIgnoredReport || count == 0) return;
 		var items = Lambda.filter(totalResults, filterIngored); 
@@ -142,9 +141,9 @@ class PrintClientBase extends AbstractTestResultClient {
 		}
 		printLine("");
 	}
-
+	
 	function filterIngored(result:TestResult):Bool  return result.type == IGNORE;
-
+	
 	override function printFinalStatistics(result:Bool, testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float) {
 		printLine(divider2);
 		var sb = new StringBuf();
@@ -156,19 +155,19 @@ class PrintClientBase extends AbstractTestResultClient {
 		sb.add(" Ignored: "); sb.add(ignoreCount);
 		sb.add(" Time: "); sb.add(MathUtil.round(time, 5));
 		printLine(sb.toString());
-		printLine("");	
+		printLine("");
 	}
-
+	
 	override function printOverallResult(result:Bool) printLine("");
 	
 	public function print(value:Dynamic) output += Std.string(value);
-
+	
 	public function printLine(value:Dynamic, ?indent:Int = 0) {
 		value = Std.string(value);
 		value = indentString(value, indent);
 		print("\n" + value);
 	}
-
+	
 	function indentString(value:String, ?indent:Int = 0):String {
 		if(indent > 0) value = StringTools.lpad("", " ", indent * 4) + value;
 		return value;
@@ -209,101 +208,91 @@ interface ExternalPrintClient {
 	function printSummary(value:String):Void;
 }
 
-class ExternalPrintClientJS implements ExternalPrintClient
-{
-	public function new()
-	{
+class ExternalPrintClientJS implements ExternalPrintClient {
+	
+	public function new() {
 		#if flash
-			if(!flash.external.ExternalInterface.available)
-			{
-				throw new MUnitException("ExternalInterface not available");
-			}
-
-			if(!flashInitialised)
-			{
-				flashInitialised = true;
-				flash.Lib.current.stage.addEventListener(flash.events.Event.ENTER_FRAME, enterFrameHandler);
-			}
-
-			if(!flash.system.Capabilities.isDebugger)
-			{
-				printLine("WARNING: Flash Debug Player not installed. May cause unexpected behaviour in MUnit when handling thrown exceptions.");
-			}
-		#elseif js
-			var div = js.Browser.document.getElementById("haxe:trace");
-			if (div == null) 
-			{
-				var positionInfo = ReflectUtil.here();
-				var error:String = "MissingElementException: 'haxe:trace' element not found at " + positionInfo.className + "#" + positionInfo.methodName + "(" + positionInfo.lineNumber + ")";
-				js.Browser.alert(error);
-			}	
-		#else
+		if(!flash.external.ExternalInterface.available)
+		{
+			throw new MUnitException("ExternalInterface not available");
+		}
+		
+		if(!flashInitialised)
+		{
+			flashInitialised = true;
+			flash.Lib.current.stage.addEventListener(flash.events.Event.ENTER_FRAME, enterFrameHandler);
+		}
+		
+		if(!flash.system.Capabilities.isDebugger)
+		{
+			printLine("WARNING: Flash Debug Player not installed. May cause unexpected behaviour in MUnit when handling thrown exceptions.");
+		}
+		#elseif (js && !nodejs)
+		var div = js.Browser.document.getElementById("haxe:trace");
+		if (div == null) {
+			var positionInfo = ReflectUtil.here();
+			var error:String = "MissingElementException: 'haxe:trace' element not found at " + positionInfo.className + "#" + positionInfo.methodName + "(" + positionInfo.lineNumber + ")";
+			js.Browser.alert(error);
+		}
 		#end
 	}
-
+	
 	#if flash
-		static var externalInterfaceQueue:Array<String> = [];
-		static var flashInitialised:Bool = false;
-		static var externalInterfaceCounter:Int = 0;
-		static var EXTERNAL_INTERFACE_FRAME_DELAY:Int = 20;
+	static var externalInterfaceQueue:Array<String> = [];
+	static var flashInitialised:Bool = false;
+	static var externalInterfaceCounter:Int = 0;
+	static var EXTERNAL_INTERFACE_FRAME_DELAY:Int = 20;
 
-		static function enterFrameHandler(_)
-		{
-			if(externalInterfaceQueue.length == 0) return;
-			if(externalInterfaceCounter ++ < EXTERNAL_INTERFACE_FRAME_DELAY) return;
-
-			externalInterfaceCounter = 0;
-			
-			var tempArray = externalInterfaceQueue.copy();
-			externalInterfaceQueue = [];
-
-			for(jsCode in tempArray)
-			{
-				flash.external.ExternalInterface.call(jsCode);
-			}
-		}
+	static function enterFrameHandler(_) {
+		if(externalInterfaceQueue.length == 0) return;
+		if(externalInterfaceCounter ++ < EXTERNAL_INTERFACE_FRAME_DELAY) return;
+		externalInterfaceCounter = 0;
+		var tempArray = externalInterfaceQueue.copy();
+		externalInterfaceQueue = [];
+		for(jsCode in tempArray) flash.external.ExternalInterface.call(jsCode);
+	}
 	#end
-
+	
 	public function print(value:String) queue("munitPrint", value);
-
+	
 	public function printLine(value:String) queue("munitPrintLine", value);
-
-	public function setResult(value:Bool) queue("setResult", value);	
-
-	public function setResultBackground(value:Bool) queue("setResultBackground", value);	
-
-	public function trace(value:Dynamic) queue("munitTrace", value);	
-
+	
+	public function setResult(value:Bool) queue("setResult", value);
+	
+	public function setResultBackground(value:Bool) queue("setResultBackground", value);
+	
+	public function trace(value:Dynamic) queue("munitTrace", value);
+	
 	public function createTestClass(className:String) queue("createTestClass", className);
-
+	
 	public function printToTestClassSummary(value:String) queue("updateTestSummary", value);
-
+	
 	public function setTestClassResult(resultType:Int):Void queue("setTestClassResult", resultType);
-
+	
 	public function addTestPass(value:String):Void if(value != null) queue("addTestPass", value);
-
+	
 	public function addTestFail(value:String):Void queue("addTestFail", value);
-
+	
 	public function addTestError(value:String):Void queue("addTestError", value);
-
+	
 	public function addTestIgnore(value:String):Void queue("addTestIgnore", value);
-
+	
 	public function addTestClassCoverage(className:String, percent:Float = 0):Void queue("addTestCoverageClass", [className, percent]);
-
+	
 	public function addTestClassCoverageItem(value:String):Void queue("addTestCoverageItem", value);
-
+	
 	public function createCoverageReport(percent:Float = 0):Void queue("createCoverageReport", percent);
-
+	
 	public function addMissingCoverageClass(className:String, percent:Float = 0):Void queue("addMissingCoverageClass", [className, percent]);
-
+	
 	public function addCoverageReportSection(name:String, value:String):Void queue("addCoverageReportSection", [name, value]);
 	
 	public function addCoverageSummary(value:String):Void queue("addCoverageSummary", value);
-
+	
 	public function printSummary(value:String):Void queue("printSummary", value);
-
+	
 	public function queue(method:String, ?args:Dynamic):Bool {
-		#if (!js && !flash)
+		#if (!js && !flash || nodejs)
 		//throw new MUnitException("Cannot call from non JS/Flash targets");
 		return false;
 		#end
@@ -311,14 +300,14 @@ class ExternalPrintClientJS implements ExternalPrintClient
 		if(Std.is(args, Array)) a = a.concat(cast(args, Array<Dynamic>));
 		else a.push(args);
 		var jsCode = convertToJavaScript(method, a);
-		#if js		
+		#if js
 		return js.Lib.eval(jsCode);
 		#elseif flash
 		externalInterfaceQueue.push(jsCode);
 		#end
 		return false;
 	}
-
+	
 	public function convertToJavaScript(method:String, ?args:Array<Dynamic>):String {
 		var htmlArgs:Array<String> = args != null && args.length > 0 ? [for(arg in args) serialiseToHTML(Std.string(arg))] : null;
 		if(htmlArgs == null) return "addToQueue(\"" + method + "\")";
@@ -327,7 +316,7 @@ class ExternalPrintClientJS implements ExternalPrintClient
 		result += ")";
 		return result;
 	}
-
+	
 	public function serialiseToHTML(value:Dynamic):String {
 		#if js
 		value = untyped js.Boot.__string_rec(value, "");
