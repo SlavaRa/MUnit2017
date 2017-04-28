@@ -8,13 +8,13 @@ os:
   - linux
   #- osx
 
-sudo: true
+sudo: required
 
 addons:
   apt:
     packages:
-    - mono-complete
-    - python3
+    #- mono-complete
+    #- python3
     #- php70
     #- php70-common
     #- php70-cli
@@ -32,8 +32,8 @@ before_install:
     else
       sudo apt-get install php7.0;
     fi
-  - mono --version;
-  - python3 --version;
+  #- mono --version;
+  #- python3 --version;
   - php --version;
 
 install:
