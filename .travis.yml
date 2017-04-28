@@ -16,6 +16,8 @@ addons:
     - mono-complete
     - python3
     - php5
+    - php5-common
+    - php5-cli
 
 before_install:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
