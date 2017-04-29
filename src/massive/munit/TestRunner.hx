@@ -31,7 +31,7 @@ package massive.munit;
 import haxe.Constraints.Function;
 import haxe.PosInfos;
 import massive.munit.Assert;
-import massive.munit.TestClassHelper.TestCaseData;
+import massive.munit.TestClassHelper.TestData;
 import massive.munit.async.AsyncDelegate;
 import massive.munit.async.AsyncFactory;
 import massive.munit.async.AsyncTimeoutException;
@@ -251,7 +251,7 @@ class TestRunner implements IAsyncDelegateObserver {
         }
     }
 
-    function executeTestCase(testCaseData:TestCaseData, async:Bool) {
+    function executeTestCase(testCaseData:TestData, async:Bool) {
         var result = testCaseData.result;
         try {
             if(async) {

@@ -132,7 +132,7 @@ class TestClassHelper {
 	public var after(default, null):Function;
 	
 	public var className(default, null):String;
-	var tests:Array<TestCaseData> = [];
+	var tests:Array<TestData> = [];
 	var index:Int = 0;
 	var isDebug:Bool;
 
@@ -166,7 +166,7 @@ class TestClassHelper {
 	 * 
 	 * @return	if another test is available it's returned, otherwise returns null
 	 */
-	public function next():TestCaseData
+	public function next():TestData
 	{
 		return hasNext() ? tests[index++] : null;
 	}
@@ -176,7 +176,7 @@ class TestClassHelper {
 	 * 
 	 * @return	current test in the iterable list of tests
 	 */
-	public function current():TestCaseData
+	public function current():TestData
 	{
 		return (index <= 0) ? tests[0] : tests[index - 1];
 	}
@@ -276,7 +276,7 @@ class TestClassHelper {
 		tests.push({test:testFunction, result:result});
 	}
 	
-	inline function sortTestsByName(x:TestCaseData, y:TestCaseData):Int {
+	inline function sortTestsByName(x:TestData, y:TestData):Int {
 		var xName = x.result.name;
 		var yName = y.result.name;
 		if(xName == yName) return 0;
@@ -287,7 +287,7 @@ class TestClassHelper {
 	public static function nullFunc() {}
 }
 
-typedef TestCaseData = {
+typedef TestData = {
 	var test:Function;
 	var result:TestResult;
 }
