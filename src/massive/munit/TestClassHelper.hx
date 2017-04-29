@@ -273,7 +273,7 @@ class TestClassHelper {
 		result.className = className;
 		result.description = description;
 		result.name = field;
-		tests.push({test:testFunction, result:result});
+		tests.push({scope:testInstance, test:testFunction, result:result});
 	}
 	
 	inline function sortTestsByName(x:TestData, y:TestData):Int {
@@ -288,6 +288,7 @@ class TestClassHelper {
 }
 
 typedef TestData = {
+	var scope:Dynamic;
 	var test:Function;
 	var result:TestResult;
 }
