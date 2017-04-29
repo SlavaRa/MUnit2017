@@ -54,11 +54,9 @@ class TestClassHelperTest {
 		Assert.areEqual(helper.test.field("exampleTestOne"), helper.next().test);
 		Assert.areEqual(helper.test.field("exampleTestOne"), helper.current().test);
 		Assert.isFalse(helper.current().result.async);		
-		Assert.areEqual(helper.test, helper.current().scope);
 		Assert.areEqual(helper.test.field("exampleTestTwo"), helper.next().test);
 		Assert.areEqual(helper.test.field("exampleTestTwo"), helper.current().test);
 		Assert.isTrue(helper.current().result.async);
-		Assert.areEqual(helper.test, helper.current().scope);
 		Assert.isFalse(helper.hasNext());
 		Assert.isNull(helper.next());
 	}
@@ -72,11 +70,9 @@ class TestClassHelperTest {
 		Assert.areEqual(helper.test.field("exampleTestOne"), helper.next().test);
 		Assert.areEqual(helper.test.field("exampleTestOne"), helper.current().test);
 		Assert.isFalse(helper.current().result.async);		
-		Assert.areEqual(helper.test, helper.current().scope);
 		Assert.areEqual(helper.test.field("exampleTestThree"), helper.next().test);
 		Assert.areEqual(helper.test.field("exampleTestThree"), helper.current().test);
 		Assert.isFalse(helper.current().result.async);
-		Assert.areEqual(helper.test, helper.current().scope);
 		Assert.isFalse(helper.hasNext());
 		Assert.isNull(helper.next());
 	}

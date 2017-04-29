@@ -273,12 +273,14 @@ class TestClassHelper {
 		result.className = className;
 		result.description = description;
 		result.name = field;
-		tests.push({test:testFunction, scope:testInstance, result:result});
+		tests.push({test:testFunction, result:result});
 	}
 	
 	inline function sortTestsByName(x:TestCaseData, y:TestCaseData):Int {
-		if(x.result.name == y.result.name) return 0;
-		if(x.result.name > y.result.name) return 1;
+		var xName = x.result.name;
+		var yName = y.result.name;
+		if(xName == yName) return 0;
+		if(xName > yName) return 1;
 		return -1;
 	}
 
@@ -287,6 +289,5 @@ class TestClassHelper {
 
 typedef TestCaseData = {
 	var test:Function;
-	var scope:Dynamic;
 	var result:TestResult;
 }

@@ -255,11 +255,11 @@ class TestRunner implements IAsyncDelegateObserver {
         var result = testCaseData.result;
         try {
             if(async) {
-                Reflect.callMethod(testCaseData.scope, testCaseData.test, [asyncFactory]);
+                Reflect.callMethod(null, testCaseData.test, [asyncFactory]);
                 if(asyncDelegate == null) throw new MissingAsyncDelegateException("No AsyncDelegate was created in async test at " + result.location, null);
                 asyncPending = true;
             } else {
-                Reflect.callMethod(testCaseData.scope, testCaseData.test, emptyParams);
+                Reflect.callMethod(null, testCaseData.test, emptyParams);
                 result.passed = true;
                 result.executionTime = Timer.stamp() - testStartTime;
                 passCount++;
@@ -303,7 +303,6 @@ class TestRunner implements IAsyncDelegateObserver {
     public function asyncResponseHandler(delegate:AsyncDelegate) {
         var testCaseData = activeHelper.current();
         testCaseData.test = delegate.runTest;
-        testCaseData.scope = delegate;
         asyncPending = false;
         asyncDelegate = null;
         executeTestCase(testCaseData, false);
