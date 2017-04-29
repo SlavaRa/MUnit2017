@@ -25,15 +25,11 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
-
-
 package massive.munit.client;
-
 import massive.munit.ITestResultClient;
 import massive.munit.TestResult;
 
-class AbstractTestResultClient implements IAdvancedTestResultClient implements ICoverageTestResultClient {
+class AbstractTestResultClient implements ICoverageTestResultClient {
 	
 	/**
 	 * The unique identifier for the client.
@@ -216,8 +212,7 @@ class AbstractTestResultClient implements IAdvancedTestResultClient implements I
 	 */
 	function getTraces():Array<String> return traces.copy();
 
-	function sortTestResults(a:TestResult, b:TestResult):Int
-	{
+	inline function sortTestResults(a:TestResult, b:TestResult):Int {
 		var aInt:Int = switch(a.type) {
 			case ERROR: 2;
 			case FAIL: 1;

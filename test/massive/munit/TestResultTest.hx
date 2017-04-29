@@ -32,11 +32,11 @@ import massive.munit.TestResult;
 /**
  * @author Mike Stead
  */
-class TestResultTest {
-	public function new() {}
-	
+class TestResultTest 
+{
 	@Test
-	public function testConstructor() {
+	public function testConstructor():Void
+	{
 		var result:TestResult = new TestResult();
 		Assert.isFalse(result.passed);
 		Assert.areEqual(0.0, result.executionTime);
@@ -50,7 +50,8 @@ class TestResultTest {
 	}
 	
 	@Test
-	public function testLocation() {
+	public function testLocation():Void
+	{
 		var result:TestResult = new TestResult();
 		var positionInfo = ReflectUtil.here();
 		result.name = positionInfo.methodName;
@@ -65,7 +66,8 @@ class TestResultTest {
 	}
 
 	@Test
-	public function testType() {
+	public function testType()
+	{
 		var result:TestResult = new TestResult();
 		Assert.areEqual(TestResultType.UNKNOWN, result.type);
 		result.passed = true;

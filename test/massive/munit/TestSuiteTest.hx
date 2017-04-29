@@ -34,9 +34,6 @@ class TestSuiteTest
 {
 	private var suite:massive.munit.TestSuite;
 
-	public function new() 
-	{}
-	
 	@Before
 	public function setup():Void
 	{
@@ -67,15 +64,12 @@ class TestSuiteTest
 	{
 		suite.add(TestSuiteTest);
 		suite.add(TestRunnerTest);
-		
 		Assert.isTrue(suite.hasNext());		
 		Assert.areEqual(TestRunnerTest, suite.next());
 		Assert.isTrue(suite.hasNext());
 		Assert.areEqual(TestSuiteTest, suite.next());
 		Assert.isFalse(suite.hasNext());
-		
 		suite.repeat();
-
 		Assert.isTrue(suite.hasNext());
 		Assert.areEqual(TestSuiteTest, suite.next());
 	}

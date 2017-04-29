@@ -34,11 +34,6 @@ import massive.munit.Assert;
  */
 class AssertTest 
 {
-	public function new() 
-	{
-		
-	}
-	
 	@Test
 	public function testIsTrue()
 	{

@@ -2,28 +2,18 @@ package massive.munit;
 
 import massive.munit.Assert;
 import massive.munit.UnhandledException;
-class UnhandledExceptionTest {
-	var instance:UnhandledException; 
-	
-	public function new() {}
-	
-	@BeforeClass
-	public function beforeClass() {}
-	
-	@AfterClass
-	public function afterClass() {}
-	
-	@Before
-	public function setup() {}
-	
-	@After
-	public function tearDown() {}
-	
+
+class UnhandledExceptionTest
+{
 	@Test
-	public function testConstructor() {
-		try {
+	public function testConstructor():Void
+	{
+		try
+		{
 			throw "";
-		} catch(e:Dynamic) {
+		}
+		catch(e:Dynamic)
+		{
 			var source = "original msg";
 			var location:String = "location";
 			var exception = new UnhandledException(source, location);

@@ -30,19 +30,14 @@ import massive.munit.Assert;
 import massive.munit.util.Timer;
 
 /**
- * ...
  * @author Mike Stead
  */
-
 class AsyncDelegateTest implements IAsyncDelegateObserver
 {
 	private var delegate:AsyncDelegate;
 	private var handler:Dynamic;
 	private var handlerCalled:Bool;
 	private var timeoutCalled:Bool;
-
-	public function new() 
-	{}
 
 	@Before
 	public function setup():Void
@@ -52,7 +47,7 @@ class AsyncDelegateTest implements IAsyncDelegateObserver
 		handlerCalled = false;
 		timeoutCalled = false;
 	}
-		
+	
 	@After
 	public function tearDown():Void
 	{
@@ -66,13 +61,11 @@ class AsyncDelegateTest implements IAsyncDelegateObserver
 	public function testConstructorThreeParams():Void
 	{
 		var delegate:AsyncDelegate = new AsyncDelegate(this, asyncTestHandler); 
-		
 		Assert.areEqual(AsyncDelegate.DEFAULT_TIMEOUT, delegate.timeoutDelay);
 		Assert.isNull(delegate.observer);
 		Assert.isNotNull(delegate.info);
 		Assert.isFalse(delegate.timedOut);
 	}
-
 
 	@Test
 	public function testConstructorFourParamas():Void
@@ -95,7 +88,7 @@ class AsyncDelegateTest implements IAsyncDelegateObserver
 		delegate.observer = this;
 		handler = factory.createHandler(this, onTestTimeout);//created after delegate to ensure delegate timer executes beofre handler one (interval bug in flash when under heavy load)
 	}
-		
+	
 	public function asyncTimeoutHandler(delegate:AsyncDelegate):Void
 	{
 		timeoutCalled = true;
@@ -105,12 +98,8 @@ class AsyncDelegateTest implements IAsyncDelegateObserver
 	
 	private function onTestTimeout():Void
 	{
-
 		Assert.isTrue(true); // need to assert in handler or we'll get an exception
 	}
-
-
-	//---------------
 
 	@AsyncTest
 	public function testCancel(factory:AsyncFactory):Void
@@ -123,8 +112,8 @@ class AsyncDelegateTest implements IAsyncDelegateObserver
 
 		handler = factory.createHandler(this, onTestCancelHandler);
 		Timer.delay(handler, 100);
-
 	}
+	
 	public function asyncDelegateCreatedHandler(delegate:AsyncDelegate):Void
     {
         //just implementing part of IAsyncDelegateObserver
@@ -141,9 +130,6 @@ class AsyncDelegateTest implements IAsyncDelegateObserver
     	Assert.isFalse(timeoutCalled);
     	Assert.isFalse(handlerCalled);
     }
-
-
-	//-----------------------------
 	
 	@AsyncTest
 	public function testHandler(factory:AsyncFactory):Void

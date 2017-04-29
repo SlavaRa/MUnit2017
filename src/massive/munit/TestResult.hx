@@ -25,9 +25,6 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
-
-
 package massive.munit;
 
 /**
@@ -35,9 +32,8 @@ package massive.munit;
  * 
  * @author Mike Stead
  */
-
-class TestResult
-{
+class TestResult {
+	
 	/**
 	 * Whether the test passed or not.
 	 */
@@ -89,13 +85,7 @@ class TestResult
 	 */
 	public var error:Dynamic;
 
-	public var type(get, null):TestResultType;
-	
-	/**
-	 * Class constructor.
-	 */
-	public function new() {}
-
+	public var type(get_type, never):TestResultType;
 	function get_type():TestResultType {
 		if(error != null) return ERROR;
 		if(failure != null) return FAIL;
@@ -103,7 +93,11 @@ class TestResult
 		if(passed) return PASS;
 		return UNKNOWN;
 	}
-
+	
+	/**
+	 * Class constructor.
+	 */
+	public function new() {}
 }
 
 @:enum

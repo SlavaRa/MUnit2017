@@ -31,14 +31,13 @@ import massive.munit.Assert;
 /**
  * @author Mike Stead
  */
-class MissingAsyncDelegateExceptionTest  {
-	
-	public function new() {}
-
+class MissingAsyncDelegateExceptionTest 
+{
 	@Test
-	public function testConstructor() {
-		var msg = "custom msg";
-		var e = new MissingAsyncDelegateException(msg);
+	public function testConstructor():Void
+	{
+		var msg:String = "custom msg";
+		var e:MissingAsyncDelegateException = new MissingAsyncDelegateException(msg);
 		Assert.areEqual(msg, e.message);
 		Assert.isNotNull(e.info);
 	}

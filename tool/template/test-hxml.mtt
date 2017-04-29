@@ -48,3 +48,44 @@
 ::end::
 -cp ::src::
 -java ::bin::/java_test
+
+## CSharp
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+::foreach classPaths::-cp ::__current__::
+::end::
+-cp ::src::
+-cs ::bin::/cs_test
+
+## Python
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+::foreach classPaths::-cp ::__current__::
+::end::
+-cp ::src::
+-python ::bin::/python_test.py
+
+## PHP
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+::foreach classPaths::-cp ::__current__::
+::end::
+-cp ::src::
+-php ::bin::/php_test
+
+## PHP 7
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+::foreach classPaths::-cp ::__current__::
+::end::
+-cp ::src::
+-D php7
+-php ::bin::/php_test

@@ -1,3 +1,4 @@
+[![TravisCI Build Status](https://travis-ci.org/SlavaRa/MUnit2017.svg?branch=master)](https://travis-ci.org/SlavaRa/MUnit2017)
 
 MUnit is a metadata driven unit testing framework for cross-platform Haxe development.
 
@@ -10,9 +11,9 @@ Installation
 
 To install you must have [Haxe](http://www.haxe.org) installed
 
-Then just use haxelib to download the latest version
+To install latest build from git:
 
-	haxelib install munit
+	haxelib git munit https://github.com/SlavaRa/MUnit2017.git munit2017
 
 To check that it is all installed and to view the help run:
 
@@ -21,38 +22,37 @@ To check that it is all installed and to view the help run:
 
 **Please note:** After upgrading you may be required to update the TestMain.hx in existing project before being able to test
 
-To install latest build from git:
-
-    haxelib git munit https://github.com/SlavaRa/MUnit2017.git src
-
 Features
 ---------------------
 
 ### Cross Platform
 
 MUnit has been designed for cross platform Haxe development.
-It currently supports js, swf, neko, c++ and java, and the tool chain works on PC and OSX
-
+It currently supports js, swf, neko, c++, java, cs, python and php and the tool chain works on PC, OSX and Linux
 
 ### Test Metadata
 
 Test cases use Haxe metadata to simplify creating tests (and avoid needing to extend or implement framework classes).
 
-	@Test
-	public function testExample()
-	{
-		Assert.isTrue(true);
-	}
+```haxe
+@Test
+public function testExample()
+{
+	Assert.isTrue(true);
+}
+```
 
 ### Asynchronous Tests
 
 Unlike the default haxe unit test classes, MUnit supports asynchronous testing
 
-	@AsyncTest
-	public function asyncTestExample(factory:AsyncFactory)
-	{
-		...
-	}
+```haxe
+@AsyncTest
+public function asyncTestExample(factory:AsyncFactory)
+{
+	...
+}
+```
 
 ### Tool Chain
 
@@ -66,15 +66,11 @@ MUnit is way more than just a unit test framework. It includes a command line to
 *	Auto generate stub test classes (and/or target classes)
 *	Integrated code coverage compilation with [MCover](https://github.com/massiveinteractive/MassiveCover)
 
-
-
 ## Documentation
-
 
 For detailed user guides refer to the **[wiki](https://github.com/massiveinteractive/MassiveUnit/wiki)**
 
 The API documentation is available on the [haxelib project page](http://lib.haxe.org/d/munit).
-
 
 ## How to contribute
 
@@ -85,10 +81,10 @@ If you want to help, [fork it](https://github.com/massiveinteractive/MassiveUnit
 
 To install latest build from git:
 
-    haxelib git munit https://github.com/SlavaRa/MUnit2017.git src
+	haxelib git munit https://github.com/SlavaRa/MUnit2017.git munit2017
 
 
-If you want to make sure it works, make sure to run the bash script (build.sh) and check that the tests all pass on all platforms:
+If you want to make sure it works, make sure to run the build.hxml and check that the tests all pass on all platforms:
 
 	haxelib run munit test -coverage
 
@@ -176,17 +172,18 @@ Get error exit code when tests on one or more platforms fail
 > Note: haxelib currently doesnt return exit codes > 0 on OSX (see [issue](http://code.google.com/p/haxe/issues/detail?id=879))
 
 Workaround for issues with nekotools server HTTP POST via a simple SummaryReportClient
-	
-	var httpClient = new HTTPClient(new SummaryReportClient())
-	runner.addResultClient(httpClient);
-
+```haxe
+var httpClient = new HTTPClient(new SummaryReportClient())
+runner.addResultClient(httpClient);
+```
 
 New since 0.9.2.x
 ---------------------
 
 Rich HTML output for JavaScript and Flash targets (see RichPrintClient)
-
-	var client = new RichPrintClient();
+```haxe
+var client = new RichPrintClient();
+```
 
 Seamless support for MCover code coverage
 
@@ -203,11 +200,12 @@ CI friendly options for munit config command
 	haxelib run munit config -file path/to/my/custom/config.txt
 
 Support for assertions inside async tests
-
-	public function someAsyncTest(factory:AsyncFactory)
-	{
-		Assert.isTrue(false);
-	}
+```haxe
+public function someAsyncTest(factory:AsyncFactory)
+{
+	Assert.isTrue(false);
+}
+```
 
 Support for custom runner html templates and resources
 
@@ -215,9 +213,6 @@ Support for custom runner html templates and resources
 
 
 For full list of recent changes see the **[change log](https://github.com/massiveinteractive/MassiveUnit/blob/master/CHANGES)**
-
-
-
 
 ## Credits
 

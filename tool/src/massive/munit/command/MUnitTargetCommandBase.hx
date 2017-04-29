@@ -22,24 +22,26 @@ class MUnitTargetCommandBase extends MUnitCommand {
 		setFilteredTargets();
 		hxml = config.hxml;
 		targetTypes = config.targetTypes;
-		targets = config.targets;	
+		targets = config.targets;
 	}
 
 	function getTargetsFromConsole():Array<TargetType> {
 		var result = [];
-		if(console.getOption("swf") == "true") result.push(TargetType.as3);
-		else if(console.getOption(TargetType.as3) == "true") result.push(TargetType.as3);
-		if(console.getOption(TargetType.js) == "true") result.push(TargetType.js);
-		if(console.getOption(TargetType.neko) == "true") result.push(TargetType.neko);
-		if(console.getOption(TargetType.cpp) == "true") result.push(TargetType.cpp);
-		if(console.getOption(TargetType.java) == "true") result.push(TargetType.java);
-		if(console.getOption(TargetType.hl) == "true") result.push(TargetType.hl);
+		if(console.getOption("swf") == "true" || console.getOption(as3) == "true") result.push(as3);
+		if(console.getOption(js) == "true") result.push(js);
+		if(console.getOption(neko) == "true") result.push(neko);
+		if(console.getOption(cpp) == "true") result.push(cpp);
+		if(console.getOption(java) == "true") result.push(java);
+		if(console.getOption(cs) == "true") result.push(cs);
+		if(console.getOption(python) == "true") result.push(python);
+		if(console.getOption(php) == "true") result.push(php);
+		if(console.getOption(hl) == "true") result.push(hl);
 		return result;
 	}
 
 	/**
-	Updates the config targetTypes if user has specified via the CLI.
-	*/
+	 * Updates the config targetTypes if user has specified via the CLI.
+	 */
 	function setTargetTypes() {
 		if (config.targetTypes != config.defaultTargetTypes) return;
 		var targetTypes = getTargetsFromConsole();
@@ -48,10 +50,9 @@ class MUnitTargetCommandBase extends MUnitCommand {
 	}
 
 	/**
-	Updates and validates the hxml file for the project.
-	*/
-	function setHXMLFile(checkConsole:Bool):Void
-	{
+	 * Updates and validates the hxml file for the project.
+	 */
+	function setHXMLFile(checkConsole:Bool) {
 		var hxml:File = null;
 		var hxmlPath:String = null;
 		if(checkConsole) hxmlPath = console.getNextArg();
@@ -67,9 +68,9 @@ class MUnitTargetCommandBase extends MUnitCommand {
 	}
 
 	/**
-	Updates the set of valid targets for the project.
-	Note: also removes config.targetTypes that are not present in the hxml.
-	*/
+	 * Updates the set of valid targets for the project.
+	 * Note: also removes config.targetTypes that are not present in the hxml.
+	 */
 	function setFilteredTargets()
 	{
 		if (config.targets.length > 0 ) return;
@@ -93,13 +94,13 @@ class MUnitTargetCommandBase extends MUnitCommand {
 	}
 
 	/**
-	Parses the contents of an hxml file and returns contents as an array of targets
-	@param hxml: path to hxml file
-	@return array of Targets
-	*/
+	 * Parses the contents of an hxml file and returns contents as an array of targets
+	 * @param hxml: path to hxml file
+	 * @return array of Targets
+	 */
 	function getTargetsFromHXML(hxml:File):Array<Target>
 	{
-		var contents:String = hxml.readString();		
+		var contents:String = hxml.readString();
 		var lines:Array<String> = contents.split("\n");
 		var target:Target = new Target();
 		
@@ -118,7 +119,7 @@ class MUnitTargetCommandBase extends MUnitCommand {
 				continue;
 			}
 			
-			var mainReg:EReg = ~/^-main (.*)/;	
+			var mainReg:EReg = ~/^-main (.*)/;
 			if (mainReg.match(line))
 			{
 				target.main = config.src.resolveFile(mainReg.matched(1) + ".hx");
@@ -137,67 +138,61 @@ class MUnitTargetCommandBase extends MUnitCommand {
 			}
 
 			var fileStr:String = getOutputFileFromLine(line);
-
 			if(target.file == null && fileStr != null)
 			{
 				//dont add to hxml just yet
 				target.file = File.create(fileStr, File.current);
 			}
-			else
-			{
-				target.hxml += line + "\n";
-			}
-
-			if (target.type == null)
-			{
-				for(type in config.targetTypes)
-				{
-					var s:String = null;
-					switch(type)
-					{
-						case as3: s = "swf-version [^8]";
-						default: s = Std.string(type);
+			else target.hxml += line + "\n";
+			if(target.type == null) {
+				for(type in config.targetTypes) {
+					var s:String = switch(type) {
+						case as3: "swf-version [^8]";
+						default: Std.string(type);
 					}	
 					var targetMatcher = new EReg("^-" + s, "");
-					if (targetMatcher.match(line))
-					{
+					if(targetMatcher.match(line)) {
 						target.type = type;
 						break;
 					}
 				}
 			}
-
 		}
-
 		targets.push(target);
-
-		for(target in targets)
-		{
-			if(target.type != null)
-				updateHxmlOutput(target);
+		for(target in targets) {
+			if(target.type != null) updateHxmlOutput(target);
 		}
-
 		return targets;
 	}
 
 	function updateHxmlOutput(target:Target) {
-		var output:String =  switch(target.type) {
+		var output:String = switch(target.type) {
 			case as3: "-swf";
-			default: "-" + Std.string(target.type);
+			case _: "-" + Std.string(target.type);
 		}
 		var file = config.dir.getRelativePath(target.file);
-		switch (target.type) {
+		switch(target.type) {
 			case cpp:
 				var executablePath = target.main.name;
 				if(target.debug) executablePath += "-debug";
-				if (FileSys.isWindows) executablePath += ".exe";
+				if(FileSys.isWindows) executablePath += ".exe";
 				target.executableFile = target.file.resolveFile(executablePath);
+			case cs:
+				var executablePath = target.main.name;
+				if(target.debug) executablePath += "-debug";
+				executablePath += ".exe";
+				target.executableFile = target.file.resolveDirectory("bin").resolveFile(executablePath);
 			case java:
 				var executablePath = target.main.name;
 				if(target.debug) executablePath += "-debug";
 				executablePath += ".jar";
 				target.executableFile = target.file.resolveFile(executablePath);
-			default: target.executableFile = target.file;
+			case php:
+				var executablePath = "index";
+				if(target.debug) executablePath += "-debug";
+				executablePath += ".php";
+				target.executableFile = target.file.resolveFile(executablePath);
+			case _: target.executableFile = target.file;
 		}
 		output += " " + file;
 		target.hxml += output + "\n";
@@ -207,19 +202,18 @@ class MUnitTargetCommandBase extends MUnitCommand {
 		for(type in config.targetTypes) {
 			var stype:String = switch(type) {
 				case as3: "swf";
-				default: Std.string(type);
+				case _: Std.string(type);
 			}
 			var targetMatcher = new EReg("^-" + stype + "\\s+", "");
 			if(targetMatcher.match(line)) {
 				var result = line.substr(stype.length + 2);
 				result = switch(type) {
-					case cpp | java if(includeCoverage): result + "-coverage";
-					default: result;
+					case cpp, java, cs, php if(includeCoverage): result + "-coverage";
+					case _: result;
 				}
 				return Path.normalize(result);
 			}
 		}
 		return null;
 	}
-
 }

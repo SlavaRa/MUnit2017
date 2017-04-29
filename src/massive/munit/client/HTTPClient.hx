@@ -25,9 +25,7 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
 package massive.munit.client;
-
 import haxe.Http;
 import haxe.ds.StringMap;
 import massive.munit.ITestResultClient;
@@ -38,9 +36,10 @@ import massive.munit.TestResult;
  * 
  * @author Mike Stead
  */
-class HTTPClient implements IAdvancedTestResultClient
-{
+class HTTPClient implements IAdvancedTestResultClient {
+	
 	@:extern public inline static var DEFAULT_SERVER_URL:String = "http://localhost:2000";
+	
 	/**
 	 * Default id of this client.
 	 */
@@ -86,7 +85,6 @@ class HTTPClient implements IAdvancedTestResultClient
 	private var queueRequest:Bool;
 
 	/**
-	 * 
 	 * @param	client				the test result client to decorate
 	 * @param	url					the url to send test results to
 	 * @param	?queueRequest		[optional] whether to add http requests to a global queue. Default is true.
@@ -179,14 +177,15 @@ class HTTPClient implements IAdvancedTestResultClient
 		}
 	}
 
-	private function platform():String
-	{
+	function platform() {
 		#if flash return "as3";
 		#elseif js return "js";
 		#elseif neko return "neko";
 		#elseif cpp return "cpp";
-		#elseif php return "php";
 		#elseif java return "java";
+		#elseif cs return "cs";
+		#elseif python return "python";
+		#elseif php return "php";
 		#elseif hl return "hl";
 		#end
 		return "unknown";
@@ -228,74 +227,64 @@ class HTTPClient implements IAdvancedTestResultClient
 
 // TODO This is a simple wrapper so we can post data. Should get propper one into mlib.
 
-class URLRequest
-{
+class URLRequest {
 	public var onData:Dynamic->Void;
 	public var onError:Dynamic->Void;
 	public var data:Dynamic;
-
+	
 	var url:String;
 	var headers:StringMap<String>;
-
-	#if (js || neko || cpp || java || hl)
-		public var client:Http;
+	
+	#if (js || neko || cpp || java || cs || python || php || hl)
+	public var client:Http;
 	#elseif flash
-		public var client:flash.LoadVars;
+	public var client:flash.LoadVars;
 	#end
-
-
-	public function new(url:String)
-	{
+	
+	public function new(url:String) {
 		this.url = url;
 		createClient(url);
 		setHeader("Content-Type", "text/plain");
 	}
-
-	function createClient(url:String)
-	{
-		#if (js || neko || cpp || java || hl)
-			client = new Http(url);
-		#elseif flash			
-			client = new flash.LoadVars();
-		#end		
-	}
-
-	public function setHeader(name:String, value:String)
-	{
-		#if (js || neko || cpp || java || hl)
-			client.setHeader(name, value);
+	
+	function createClient(url:String) {
+		#if (js || neko || cpp || java || cs || python || php || hl)
+		client = new Http(url);
 		#elseif flash
-			client.addRequestHeader(name, value);
+		client = new flash.LoadVars();
 		#end
 	}
-
-	public function send()
-	{
-		#if (js || neko || cpp || java || hl)
-			client.onData = onData;
-			client.onError = onError;
-			#if js
-				client.setPostData(data);
-			#else
-				client.setParameter("data", data);
-			#end
-			client.request(true);
+	
+	public function setHeader(name:String, value:String) {
+		#if (js || neko || cpp || java || cs || python || php || hl)
+		client.setHeader(name, value);
 		#elseif flash
-			var result = new flash.LoadVars();
-			result.onData = internalOnData;
-
-			client.data = data;
-			client.sendAndLoad(url, result, "POST");
-		#end		
+		client.addRequestHeader(name, value);
+		#end
 	}
-
+	
+	public function send() {
+		#if (js || neko || cpp || java || cs || python || php || hl)
+		client.onData = onData;
+		client.onError = onError;
+			#if (js && !nodejs)
+			client.setPostData(data);
+			#else
+			client.setParameter("data", data);
+			#end
+		client.request(true);
+		#elseif flash
+		var result = new flash.LoadVars();
+		result.onData = internalOnData;
+		client.data = data;
+		client.sendAndLoad(url, result, "POST");
+		#end
+	}
+	
 	#if flash
-		function internalOnData(value:String)
-		{
-			if (value == null)
-				onError("Invalid Server Response.");
-			else
-				onData(value);
-		}
+	function internalOnData(value:String) {
+		if(value == null) onError("Invalid Server Response.");
+		else onData(value);
+	}
 	#end
 }

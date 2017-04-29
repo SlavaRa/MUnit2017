@@ -56,6 +56,7 @@ package massive.munit;
  * @author Mike Stead
  */
 class TestSuite {
+	
 	/** 
 	 * Note that it was a considered design decision not to cater for the addition of individual
 	 * test methods to a suite. The reason being that this was not a hugely common use-case from
@@ -99,13 +100,13 @@ class TestSuite {
 	 */
 	public function repeat() if (index > 0) index--;
 	
-	function sortTests() tests.sort(sortByName);
+	inline function sortTests() tests.sort(sortByName);
 	
-	function sortByName(x, y):Int {
+	inline function sortByName(x, y):Int {
 		var xName:String = Type.getClassName(x);
 		var yName:String = Type.getClassName(y);
-		if (xName == yName) return 0;
-		if (xName > yName) return 1;
+		if(xName == yName) return 0;
+		if(xName > yName) return 1;
 		return -1;
 	}
 }

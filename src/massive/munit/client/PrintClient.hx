@@ -51,8 +51,7 @@ import massive.munit.client.PrintClientBase;
  * 
  * @author Mike Stead
  */
-class PrintClient extends PrintClientBase
-{
+class PrintClient extends PrintClientBase {
 
 	/**
 	 * Default id of this client.
@@ -78,7 +77,7 @@ class PrintClient extends PrintClientBase
 	{
 		super.init();
 
-		#if nodejs		
+		#if nodejs
 		#elseif (js || flash)
 			external = new ExternalPrintClientJS();
 			#if flash
@@ -135,22 +134,19 @@ class PrintClient extends PrintClientBase
 		#end
 	}
 
-	function customTrace(value, ?info:haxe.PosInfos)
-	{
+	function customTrace(value, ?info:haxe.PosInfos) {
 		addTrace(value, info);
 	}
 	
 	override public function print(value:Dynamic) {
 		super.print(value);
-
 		#if flash
 		textField.appendText(value);
 		textField.scrollV = textField.maxScrollV;
 		#end
-
 		#if nodejs
 		untyped process.stdout.write(value);
-		#elseif (neko || cpp || php || java || hl)
+		#elseif (neko || cpp || java || cs || python || php || hl)
 		Sys.print(value);
 		#elseif (js || flash)
 		external.print(value);

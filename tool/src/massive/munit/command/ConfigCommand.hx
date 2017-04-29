@@ -31,9 +31,9 @@ import massive.haxe.util.*;
 import massive.sys.io.*;
 
 /**
-The ConfigCommand provides a number of ways to create and modify the configuration file (.munit) for a project.
-Either from command line args, manual input into the console, or from an external file.
-*/
+ * The ConfigCommand provides a number of ways to create and modify the configuration file (.munit) for a project.
+ * Either from command line args, manual input into the console, or from an external file.
+ */
 class ConfigCommand extends MUnitCommand {
 	static inline var DEFAULT_SRC:String = "test";
 	static inline var DEFAULT_BIN:String = "build";
@@ -60,7 +60,6 @@ class ConfigCommand extends MUnitCommand {
 	}
 
 	override public function initialise() {
-
 		if(hasDeleteArg())
 		{
 			config.remove();
@@ -97,9 +96,7 @@ class ConfigCommand extends MUnitCommand {
 		{
 			setDefaultValuesForMissingProperties();
 		}
-
 		writeHxmlToFile(hxml);
-
 		if(!config.exists)
 		{
 			config.createDefault(src, bin, report, hxml,classPaths,resources,templates,coveragePackages,coverageIgnoredClasses);
@@ -126,8 +123,7 @@ class ConfigCommand extends MUnitCommand {
 
 	inline function hasDefaultArg():Bool return console.getOption("default") != null;
 
-	inline function hasInlineArgs():Bool
-	{
+	inline function hasInlineArgs():Bool {
 		if(console.getOption("src") != null) return true;
 		if(console.getOption("bin") != null) return true;
 		if(console.getOption("report") != null) return true;
@@ -239,12 +235,13 @@ class ConfigCommand extends MUnitCommand {
 		if(hxml == null) hxml = convertToFile(DEFAULT_HXML, DEFAULT_HXML, "hxml");
 	}
 
-	function parseFromFile(filePath:String) {
+	function parseFromFile(filePath:String)	{
 		if(filePath == "true" || filePath == "") error("Invalid argument. '-file' must be followed by a valid file path");
-		file = File.create(filePath, config.dir);	
-		if(file == null) error("invaid file path: " + filePath);
-		if(file.isDirectory) error("file path should not be a directory: " + filePath);
-		if(!file.exists) error("invaid file path: " + filePath);
+		file = File.create(filePath, config.dir);
+		var label = "file";
+		if(file == null) error("invaid " + label + " path: " + filePath);
+		if(file.isDirectory) error(label + "path should not be a directory: " + filePath);
+		if(!file.exists) error("invaid file path " + filePath);
 		var tempConfig = new Config(config.dir, config.currentVersion);
 		tempConfig.load(file);
 		src = tempConfig.src;

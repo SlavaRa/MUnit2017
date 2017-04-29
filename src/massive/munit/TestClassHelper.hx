@@ -25,8 +25,8 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
 package massive.munit;
+import haxe.Constraints.Function;
 import haxe.rtti.Meta;
 import haxe.Constraints.Function;
 
@@ -43,6 +43,7 @@ import haxe.Constraints.Function;
  * @author Mike Stead
  */
 class TestClassHelper {
+	
 	/**
 	 * Meta tag marking method to be called before all tests in a class.
 	 */
@@ -80,7 +81,6 @@ class TestClassHelper {
 		
 	/**
 	 * Param for META_TAG_TEST, marking test method in class as asynchronous.
-     *
      * @deprecated As of 0.9.1.4, use @AsyncTest instead.
 	 */
 	public inline static var META_PARAM_ASYNC_TEST:String = "Async";
@@ -131,10 +131,10 @@ class TestClassHelper {
 	 */
 	public var after(default, null):Function;
 	
-	var tests:Array<TestCaseData> = [];
-	var index:Int = 0;
 	public var className(default, null):String;
-	private var isDebug:Bool;
+	var tests:Array<TestData> = [];
+	var index:Int = 0;
+	var isDebug:Bool;
 
 	/**
 	 * Class constructor.
@@ -157,21 +157,27 @@ class TestClassHelper {
 	 * 
 	 * @return	true if there is one or more tests available, false if not.
 	 */
-	public function hasNext():Bool return index < tests.length;
+	public function hasNext():Bool {
+		return index < tests.length;
+	}
 	
 	/**
 	 * Returns the next test in the iterable list of tests.
 	 * 
 	 * @return	if another test is available it's returned, otherwise returns null
 	 */
-	public function next():TestCaseData return hasNext() ? tests[index++] : null;
+	public function next():TestData {
+		return hasNext() ? tests[index++] : null;
+	}
 	
 	/**
 	 * Get the current test in the iterable list of tests.
 	 * 
 	 * @return	current test in the iterable list of tests
 	 */
-	public function current():TestCaseData return (index <= 0) ? tests[0] : tests[index - 1];
+	public function current():TestData {
+		return (index <= 0) ? tests[0] : tests[index - 1];
+	}
 	
 	function parse(type:Class<Dynamic>) {
 		test = Type.createEmptyInstance(type);
@@ -208,17 +214,14 @@ class TestClassHelper {
 					Reflect.setField(meta, fieldName, tagsCopy);
 				} else {
 					var ignored = false;
-					for (tagName in newTagNames) {
-						if (tagName == META_TAG_IGNORE) ignored = true;
-						
+					for(tagName in newTagNames) {
+						if(tagName == META_TAG_IGNORE) ignored = true;
 						// TODO: Support @TestDebug ignore scenarios too. ms 4.9.2011
-						
 						// @Test in subclass takes precendence over @Ignore in parent
-						if (!ignored && (tagName == META_TAG_TEST || 
+						if(!ignored && (tagName == META_TAG_TEST || 
 										tagName == META_TAG_ASYNC_TEST) && 
 										Reflect.hasField(recordedFieldTags, META_TAG_IGNORE))
 							Reflect.deleteField(recordedFieldTags, META_TAG_IGNORE);
-						
 						var tagValue = Reflect.field(newFieldTags, tagName);
 						Reflect.setField(recordedFieldTags, tagName, tagValue);
 					}
@@ -232,9 +235,9 @@ class TestClassHelper {
 	function scanForTests(fieldMeta:Dynamic) {
 		var fieldNames = Reflect.fields(fieldMeta);
 		for(fieldName in fieldNames) {
-			var f:Dynamic = Reflect.field(test, fieldName);
+			var f = Reflect.field(test, fieldName);
 			if(!Reflect.isFunction(f)) continue;
-			var funcMeta:Dynamic = Reflect.field(fieldMeta, fieldName);
+			var funcMeta = Reflect.field(fieldMeta, fieldName);
 			searchForMatchingTags(fieldName, f, funcMeta);
 		}
 	}
@@ -264,16 +267,16 @@ class TestClassHelper {
 	}
 	
 	function addTest(field:String, testFunction:Function, testInstance:Dynamic, isAsync:Bool, isIgnored:Bool, description:String) {
-		var result:TestResult = new TestResult();
+		var result = new TestResult();
 		result.async = isAsync;
 		result.ignore = isIgnored;
 		result.className = className;
 		result.description = description;
 		result.name = field;
-		tests.push({test:testFunction, scope:testInstance, result:result});
+		tests.push({test:testFunction, result:result});
 	}
 	
-	inline function sortTestsByName(x:TestCaseData, y:TestCaseData):Int {
+	inline function sortTestsByName(x:TestData, y:TestData):Int {
 		var xName = x.result.name;
 		var yName = y.result.name;
 		if(xName == yName) return 0;
@@ -284,8 +287,7 @@ class TestClassHelper {
 	public static function nullFunc() {}
 }
 
-typedef TestCaseData = {
+typedef TestData = {
 	var test:Function;
-	var scope:Dynamic;
 	var result:TestResult;
 }

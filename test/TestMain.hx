@@ -25,7 +25,6 @@
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of Massive Interactive.
  */
-
 import massive.munit.client.PrintClient;
 import massive.munit.client.RichPrintClient;
 import massive.munit.client.HTTPClient;
@@ -70,11 +69,11 @@ class TestMain {
 			flash.external.ExternalInterface.call("testResult", successful);
 			#elseif js
 			js.Lib.eval("testResult(" + successful + ");");
-			#elseif (neko || cpp || php || java || hl)
+			#elseif (neko || cpp || java || cs || python || php || hl)
 			Sys.exit(0);
 			#end
 		}
 		// if run from outside browser can get error which we can ignore
-		catch (e:Dynamic) {}
+		catch(e:Dynamic) {}
 	}
 }

@@ -30,11 +30,11 @@ package massive.munit;
 /**
  * @author Mike Stead
  */
-class AssertionExceptionTest {
-	public function new() {}
-	
+class AssertionExceptionTest 
+{
 	@Test
-	public function testConstructor() {
+	public function testConstructor():Void
+	{
 		var msg:String = "custom msg";
 		var e:AssertionException = new AssertionException(msg);
 		Assert.areEqual(msg, e.message);

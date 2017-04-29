@@ -25,9 +25,7 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
 package massive.munit;
-
 import haxe.Constraints.Function;
 import haxe.PosInfos;
 import haxe.extern.EitherType;
@@ -39,8 +37,7 @@ private typedef RefType = EitherType<{}, Function>;
  *  
  * @author Mike Stead
  */
-class Assert 
-{
+class Assert {
 	/**
 	 * The incremented number of assertions made during the execution of a set of tests.
 	 */
@@ -52,8 +49,7 @@ class Assert
 	 * @param	value				value expected to be true
 	 * @throws	AssertionException	if value is not true
 	 */ 
-	public static function isTrue(value:Bool, ?info:PosInfos)
-	{
+	public static function isTrue(value:Bool, ?info:PosInfos) {
 		assertionCount++;
 		if(!value) fail("Expected TRUE but was [" + value + "]", info);
 	}
@@ -64,8 +60,7 @@ class Assert
 	 * @param	value				value expected to be false
 	 * @throws	AssertionException	if value is not false
 	 */ 
-	public static function isFalse(value:Bool, ?info:PosInfos)
-	{
+	public static function isFalse(value:Bool, ?info:PosInfos) {
 		assertionCount++;
 		if(value) fail("Expected FALSE but was [" + value + "]", info);
 	}
@@ -76,8 +71,7 @@ class Assert
 	 * @param	value				value expected to be null
 	 * @throws	AssertionException	if value is not null
 	 */ 
-	public static function isNull<T>(value:Null<T>, ?info:PosInfos)
-	{
+	public static function isNull<T>(value:Null<T>, ?info:PosInfos) {
 		assertionCount++;
 		if (value != null) fail("Value [" + value + "] was not NULL", info);
 	}
@@ -88,8 +82,7 @@ class Assert
 	 * @param	value				value expected not to be null
 	 * @throws	AssertionException	if value is null
 	 */ 
-	public static function isNotNull<T>(value:Null<T>, ?info:PosInfos)
-	{
+	public static function isNotNull<T>(value:Null<T>, ?info:PosInfos) {
 		assertionCount++;
 		if (value == null) fail("Value [" + value + "] was NULL", info);
 	}
@@ -100,8 +93,7 @@ class Assert
 	 * @param	value				value expected to be Math.NaN
 	 * @throws	AssertionException	if value is not Math.NaN
 	 */ 
-	public static function isNaN(value:Float, ?info:PosInfos)
-	{
+	public static function isNaN(value:Float, ?info:PosInfos) {
 		assertionCount++;
 		if (!Math.isNaN(value)) fail("Value [" + value + "]  was not NaN", info);		
 	}
@@ -112,8 +104,7 @@ class Assert
 	 * @param	value				value expected not to be Math.NaN
 	 * @throws	AssertionException	if value is Math.NaN
 	 */
-	public static function isNotNaN(value:Float, ?info:PosInfos)
-	{
+	public static function isNotNaN(value:Float, ?info:PosInfos) {
 		assertionCount++;
 		if (Math.isNaN(value)) fail("Value [" + value + "] was NaN", info);		
 	}
@@ -124,8 +115,7 @@ class Assert
 	 * @param	value				value expected to be of a given type
 	 * @param	type				type the value should be
 	 */
-	public static function isType(value:Dynamic, type:Dynamic, ?info:PosInfos)
-	{
+	public static function isType(value:Dynamic, type:Dynamic, ?info:PosInfos) {
 		assertionCount++;
 		if (!Std.is(value, type)) fail("Value [" + value + "] was not of type: " + Type.getClassName(type), info);
 	}
@@ -136,8 +126,7 @@ class Assert
 	 * @param	value				value expected to not be of a given type
 	 * @param	type				type the value should not be
 	 */
-	public static function isNotType(value:Dynamic, type:Dynamic, ?info:PosInfos)
-	{
+	public static function isNotType(value:Dynamic, type:Dynamic, ?info:PosInfos) {
 		assertionCount++;
 		if (Std.is(value, type)) fail("Value [" + value + "] was of type: " + Type.getClassName(type), info);
 	}
@@ -152,8 +141,7 @@ class Assert
 	 * @param	actual				actual value
 	 * @throws	AssertionException	if expected is not equal to the actual value
 	 */
-	public static function areEqual<TExpected, TActual>(expected:TExpected, actual:TActual, ?info:PosInfos)
-	{
+	public static function areEqual<TExpected, TActual>(expected:TExpected, actual:TActual, ?info:PosInfos) {
 		assertionCount++;
 		if (!equals(expected, actual)) fail("Value [" + actual + "] was not equal to expected value [" + expected + "]", info);
 	}
@@ -168,8 +156,7 @@ class Assert
 	 * @param	actual				actual value
 	 * @throws	AssertionException	if expected is equal to the actual value
 	 */
-	public static function areNotEqual<TExpected, TActual>(expected:TExpected, actual:TActual, ?info:PosInfos)
-	{
+	public static function areNotEqual<TExpected, TActual>(expected:TExpected, actual:TActual, ?info:PosInfos) {
 		assertionCount++;
 		if(equals(expected, actual)) fail("Value [" + actual + "] was equal to value [" + expected + "]", info);
 	}
@@ -181,8 +168,7 @@ class Assert
 	 * @param	actual				actual value
 	 * @throws	AssertionException	if expected is not the same as the actual value
 	 */
-	public static function areSame<T:RefType>(expected:T, actual:T, ?info:PosInfos)
-	{
+	public static function areSame<T:RefType>(expected:T, actual:T, ?info:PosInfos) {
 		assertionCount++;
 		if(expected != actual) fail("Value [" + actual + "] was not the same as expected value [" + expected + "]", info);
 	}
@@ -194,8 +180,7 @@ class Assert
 	 * @param	actual				actual value
 	 * @throws	AssertionException	if expected is the same as the actual value
 	 */
-	public static function areNotSame<T:RefType>(expected:T, actual:T, ?info:PosInfos)
-	{
+	public static function areNotSame<T:RefType>(expected:T, actual:T, ?info:PosInfos) {
 		assertionCount++;
 		if(expected == actual) fail("Value [" + actual + "] was the same as expected value [" + expected + "]", info);
 	}
@@ -212,20 +197,19 @@ class Assert
 		try {
 			code();
 			fail("Expected exception wasn't thrown!", info);
-			return null; // needed to compile
 		} catch (e:Dynamic) {
 			if (Std.is(e, expectedType)) return e;
 			Assert.fail('Expected exception of type ${Type.getClassName(expectedType)} but got ${Type.getClassName(Type.getClass(e))}: ${e}');
-			return null; // needed to compile
 		}
+		return null;
 	}
 
 	/**
-	  * Force an assertion failure.
-	  *  
-	  * @param	msg				message describing the assertion which failed
-	  * @throws	AssertionException	thrown automatically
-	  */	
+	 * Force an assertion failure.
+	 *  
+	 * @param	msg				message describing the assertion which failed
+	 * @throws	AssertionException	thrown automatically
+	 */	
 	public static inline function fail(msg:String, ?info:PosInfos) throw new AssertionException(msg, info);
 	
 	static inline function equals(a:Dynamic, b:Dynamic) return switch(Type.typeof(a)) {

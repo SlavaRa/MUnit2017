@@ -25,7 +25,6 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
 package massive.munit.async;
 import haxe.Constraints.Function;
 import haxe.PosInfos;
@@ -38,7 +37,6 @@ import massive.munit.util.Timer;
  * @author Mike Stead
  */
 class AsyncDelegate {
-	
 	/**
 	 * Default timeout period in milliseconds.
 	 */
@@ -78,7 +76,6 @@ class AsyncDelegate {
 	
 	/**
 	 * Class constructor.
-	 * 
 	 * @param	testCase			test case instance where the async test originated
 	 * @param	handler				the handler in the test case for a successful async response
 	 * @param	?timeout			[optional] number of milliseconds to wait before timing out. Defaults to 400
@@ -98,7 +95,9 @@ class AsyncDelegate {
 	 * Execute the remainder of the asynchronous test. This should be called after observer
 	 * has been notified of a successful asynchronous response.
 	 */
-	public function runTest() Reflect.callMethod(testCase, handler, params);
+	public function runTest() {
+		Reflect.callMethod(testCase, handler, params);
+	}
 
 	/**
 	 * Cancels pending async timeout.
@@ -110,12 +109,12 @@ class AsyncDelegate {
 	}
 
 	function responseHandler(?params:Array<Dynamic>):Dynamic {	
-		if (timedOut || canceled) return null;
+		if(timedOut || canceled) return null;
 		timer.stop();
 		if(deferredTimer != null) deferredTimer.stop();
-		this.params = params == null ? [] : params.copy();
+		this.params = params != null ? params.copy() : [];
 		// defer callback to force async runner
-		if (observer != null) Timer.delay(delayActualResponseHandler, 1);
+		if(observer != null) Timer.delay(delayActualResponseHandler, 1);
 		return null;
 	}
 

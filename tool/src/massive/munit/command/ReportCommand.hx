@@ -8,8 +8,8 @@ import massive.munit.report.TeamCityReportFormatter;
 import massive.sys.io.File;
 
 /**
-The ReportCommand converts raw report data into a specific format for a 3rd party tool or CI platform
-*/
+ * The ReportCommand converts raw report data into a specific format for a 3rd party tool or CI platform
+ */
 class ReportCommand extends MUnitTargetCommandBase {
 	var reportType:ReportType;
 	var minCoverage:Int = 0;
@@ -18,8 +18,8 @@ class ReportCommand extends MUnitTargetCommandBase {
 
 	override public function initialise() {
 		reportDir = config.report;
-		if (reportDir == null) error("Default report directory is not set. Please run munit config.");
-		if (!reportDir.exists) reportDir.createDirectory();
+		if(reportDir == null) error("Default report directory is not set. Please run munit config.");
+		if(!reportDir.exists) reportDir.createDirectory();
 		getTargetTypes();
 		getReportFormatType();
 		getDestinationDir();
@@ -40,30 +40,27 @@ class ReportCommand extends MUnitTargetCommandBase {
 					line = StringTools.trim(line);
 					if(reg.match(line)) {
 						switch(reg.matched(1)) {
-							case TargetType.js: targetTypes.push(TargetType.js);
-							case TargetType.as3: targetTypes.push(TargetType.as3);
-							case TargetType.neko: targetTypes.push(TargetType.neko);
-							case TargetType.cpp: targetTypes.push(TargetType.cpp);
-							case TargetType.java: targetTypes.push(TargetType.java);
-							case TargetType.hl: targetTypes.push(TargetType.hl);
+							case js: targetTypes.push(js);
+							case as3: targetTypes.push(as3);
+							case neko: targetTypes.push(neko);
+							case cpp: targetTypes.push(cpp);
+							case java: targetTypes.push(java);
+							case cs: targetTypes.push(cs);
+							case python: targetTypes.push(python);
+							case php: targetTypes.push(php);
+							case hl: targetTypes.push(hl);
 						}
 					}
 				}
 			}
 		}
-
 		//last option is to get from default target types
 		if (targetTypes.length == 0) targetTypes = config.targetTypes.copy();
 	}
-
-	function getReportFormatType()
-	{
+	
+	function getReportFormatType() {
 		var format:String = console.getNextArg();
-
-		if (format == null)
-		{
-			error("Please specify one of the following report types: " + Std.string(Type.allEnums(ReportType)));
-		}
+		if(format == null) error("Please specify one of the following report types: " + Std.string(Type.allEnums(ReportType)));
 		else
 		{
 			try
@@ -77,71 +74,54 @@ class ReportCommand extends MUnitTargetCommandBase {
 				error("Please specify one of the following report types: " + Std.string(Type.allEnums(ReportType)));
 			}
 		}
-
 		Log.debug("reportType: " + reportType);
 	}
-
+	
 	function getDestinationDir()
 	{
 		var dest:String = console.getNextArg();
-
 		if (dest != null)
 		{
 			destDir = config.dir.resolveDirectory(dest);
-
 		}
 		else
 		{
 			destDir =  config.report;
 		}
-
 		Log.debug("destDir: " + destDir);
 	}
-
+	
 	function getMinCoverage()
 	{
 		var coverage:String = console.getOption("coverage");
-
 		if (coverage != null)
 		{
 			minCoverage = Std.parseInt(coverage);
 			Log.debug("minCoverage " + coverage);
 		}
 	}
-
+	
 	override public function execute():Void
 	{
 		var files = getSummaryFiles();
 		var formatter = getReportFormatterForType(reportType);
 		formatter.format(files, destDir, minCoverage);
 	}
-
-	function getSummaryFiles():Array<File>
-	{
-		var files:Array<File> = [];
-
-		for(target in targetTypes)
-		{
-			var file = reportDir.resolveFile("test/summary/" + Std.string(target) + "/summary.txt");
-
-			if (!file.exists)
-			{
-				print("Warning: Report summary file does not exist for target (" + Std.string(target) + "): " + file);
-			}
-
-			files.push(file);
+	
+	function getSummaryFiles():Array<File> {
+		var result:Array<File> = [];
+		for(target in targetTypes) {
+			var file = reportDir.resolveFile("test/summary/" + target + "/summary.txt");
+			if(!file.exists) print("Warning: Report summary file does not exist for target (" + target + "): " + file);
+			result.push(file);
 		}
-
-		return files;
+		return result;
 	}
-
-	function getReportFormatterForType(type:ReportType):ReportFormatter
-	{
-		switch(type)
-		{
-			case teamcity:
-				return new massive.munit.report.TeamCityReportFormatter();
-			default: return null;
+	
+	function getReportFormatterForType(type:ReportType):ReportFormatter {
+		return switch(type) {
+			case teamcity: new massive.munit.report.TeamCityReportFormatter();
+			default: null;
 		}
 	}
 }

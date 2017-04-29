@@ -41,6 +41,8 @@ import sys.FileSystem;
 import sys.io.Process;
 import sys.net.Host;
 import sys.net.Socket;
+
+using Lambda;
  
 /**
  * Don't ask - compiler always thinks it is massive.munit.TargetType enum 'neko'
@@ -49,7 +51,7 @@ typedef SysFile = sys.io.File;
 
 class RunCommand extends MUnitTargetCommandBase {
 	public static inline var DEFAULT_SERVER_TIMEOUT_SEC:Int = 30;
-
+	
 	var browser:String;
 	var reportDir:File;
 	var reportRunnerDir:File;
@@ -63,10 +65,14 @@ class RunCommand extends MUnitTargetCommandBase {
 	var nekoFile:File;
 	var cppFile:File;
 	var javaFile:File;
+	var csFile:File;
+	var pythonFile:File;
+	var phpFiles:Array<File> = [];
+	var nodejsFiles:Array<File> = [];
 	var hlFile:File;
 	var serverTimeoutTimeSec:Int;
 	var resultExitCode:Bool;
-
+	
 	override public function initialise() {
 		initialiseTargets(false);
 		locateBinDir();
@@ -78,7 +84,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		generateTestRunnerPages();
 		checkForExitOnFail();
 	}
-
+	
 	function locateBinDir() {
 		var binPath = console.getNextArg();
 		if(binPath == null) {
@@ -111,7 +117,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		Log.debug(targets.length + " targets");
 		for(target in targets) Log.debug("   " + target.file);
 	}
-
+	
 	function locateReportDir() {
 		var reportPath:String = console.getNextArg();
 		if(reportPath == null) {
@@ -146,12 +152,12 @@ class RunCommand extends MUnitTargetCommandBase {
 	}
 
 	function resetOutputDirectories() {
-		if(!reportRunnerDir.exists) reportRunnerDir.createDirectory();
-		else reportRunnerDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
-		if(!reportTestDir.exists) reportTestDir.createDirectory();
-		else reportTestDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
+		for(it in [reportRunnerDir, reportTestDir]) {
+			if(!it.exists) it.createDirectory();
+			else it.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
+		}
 	}
-
+	
 	function generateTestRunnerPages() {
 		var pageNames = [];
 		for(target in targets) {
@@ -160,10 +166,14 @@ class RunCommand extends MUnitTargetCommandBase {
 				case neko: nekoFile = file;
 				case cpp: cppFile = file;
 				case java: javaFile = file;
+				case cs: csFile = file;
+				case python: pythonFile = file;
+				case php: phpFiles.push(file);
+				case js if(function() {for(it in target.flags.keys()) if(it == "nodejs") return true; return false;}()) : nodejsFiles.push(file);
 				case hl: hlFile = file;
-				default:
+				case _:
 					hasBrowserTests = true;
-					var pageName = Std.string(target.type);
+					var pageName = target.type;
 					var templateName = file.extension + "_runner-html";
 					var pageContent = getTemplateContent(templateName, {runnerName:file.fileName});
 					var runnerPage = reportRunnerDir.resolvePath(pageName + ".html");
@@ -195,40 +205,38 @@ class RunCommand extends MUnitTargetCommandBase {
 			file.copyTo(reportRunnerDir.resolveFile(file.fileName));
 		}
 	}
-
+	
 	/**
 	 * Returns content from a html template.
 	 * Checks for local template before using default template
 	 */
 	function getTemplateContent(templateName:String, properties:Dynamic) {
 		var resource:String;
-		if (config.templates != null && config.templates.resolveFile(templateName + ".mtt").exists)
-		{
+		if(config.templates != null && config.templates.resolveFile(templateName + ".mtt").exists) {
 			resource = config.templates.resolveFile(templateName + ".mtt").readString();
-		}
-		else resource = haxe.Resource.getString(templateName);
+		} else resource = haxe.Resource.getString(templateName);
 		var template = new haxe.Template(resource);
 		return template.execute(properties);
 	}
-
+	
 	override public function execute() {
 		if(FileSys.isWindows) {
 			//Windows has issue releasing port registries reliably.
 			//To prevent possibility of nekotools server failing, on
 			//windows the tmp directory is always located inside the munit install
-			Sys.setCwd(console.originalDir.nativePath);
+			FileSys.setCwd(console.originalDir.nativePath);
 		} else {
 			//for mac and linux we create a tmp directory locally within the bin
 			Sys.setCwd(binDir.nativePath);
 		}
 		var serverFile:File = createServerAlias();
 		tmpDir = File.current.resolveDirectory("tmp");
-		if (tmpDir.exists) tmpDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
+		if(tmpDir.exists) tmpDir.deleteDirectoryContents(RegExpUtil.SVN_REGEX, true);
 		tmpRunnerDir = tmpDir.resolveDirectory("runner");
 		reportRunnerDir.copyTo(tmpRunnerDir);
 		var userTimeout = console.getOption("timeout");
-		if (userTimeout != null) serverTimeoutTimeSec = Std.parseInt(userTimeout);
-		if (serverTimeoutTimeSec == null) serverTimeoutTimeSec = DEFAULT_SERVER_TIMEOUT_SEC;
+		if(userTimeout != null) serverTimeoutTimeSec = Std.parseInt(userTimeout);
+		if(serverTimeoutTimeSec == null) serverTimeoutTimeSec = DEFAULT_SERVER_TIMEOUT_SEC;
 		else print('Running tests with $serverTimeoutTimeSec seconds timeout');
 		var serverProcess:Process = null;
 		try {
@@ -245,6 +253,10 @@ class RunCommand extends MUnitTargetCommandBase {
 		if(nekoFile != null) launchNeko(nekoFile);
 		if(cppFile != null) launchCPP(cppFile);
 		if(javaFile != null) launchJava(javaFile);
+		if(csFile != null) launchCS(csFile);
+		if(pythonFile != null) launchPython(pythonFile);
+		phpFiles.iter(launchPHP);
+		nodejsFiles.iter(launchNodeJS);
 		if(hlFile != null) launchHashLink(hlFile);
 		if(hasBrowserTests) launchFile(indexPage);
 		else resultMonitor.sendMessage("quit");
@@ -255,15 +267,14 @@ class RunCommand extends MUnitTargetCommandBase {
 		tmpRunnerDir.deleteDirectory();
 		tmpDir.copyTo(reportTestDir);
 		tmpDir.deleteDirectory(true);
-		Sys.setCwd(console.dir.nativePath);
+		FileSys.setCwd(console.dir.nativePath);
 		if(!platformResults && resultExitCode) {
-			//print("TESTS FAILED");
 			Sys.stderr().writeString("TESTS FAILED\n");
 			Sys.stderr().flush();
 			exit(1);
 		}
 	}
-
+	
 	/**
 	 * Generates an alias to the nekotools server file on osx/linux
 	 */
@@ -274,7 +285,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		serverFile.copyTo(copy);
 		return copy;
 	}
-
+	
 	function readServerOutput() {
 		// just consume server output
 		var serverProcess:Process = Thread.readMessage(true);
@@ -284,7 +295,7 @@ class RunCommand extends MUnitTargetCommandBase {
 			}
 		} catch(e:haxe.io.Eof) {}
 	}
-
+	
 	function monitorResults() {
 		var mainThread = Thread.readMessage(true);
 		var serverProcess = Thread.readMessage(true);
@@ -295,9 +306,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		var startTime = Sys.time();
 		var lastResultTime = startTime;
 		var serverHung = false;
-		if(serverTimeoutTimeSec == null || serverTimeoutTimeSec < 10)
-			serverTimeoutTimeSec = DEFAULT_SERVER_TIMEOUT_SEC;
-
+		if(serverTimeoutTimeSec == null || serverTimeoutTimeSec < 10) serverTimeoutTimeSec = DEFAULT_SERVER_TIMEOUT_SEC;
 		// Note: Tried using FileSystem.stat mod date to see changes in results.txt but
 		//       writes are too quick so using line count instead.
 		var fileName = tmpDir.nativePath + "results.txt";
@@ -346,24 +355,24 @@ class RunCommand extends MUnitTargetCommandBase {
 			}
 		} while(true);
 		var platformCount = Lambda.count(platformMap);
-		if (platformCount > 0) {
+		if(platformCount > 0) {
 			print("------------------------------");
 			print("PLATFORMS TESTED: " + platformCount + ", PASSED: " + testPassCount + ", FAILED: " + testFailCount + ", ERRORS: " + testErrorCount + ", TIME: " + MathUtil.round(Sys.time() - startTime, 5));
 		}
-		if (serverHung) {
+		if(serverHung) {
 			print("------------------------------");
 			print("ERROR: Local results server appeared to hang so test reporting was cancelled.");
 		}
 		var platformResult:Bool = platformCount > 0 && testFailCount == 0 && testErrorCount == 0 && !serverHung;
 		mainThread.sendMessage(platformResult);
 	}
-
+	
 	function getTargetName(result:String):String return result.split("under ")[1].split(" using")[0];
-
+	
 	function checkIfTestPassed(result:String):Bool return result.indexOf(ServerMain.PASSED) != -1;
-
+	
 	function checkIfTestFailed(result:String):Bool return result.indexOf(ServerMain.FAILED) != -1;
-
+	
 	function launchFile(file:File):Int {
 		var targetLocation:String  = HTTPClient.DEFAULT_SERVER_URL + "/tmp/runner/" + file.fileName;
 		var parameters:Array<String> = [];
@@ -376,7 +385,7 @@ class RunCommand extends MUnitTargetCommandBase {
 			}
 		} else if(FileSys.isMac) {
 			parameters.push("open");
-			if (browser != null) parameters.push("-a " + browser);
+			if(browser != null) parameters.push("-a " + browser);
 		} else if(FileSys.isLinux) {
 			if(browser != null) parameters.push(browser);
 			else parameters.push("xdg-open");
@@ -387,7 +396,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		return exitCode;
 	}
 	
-	function sendFlashDevelopCommand(args:String, cmd:String, data:String)  {
+	function sendFlashDevelopCommand(args:String, cmd:String, data:String) {
 		var port = 1978;
 		var parts = args.split(':');
 		if(parts.length > 1) port = Std.parseInt(parts[1]);
@@ -397,49 +406,34 @@ class RunCommand extends MUnitTargetCommandBase {
 			conn.write('<flashconnect><message cmd="call" command="' + cmd + '">' + data + '</message></flashconnect>');
 			conn.output.writeByte(0);
 			conn.close(); 
-		} catch(e:Dynamic) {
+		} catch(ex:Dynamic) {
 			print("ERROR: Failed to connect to FlashDevelop socket server");
 			return 1;
 		}
 		return 0;
 	}
-
-	function launchNeko(file:File):Int {
-		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
-		file.copyTo(reportRunnerFile);
-		Sys.setCwd(config.dir.nativePath);
-		var exitCode = runProgram('neko', [reportRunnerFile.nativePath]);
-		Sys.setCwd(console.originalDir.nativePath);
-		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
-		return exitCode;
-	}
 	
-	function launchCPP(file:File):Int {
-		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
-		file.copyTo(reportRunnerFile);
-		Sys.setCwd(config.dir.nativePath);
-		var exitCode = runProgram(file.nativePath);
-		Sys.setCwd(console.originalDir.nativePath);
-		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
-		return exitCode;
-	}
+	inline function launchNeko(file:File):Int return launch(file, 'neko', [file.nativePath]);
 	
-	function launchJava(file:File):Int {
-		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
-		file.copyTo(reportRunnerFile);
-		Sys.setCwd(config.dir.nativePath);
-		var exitCode = runProgram('java', ['-jar', reportRunnerFile.nativePath]);
-		Sys.setCwd(console.originalDir.nativePath);
-		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
-		return exitCode;
-	}
+	inline function launchCPP(file:File):Int return launch(file, file.nativePath);
 	
-	function launchHashLink(file:File):Int {
-		var reportRunnerFile = reportRunnerDir.resolvePath(file.fileName);
-		file.copyTo(reportRunnerFile);
-		Sys.setCwd(config.dir.nativePath);
-		var exitCode = runProgram('hl', [reportRunnerFile.nativePath]);
-		Sys.setCwd(console.originalDir.nativePath);
+	inline function launchJava(file:File):Int return launch(file, 'java', ['-jar', file.nativePath]);
+	
+	inline function launchCS(file:File):Int return FileSys.isWindows ? launch(file, file.nativePath) : launch(file, 'mono', [file.nativePath]);
+	
+	inline function launchPython(file:File):Int return launch(file, FileSys.isWindows ? 'python' : 'python3', [file.nativePath]);
+	
+	inline function launchPHP(file:File):Int return launch(file, 'php', [file.nativePath]);
+	
+	inline function launchNodeJS(file:File):Int return launch(file, 'node', [file.nativePath]);
+	
+	inline function launchHashLink(file:File):Int return launch(file, 'hl', [file.nativePath]);
+	
+	function launch(file:File, executor:String, ?args:Array<String>):Int {
+		file.copyTo(reportRunnerDir.resolvePath(file.fileName));
+		FileSys.setCwd(config.dir.nativePath);
+		var exitCode = runProgram(executor, args);
+		FileSys.setCwd(console.originalDir.nativePath);
 		if(exitCode > 0) error('Error ($exitCode) running $file', exitCode);
 		return exitCode;
 	}
@@ -447,24 +441,33 @@ class RunCommand extends MUnitTargetCommandBase {
 	function runProgram(name:String, ?args:Array<String>) {
 		var process = new Process(name, args);
 		try {
-			while (true) {
+			while(true) {
 				Sys.sleep(0.01);
 				var output = process.stdout.readLine();
 				Sys.println(output);
 			}
-		} catch (e:haxe.io.Eof) {}
+		} catch(e:haxe.io.Eof) {}
 		var exitCode:Int = 0;
 		var error:String = null;
 		try {
 			exitCode = process.exitCode();
+			if(exitCode > 0) {
+				var sb = new StringBuf();
+				try {
+					while(true) {
+						sb.add(process.stderr.readLine());
+						sb.add("\n");
+					}
+				} catch(e:haxe.io.Eof) {}
+				error = sb.toString();
+			}
 		} catch(e:Dynamic) {
 			exitCode = 1;
 			error = Std.string(e).split("\n").join("\n\t");
 		}
 		var stfErrString = process.stderr.readAll().toString().split("\n").join("\n\t");
 		if(stfErrString == null) stfErrString = "";
-		if (exitCode > 0 || stfErrString.length > 0)
-		{
+		if(exitCode > 0 || stfErrString.length > 0) {
 			if(error != null) error += "\n\t";
 			Sys.println("Error running '" + name + "'\n\t" + error);
 		}

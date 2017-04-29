@@ -10,11 +10,11 @@ class Target {
 	public var flags:StringMap<String> = new StringMap();
 	public var debug:Bool = false;
 	public var executableFile:File;
-
+	
 	public function new() {}
 	
-	public function toString():String return "Target " + Std.string(type) + " " + file.toString();
-
+	public function toString():String return 'Target ${type} ${file.toString()}';
+	
 	public function toHxmlString():String {
 		var output = "haxe";
 		var lines = hxml.split("\n");
@@ -28,11 +28,15 @@ class Target {
 }
 
 @:enum
+@:forward
 abstract TargetType(String) from String to String {
 	var as3 = "as3";
 	var js = "js";
 	var neko = "neko";
 	var cpp = "cpp";
 	var java = "java";
+	var cs = "cs";
+	var python = "python";
+	var php = "php";
 	var hl = "hl";
 }

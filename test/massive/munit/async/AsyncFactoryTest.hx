@@ -30,20 +30,16 @@ package massive.munit.async;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import massive.munit.util.Timer;
+
 /**
- * ...
  * @author Mike Stead
  */
-
 class AsyncFactoryTest implements IAsyncDelegateObserver
 {
 	private var handlerCalled:Bool;
 	private var execHandlerCalled:Bool;
 	private var delegate:AsyncDelegate;
 	
-	public function new() 
-	{}
-
 	@After
 	public function tearDown():Void
 	{
@@ -67,17 +63,12 @@ class AsyncFactoryTest implements IAsyncDelegateObserver
 	{
 		var tempFactory:AsyncFactory = new AsyncFactory(this);
 		var tempHandler:Dynamic = tempFactory.createHandler(this, onTestCreateBasicHandler, 333);
-
 		Assert.isNotNull(delegate);
-
 		Assert.isNotNull(tempHandler);
 		Assert.areEqual(tempHandler, delegate.delegateHandler);
-		
 		execHandlerCalled = false;
 		handlerCalled = false;
-		
 		tempHandler();
-
 		var actualHandler:Dynamic = factory.createHandler(this, assertOnTestCreateBasicHandlerCalled, 333);
 		Timer.delay(actualHandler, 10);
 	}
@@ -109,5 +100,4 @@ class AsyncFactoryTest implements IAsyncDelegateObserver
 		Assert.fail("Async timeout occured when it shouldn't have");
 	}
 
-	
 }
