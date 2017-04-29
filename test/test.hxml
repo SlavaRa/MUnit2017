@@ -65,10 +65,10 @@
 -D php7
 -php bin/test/core/php7_test
 
-## HashLink
---next
--main TestMain
--cp test
--cp src
--lib mlib
--hl bin/test/core/hl_test.hl
+### HashLink
+#--next
+#-main TestMain
+#-cp test
+#-cp src
+#-lib mlib
+#-hl bin/test/core/hl_test.hl
