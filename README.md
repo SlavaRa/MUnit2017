@@ -13,7 +13,7 @@ To install you must have [Haxe](http://www.haxe.org) installed
 
 To install latest build from git:
 
-    haxelib git munit https://github.com/SlavaRa/MUnit2017.git munit2017
+	haxelib git munit https://github.com/SlavaRa/MUnit2017.git munit2017
 
 To check that it is all installed and to view the help run:
 
@@ -81,10 +81,10 @@ If you want to help, [fork it](https://github.com/massiveinteractive/MassiveUnit
 
 To install latest build from git:
 
-    haxelib git munit https://github.com/SlavaRa/MUnit2017.git munit2017
+	haxelib git munit https://github.com/SlavaRa/MUnit2017.git munit2017
 
 
-If you want to make sure it works, make sure to run the bash script (build.sh) and check that the tests all pass on all platforms:
+If you want to make sure it works, make sure to run the build.hxml and check that the tests all pass on all platforms:
 
 	haxelib run munit test -coverage
 
@@ -172,17 +172,18 @@ Get error exit code when tests on one or more platforms fail
 > Note: haxelib currently doesnt return exit codes > 0 on OSX (see [issue](http://code.google.com/p/haxe/issues/detail?id=879))
 
 Workaround for issues with nekotools server HTTP POST via a simple SummaryReportClient
-	
-	var httpClient = new HTTPClient(new SummaryReportClient())
-	runner.addResultClient(httpClient);
-
+```haxe
+var httpClient = new HTTPClient(new SummaryReportClient())
+runner.addResultClient(httpClient);
+```
 
 New since 0.9.2.x
 ---------------------
 
 Rich HTML output for JavaScript and Flash targets (see RichPrintClient)
-
-	var client = new RichPrintClient();
+```haxe
+var client = new RichPrintClient();
+```
 
 Seamless support for MCover code coverage
 
@@ -199,11 +200,12 @@ CI friendly options for munit config command
 	haxelib run munit config -file path/to/my/custom/config.txt
 
 Support for assertions inside async tests
-
-	public function someAsyncTest(factory:AsyncFactory)
-	{
-		Assert.isTrue(false);
-	}
+```haxe
+public function someAsyncTest(factory:AsyncFactory)
+{
+	Assert.isTrue(false);
+}
+```
 
 Support for custom runner html templates and resources
 
@@ -211,9 +213,6 @@ Support for custom runner html templates and resources
 
 
 For full list of recent changes see the **[change log](https://github.com/massiveinteractive/MassiveUnit/blob/master/CHANGES)**
-
-
-
 
 ## Credits
 

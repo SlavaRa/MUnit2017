@@ -25,9 +25,6 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
-
-
 package massive.munit.client;
 
 /**
@@ -56,8 +53,7 @@ time:1234.3
 # ... plus 5 more
 
 */
-class SummaryReportClient extends AbstractTestResultClient
-{
+class SummaryReportClient extends AbstractTestResultClient {
 	public static inline var DEFAULT_ID:String = "summary";
 
 	public function new() {
@@ -90,11 +86,9 @@ class SummaryReportClient extends AbstractTestResultClient
 		output = sb.toString();
 	}
 
-	override function printOverallResult(result:Bool) {
-		//handled by printFinalStatistics		
-	}
+	//handled by printFinalStatistics
+	override function printOverallResult(result:Bool) { }
 
-	override function printReports() {
-		//not implemented 
-	}
+	//not implemented
+	override function printReports() { }
 }

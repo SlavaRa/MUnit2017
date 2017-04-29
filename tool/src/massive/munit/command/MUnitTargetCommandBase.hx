@@ -5,23 +5,18 @@ import massive.munit.Target;
 import massive.sys.io.File;
 import massive.sys.io.FileSys;
 
-class MUnitTargetCommandBase extends MUnitCommand
-{
+class MUnitTargetCommandBase extends MUnitCommand {
 	var hxml:File;
 	var targets:Array<Target>;
 	var targetTypes:Array<TargetType>;
 	var includeCoverage:Bool; 
 
-	override public function initialise():Void
-	{
+	override public function initialise() {
 		super.initialise();
-		//append code coverage
-		var coverage:String  = console.getOption("-coverage");
-		includeCoverage = coverage == "true";
+		includeCoverage = console.getOption("-coverage") == "true";
 	}
 
-	function initialiseTargets(getHxmlFromConsole:Bool)
-	{
+	function initialiseTargets(getHxmlFromConsole:Bool) {
 		setTargetTypes();
 		setHXMLFile(getHxmlFromConsole);
 		setFilteredTargets();
@@ -31,7 +26,7 @@ class MUnitTargetCommandBase extends MUnitCommand
 	}
 
 	function getTargetsFromConsole():Array<TargetType> {
-		var result = new Array();
+		var result = [];
 		if(console.getOption("swf") == "true" || console.getOption(as3) == "true") result.push(as3);
 		if(console.getOption(js) == "true") result.push(js);
 		if(console.getOption(neko) == "true") result.push(neko);
@@ -40,6 +35,7 @@ class MUnitTargetCommandBase extends MUnitCommand
 		if(console.getOption(cs) == "true") result.push(cs);
 		if(console.getOption(python) == "true") result.push(python);
 		if(console.getOption(php) == "true") result.push(php);
+		if(console.getOption(hl) == "true") result.push(hl);
 		return result;
 	}
 
@@ -59,34 +55,22 @@ class MUnitTargetCommandBase extends MUnitCommand
 	function setHXMLFile(checkConsole:Bool) {
 		var hxml:File = null;
 		var hxmlPath:String = null;
-		if (checkConsole) hxmlPath = console.getNextArg();
-		if (hxmlPath != null)
-		{
+		if(checkConsole) hxmlPath = console.getNextArg();
+		if(hxmlPath != null) {
 			hxml = File.create(hxmlPath, console.dir);
-			if (!hxml.exists)
-			{
-				error("Cannot locate hxml file: " + hxmlPath);
-			}
+			if(!hxml.exists) error("Cannot locate hxml file: " + hxmlPath);
 			config.hxml = hxml;//update config hxml file
-		}
-		else
-		{
+		} else {
 			hxml = config.hxml;
-			if (hxml == null)
-			{
-				error("Default hxml file path is not set. Please run munit config.");
-			}
-			if (!hxml.exists)
-			{
-				error("Default hxml file path does not exist. Please run munit config.");
-			}
+			if(hxml == null) error("Default hxml file path is not set. Please run munit config.");
+			else if(!hxml.exists) error("Default hxml file path does not exist. Please run munit config.");
 		}
 	}
 
 	/**
-	Updates the set of valid targets for the project.
-	Note: also removes config.targetTypes that are not present in the hxml.
-	*/
+	 * Updates the set of valid targets for the project.
+	 * Note: also removes config.targetTypes that are not present in the hxml.
+	 */
 	function setFilteredTargets()
 	{
 		if (config.targets.length > 0 ) return;
@@ -110,10 +94,10 @@ class MUnitTargetCommandBase extends MUnitCommand
 	}
 
 	/**
-	Parses the contents of an hxml file and returns contents as an array of targets
-	@param hxml: path to hxml file
-	@return array of Targets
-	*/
+	 * Parses the contents of an hxml file and returns contents as an array of targets
+	 * @param hxml: path to hxml file
+	 * @return array of Targets
+	 */
 	function getTargetsFromHXML(hxml:File):Array<Target>
 	{
 		var contents:String = hxml.readString();

@@ -25,10 +25,10 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
 package massive.munit;
 import haxe.Constraints.Function;
 import haxe.rtti.Meta;
+import haxe.Constraints.Function;
 
 /**
  * A helper used to discover, and provide access to, the test and life cycle methods of a test class.
@@ -132,7 +132,7 @@ class TestClassHelper {
 	public var after(default, null):Function;
 	
 	public var className(default, null):String;
-	var tests:Array<TestCaseData> = [];
+	var tests:Array<TestData> = [];
 	var index:Int = 0;
 	var isDebug:Bool;
 
@@ -141,7 +141,7 @@ class TestClassHelper {
 	 * 
 	 * @param	type			type of test class this helper is wrapping
 	 */
-	public function new(type:Class<Dynamic>, ?isDebug:Bool = false) {
+	public function new(type:Class<Dynamic>, isDebug = false) {
 		this.type = type;
 		this.isDebug = isDebug;
 		className = Type.getClassName(type);
@@ -166,8 +166,7 @@ class TestClassHelper {
 	 * 
 	 * @return	if another test is available it's returned, otherwise returns null
 	 */
-	public function next():TestCaseData
-	{
+	public function next():TestData {
 		return hasNext() ? tests[index++] : null;
 	}
 	
@@ -176,8 +175,7 @@ class TestClassHelper {
 	 * 
 	 * @return	current test in the iterable list of tests
 	 */
-	public function current():TestCaseData
-	{
+	public function current():TestData {
 		return (index <= 0) ? tests[0] : tests[index - 1];
 	}
 	
@@ -198,8 +196,9 @@ class TestClassHelper {
 	
 	function collateFieldMeta(inherintanceChain:Array<Class<Dynamic>>):Dynamic {
 		var meta = {};
-		while(inherintanceChain.length > 0) {
-			var clazz = inherintanceChain.pop(); // start at root
+		var i = inherintanceChain.length;
+		while(i-- > 0) {
+			var clazz = inherintanceChain[i]; // start at root
 			var newMeta = Meta.getFields(clazz);			
 			var markedFieldNames = Reflect.fields(newMeta);
 			for(fieldName in markedFieldNames) {
@@ -211,7 +210,7 @@ class TestClassHelper {
 					// some later and this could impact other tests which
 					// extends the same class.
 					var tagsCopy = {};
-					for (tagName in newTagNames) Reflect.setField(tagsCopy, tagName, Reflect.field(newFieldTags, tagName));
+					for(tagName in newTagNames) Reflect.setField(tagsCopy, tagName, Reflect.field(newFieldTags, tagName));
 					Reflect.setField(meta, fieldName, tagsCopy);
 				} else {
 					var ignored = false;
@@ -228,6 +227,7 @@ class TestClassHelper {
 					}
 				}
 			}
+			
 		}
 		return meta;
 	}
@@ -273,20 +273,22 @@ class TestClassHelper {
 		result.className = className;
 		result.description = description;
 		result.name = field;
-		tests.push({test:testFunction, scope:testInstance, result:result});
+		tests.push({scope:testInstance, test:testFunction, result:result});
 	}
 	
-	inline function sortTestsByName(x:TestCaseData, y:TestCaseData):Int {
-		if(x.result.name == y.result.name) return 0;
-		if(x.result.name > y.result.name) return 1;
+	inline function sortTestsByName(x:TestData, y:TestData):Int {
+		var xName = x.result.name;
+		var yName = y.result.name;
+		if(xName == yName) return 0;
+		if(xName > yName) return 1;
 		return -1;
 	}
 
 	public static function nullFunc() {}
 }
 
-typedef TestCaseData = {
-	var test:Function;
+typedef TestData = {
 	var scope:Dynamic;
+	var test:Function;
 	var result:TestResult;
 }

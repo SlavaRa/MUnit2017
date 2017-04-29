@@ -125,10 +125,10 @@ class AsyncDelegate {
 
 	function timeoutHandler() {
 		#if flash
-			//pushing timeout onto next frame to prevent raxe condition bug when flash framerate drops too low and timeout timer executes prior to response on same frame
-			deferredTimer = Timer.delay(actualTimeoutHandler, 1);
+		//pushing timeout onto next frame to prevent raxe condition bug when flash framerate drops too low and timeout timer executes prior to response on same frame
+		deferredTimer = Timer.delay(actualTimeoutHandler, 1);
 		#else
-			actualTimeoutHandler();
+		actualTimeoutHandler();
 		#end
 	}
 
@@ -137,8 +137,7 @@ class AsyncDelegate {
 		handler = null;
 		delegateHandler = null;
 		timedOut = true;
-		if (observer != null)
-		{
+		if(observer != null) {
 			observer.asyncTimeoutHandler(this);
 			observer = null; 
 		}

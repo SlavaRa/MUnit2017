@@ -52,7 +52,7 @@
  */
 package massive.munit.util;
 
-#if (cs || python || php || nodejs)
+#if (cs || python || php || nodejs || hl)
 typedef Timer = haxe.Timer;
 #else
 

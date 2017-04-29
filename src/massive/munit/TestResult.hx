@@ -25,9 +25,6 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
-
-
 package massive.munit;
 
 /**
@@ -36,6 +33,7 @@ package massive.munit;
  * @author Mike Stead
  */
 class TestResult {
+	
 	/**
 	 * Whether the test passed or not.
 	 */
@@ -102,10 +100,11 @@ class TestResult {
 	public function new() {}
 }
 
-enum TestResultType {
-	UNKNOWN;
-	PASS;
-	FAIL;
-	ERROR;
-	IGNORE;
+@:enum
+abstract TestResultType(String) to String {
+	var UNKNOWN = "UNKNOWN";
+	var PASS = "PASS";
+	var FAIL = "FAIL";
+	var ERROR = "ERROR";
+	var IGNORE = "IGNORE";
 }

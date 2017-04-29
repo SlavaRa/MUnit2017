@@ -30,7 +30,6 @@ package massive.munit.command;
 import massive.munit.Config;
 import massive.sys.cmd.Command;
 
-class MUnitCommand extends Command
-{
+class MUnitCommand extends Command {
 	public var config:Config;
 }

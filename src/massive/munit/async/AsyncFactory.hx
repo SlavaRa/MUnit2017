@@ -60,6 +60,7 @@ import haxe.PosInfos;
  * @author Mike Stead
  */
 class AsyncFactory {
+	
 	/**
 	 * Observer for all AsyncDelegates this factory creates.
 	 */

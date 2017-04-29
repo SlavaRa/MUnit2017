@@ -27,15 +27,14 @@
  */
 package massive.munit.command;
 
-import massive.haxe.util.TemplateUtil;
-import massive.sys.io.File;
+import massive.haxe.util.*;
+import massive.sys.io.*;
 
 /**
-The ConfigCommand provides a number of ways to create and modify the configuration file (.munit) for a project.
-Either from command line args, manual input into the console, or from an external file.
-*/
-class ConfigCommand extends MUnitCommand
-{
+ * The ConfigCommand provides a number of ways to create and modify the configuration file (.munit) for a project.
+ * Either from command line args, manual input into the console, or from an external file.
+ */
+class ConfigCommand extends MUnitCommand {
 	static inline var DEFAULT_SRC:String = "test";
 	static inline var DEFAULT_BIN:String = "build";
 	static inline var DEFAULT_REPORT:String = "report";
@@ -43,8 +42,8 @@ class ConfigCommand extends MUnitCommand
 	static inline var DEFAULT_HXML:String = "test.hxml";
 
 	var file:File;//external file
-	var useDefaultsIfMissing:Bool;
-	var useConsoleInput:Bool;
+	var useDefaultsIfMissing:Bool = false;
+	var useConsoleInput:Bool = false;
 	var src:File;
 	var bin:File;
 	var report:File;
@@ -55,17 +54,12 @@ class ConfigCommand extends MUnitCommand
 	var coveragePackages:Array<String>;
 	var coverageIgnoredClasses:Array<String>;
 
-	public function new()
-	{
+	public function new() {
 		super();
-		useDefaultsIfMissing = false;
-		useConsoleInput = false;
 		addPostRequisite(GenerateCommand);
 	}
 
-	override public function initialise():Void
-	{
-
+	override public function initialise() {
 		if(hasDeleteArg())
 		{
 			config.remove();
@@ -97,15 +91,12 @@ class ConfigCommand extends MUnitCommand
 		}
 	}
 
-	override public function execute():Void
-	{
+	override public function execute() {
 		if(useDefaultsIfMissing)
 		{
 			setDefaultValuesForMissingProperties();
 		}
-
 		writeHxmlToFile(hxml);
-
 		if(!config.exists)
 		{
 			config.createDefault(src, bin, report, hxml,classPaths,resources,templates,coveragePackages,coverageIgnoredClasses);
@@ -124,32 +115,15 @@ class ConfigCommand extends MUnitCommand
 		}
 	}
 
-	function hasDeleteArg():Bool
-	{
-		if(console.getOption("delete") != null) return true;
-		return false;
-	}
+	inline function hasDeleteArg():Bool return console.getOption("delete") != null;
 
-	function hasFileArg():Bool
-	{
-		if(console.getOption("file") != null) return true;
-		return false;
-	}
+	inline function hasFileArg():Bool return console.getOption("file") != null;
 
-	function hasResetArg():Bool
-	{
-		if(console.getOption("reset") != null) return true;
-		return false;
-	}
+	inline function hasResetArg():Bool return console.getOption("reset") != null;
 
-	function hasDefaultArg():Bool
-	{
-		if(console.getOption("default") != null) return true;
-		return false;
-	}
+	inline function hasDefaultArg():Bool return console.getOption("default") != null;
 
-	function hasInlineArgs():Bool
-	{
+	inline function hasInlineArgs():Bool {
 		if(console.getOption("src") != null) return true;
 		if(console.getOption("bin") != null) return true;
 		if(console.getOption("report") != null) return true;
@@ -169,26 +143,20 @@ class ConfigCommand extends MUnitCommand
 		var reportArg = console.getOption("report");
 		var classPathsArg = console.getOption("classPaths");
 		var hxmlArg = console.getOption("hxml");
-
 		var resourcesArg = console.getOption("resources");
 		var templatesArg = console.getOption("templates");
-
 		var coveragePackagesArg = console.getOption("coveragePackages");
 		var coverageIgnoredClassesArg = console.getOption("coverageIgnoredClasses");
-
 		src = convertToDirectory(srcArg, DEFAULT_SRC, "src");
 		bin = convertToDirectory(binArg, DEFAULT_BIN, "build");
 		report = convertToDirectory(reportArg, DEFAULT_REPORT, "report");
 		classPaths = convertToDirectoryList(classPathsArg, DEFAULT_CLASSPATHS, "class");
 		hxml = convertToFile(hxmlArg, DEFAULT_HXML, "hxml");
-
 		resources = convertToDirectory(resourcesArg, null, "resources");
 		templates = convertToDirectory(templatesArg, null, "templates");
-
 		coveragePackages = coveragePackagesArg != null ?  coveragePackagesArg.split(",") : null;
 		coverageIgnoredClasses = coverageIgnoredClassesArg != null ?  coverageIgnoredClassesArg.split(",") : null;
 	}
-
 
 	function parseFromConsole()
 	{
@@ -259,44 +227,23 @@ class ConfigCommand extends MUnitCommand
 		}
 	}
 
-	function setDefaultValuesForMissingProperties()
-	{
-		var srcArg = DEFAULT_SRC;
-		var binArg = DEFAULT_BIN;
-		var reportArg = DEFAULT_REPORT;
-		var classPathsArg = DEFAULT_CLASSPATHS;
-		var hxmlArg = DEFAULT_HXML;
-		
-		if(src == null) src = convertToDirectory(srcArg, DEFAULT_SRC, "src");
-		if(bin == null) bin = convertToDirectory(binArg, DEFAULT_BIN, "build");
-		if(report == null) report = convertToDirectory(reportArg, DEFAULT_REPORT, "report");
-		if(classPaths == null) classPaths = convertToDirectoryList(classPathsArg, DEFAULT_CLASSPATHS, "class");
-		if(hxml == null) hxml = convertToFile(hxmlArg, DEFAULT_HXML, "hxml");
+	function setDefaultValuesForMissingProperties() {
+		if(src == null) src = convertToDirectory(DEFAULT_SRC, DEFAULT_SRC, "src");
+		if(bin == null) bin = convertToDirectory(DEFAULT_BIN, DEFAULT_BIN, "build");
+		if(report == null) report = convertToDirectory(DEFAULT_REPORT, DEFAULT_REPORT, "report");
+		if(classPaths == null) classPaths = convertToDirectoryList(DEFAULT_CLASSPATHS, DEFAULT_CLASSPATHS, "class");
+		if(hxml == null) hxml = convertToFile(DEFAULT_HXML, DEFAULT_HXML, "hxml");
 	}
 
-	///////////
-
-
-	function parseFromFile(filePath:String)
-	{
-		if(filePath == "true" || filePath == "")
-		{
-			error("Invalid argument. '-file' must be followed by a valid file path");
-		}	
-		
-		file = File.create(filePath, config.dir);	
-		
+	function parseFromFile(filePath:String)	{
+		if(filePath == "true" || filePath == "") error("Invalid argument. '-file' must be followed by a valid file path");
+		file = File.create(filePath, config.dir);
 		var label = "file";
 		if(file == null) error("invaid " + label + " path: " + filePath);
 		if(file.isDirectory) error(label + "path should not be a directory: " + filePath);
-		if(!file.exists)
-		{
-			error("invaid file path " + filePath);
-		}
-
+		if(!file.exists) error("invaid file path " + filePath);
 		var tempConfig = new Config(config.dir, config.currentVersion);
 		tempConfig.load(file);
-
 		src = tempConfig.src;
 		bin = tempConfig.bin;
 		report = tempConfig.report;
@@ -307,75 +254,48 @@ class ConfigCommand extends MUnitCommand
 		coveragePackages = tempConfig.coveragePackages;
 		coverageIgnoredClasses = tempConfig.coverageIgnoredClasses;
 	}
-
-
 	
-	function writeHxmlToFile(file:File, ?overwrite:Bool=false):Bool
-	{
+	function writeHxmlToFile(file:File, ?overwrite:Bool=false):Bool {
 		if(file == null) return false;
 		if(file.exists && !overwrite) return false;
-
 		var src:String = src != null ? config.dir.getRelativePath(src) + "" : "";
-		var bin:String = bin != null ? config.dir.getRelativePath(bin) + "": "";
-
-		var clsPaths:Array<String> = [];
-
-		for(path in classPaths)
-		{
-			clsPaths.push(config.dir.getRelativePath(path));
-		}
-
+		var bin:String = bin != null ? config.dir.getRelativePath(bin) + "" : "";
+		var clsPaths:Array<String> = [for(it in classPaths) config.dir.getRelativePath(it)];
 		var content = TemplateUtil.getTemplate("test-hxml", {src:src, bin:bin, classPaths:clsPaths});
 		file.writeString(content, true);
 		return true;
-		
 	}
 
-	///// utilities
-
-
-	function convertToDirectory(arg:String, defaultValue:String, label:String):File
-	{
+	function convertToDirectory(arg:String, defaultValue:String, label:String):File {
 		if(arg == null) arg = defaultValue;
 		if(arg == null) return null;
-
 		var file = File.create(arg, config.dir);
-
 		if(file == null) error("invaid " + label + " path: " + arg);
 		if(!file.exists) file.createDirectory();
 		if(!file.isDirectory) error(label + "path is not a valid directory: " + arg);
-
 		return file;
 	}
 
-	function convertToFile(arg:String, defaultValue:String, label:String):File
-	{
+	function convertToFile(arg:String, defaultValue:String, label:String):File {
 		if(arg == null) arg = defaultValue;
 		var file = File.create(arg, config.dir);
 		if(file == null) error("invaid " + label + " path: " + arg);
 		if(file.isDirectory) error(label + "path should not be a directory: " + arg);
-
 		return file;
 	}
 
-	function convertToDirectoryList(arg:String, defaultValue:String, label:String):Array<File>
-	{
+	function convertToDirectoryList(arg:String, defaultValue:String, label:String):Array<File> {
 		if(arg == null) arg = defaultValue;
-		
 		var paths = arg.split(",");
-		
 		if(paths == null) error("invaid target class paths: " + paths);
-
-		var files:Array<File> = [];
-		for(path in paths)
-		{
+		var result:Array<File> = [];
+		for(path in paths) {
 			var file = File.create(path, config.dir);
 			if(file == null) error("invaid " + label + " path: " + path);
 			if(!file.exists) file.createDirectory();
 			if(!file.isDirectory) error(label + "path is not a valid directory: " + path);
-			files.push(file);
+			result.push(file);
 		}
-
-		return files;
+		return result;
 	}
 }

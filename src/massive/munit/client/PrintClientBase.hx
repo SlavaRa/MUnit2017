@@ -328,4 +328,3 @@ class ExternalPrintClientJS implements ExternalPrintClient {
 		return result;
 	}
 }
-

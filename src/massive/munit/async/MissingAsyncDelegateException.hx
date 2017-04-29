@@ -26,26 +26,22 @@
 * or implied, of Massive Interactive.
 ****/
 
-
-
 package massive.munit.async;
 import haxe.PosInfos;
-import massive.haxe.util.ReflectUtil;
 import massive.munit.MUnitException;
+using Type;
 
 /**
  * Exception thrown when an asynchronous test does not create an AsyncDelegate.
  * 
  * @author Mike Stead
  */
-class MissingAsyncDelegateException extends MUnitException
-{
+class MissingAsyncDelegateException extends MUnitException {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function new(message:String, ?info:PosInfos) 
-	{
+	public function new(message:String, ?info:PosInfos) {
 		super(message, info);
-		type = ReflectUtil.here().className;
+		type = this.getClass().getClassName();
 	}
 }

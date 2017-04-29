@@ -27,11 +27,10 @@
 ****/
 
 package massive.munit;
-
 import haxe.Constraints.Function;
 import haxe.PosInfos;
 import massive.munit.Assert;
-import massive.munit.TestClassHelper.TestCaseData;
+import massive.munit.TestClassHelper.TestData;
 import massive.munit.async.AsyncDelegate;
 import massive.munit.async.AsyncFactory;
 import massive.munit.async.AsyncTimeoutException;
@@ -47,8 +46,6 @@ import cpp.vm.Thread;
 #elseif java
 import java.vm.Thread;
 #end
-
-import haxe.CallStack;
 
 /**
  * Runner used to execute one or more suites of unit tests.
@@ -118,8 +115,8 @@ class TestRunner implements IAsyncDelegateObserver {
 
     public var asyncFactory(default, set):AsyncFactory;
     function set_asyncFactory(value:AsyncFactory):AsyncFactory {
-        if (value == asyncFactory) return value;
-        if (running) throw new MUnitException("Can't change AsyncFactory while tests are running");
+        if(value == asyncFactory) return value;
+        if(running) throw new MUnitException("Can't change AsyncFactory while tests are running");
         value.observer = this;
         return asyncFactory = value;
     }
@@ -183,7 +180,7 @@ class TestRunner implements IAsyncDelegateObserver {
         clientCompleteCount = 0;
         Assert.assertionCount = 0; // don't really like this static but can't see way around it atm. ms 17/12/10
         startTime = Timer.stamp();
-        testSuites = [for(suiteType in testSuiteClasses) Type.createInstance(suiteType, emptyParams)];
+        testSuites = [for(it in testSuiteClasses) Type.createInstance(it, emptyParams)];
         #if (neko || cpp || java) 
 		var self = this;
 		var runThread:Thread = Thread.create(function() {
@@ -236,7 +233,7 @@ class TestRunner implements IAsyncDelegateObserver {
 				cl.setCurrentTestClass(activeHelper.className);
 			}
         }
-        for(testCaseData in activeHelper)         {
+        for(testCaseData in activeHelper) {
             if(testCaseData.result.ignore) {
                 ignoreCount++;
                 for(c in clients) c.addIgnore(cast testCaseData.result);
@@ -251,7 +248,7 @@ class TestRunner implements IAsyncDelegateObserver {
         }
     }
 
-    function executeTestCase(testCaseData:TestCaseData, async:Bool) {
+    function executeTestCase(testCaseData:TestData, async:Bool) {
         var result = testCaseData.result;
         try {
             if(async) {
@@ -302,8 +299,8 @@ class TestRunner implements IAsyncDelegateObserver {
      */
     public function asyncResponseHandler(delegate:AsyncDelegate) {
         var testCaseData = activeHelper.current();
+		testCaseData.scope = delegate;
         testCaseData.test = delegate.runTest;
-        testCaseData.scope = delegate;
         asyncPending = false;
         asyncDelegate = null;
         executeTestCase(testCaseData, false);
