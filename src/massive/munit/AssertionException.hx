@@ -26,11 +26,9 @@
 * or implied, of Massive Interactive.
 ****/
 
-
-
 package massive.munit;
 import haxe.PosInfos;
-import massive.haxe.util.ReflectUtil;
+using Type;
 
 /**
  * Exception thrown when an assertion is made which is not correct.
@@ -38,15 +36,13 @@ import massive.haxe.util.ReflectUtil;
  * @author Mike Stead
  * @see Assert
  */
-class AssertionException extends MUnitException
-{
+class AssertionException extends MUnitException {
 	/**
 	 * @param	msg				message describing the assertion which failed
 	 * @param	info			pos infos of where the failing assertion was made
 	 */
-	public function new(msg:String, ?info:PosInfos) 
-	{
+	public function new(msg:String, ?info:PosInfos) {
 		super(msg, info);
-		type = ReflectUtil.here().className;
+		type = this.getClass().getClassName();
 	}
 }

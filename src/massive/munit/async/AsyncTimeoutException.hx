@@ -30,22 +30,20 @@
 
 package massive.munit.async;
 import haxe.PosInfos;
-import massive.haxe.util.ReflectUtil;
 import massive.munit.MUnitException;
+using Type;
 
 /**
  * Exception thrown when a test makes an assertion which is incorrect.
  * 
  * @author Mike Stead
  */
-class AsyncTimeoutException extends MUnitException
-{
+class AsyncTimeoutException extends MUnitException {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function new(message:String, ?info:PosInfos) 
-	{
+	public function new(message:String, ?info:PosInfos) {
 		super(message, info);
-		type = ReflectUtil.here().className;
+		type = this.getClass().getClassName();
 	}
 }

@@ -25,16 +25,12 @@
 * authors and should not be interpreted as representing official policies, either expressed
 * or implied, of Massive Interactive.
 ****/
-
-
-
 package massive.munit.client;
-
 import massive.munit.ITestResultClient;
 import massive.munit.TestResult;
 
-class AbstractTestResultClient implements ICoverageTestResultClient
-{
+class AbstractTestResultClient implements ICoverageTestResultClient {
+	
 	/**
 	 * The unique identifier for the client.
 	 */
@@ -45,68 +41,41 @@ class AbstractTestResultClient implements ICoverageTestResultClient
 	 */
 	@:isVar public var completionHandler(get, set):ITestResultClient->Void;
 
-	function get_completionHandler():ITestResultClient->Void 
-	{
-		return completionHandler;
-	}
-	function set_completionHandler(value:ITestResultClient->Void):ITestResultClient->Void
-	{
-		return completionHandler = value;
-	}
+	function get_completionHandler():ITestResultClient->Void return completionHandler;
+	function set_completionHandler(value:ITestResultClient->Void):ITestResultClient->Void return completionHandler = value;
 
-	/*
-	* String representation of print output
-	*/
+	/**
+	 * String representation of print output
+	 */
 	@:isVar public var output(get, null):String;
-	
-	function get_output():String
-	{
-		return output;
-	}
+	function get_output():String return output;
 
 	var passCount:Int;
 	var failCount:Int;
 	var errorCount:Int;
 	var ignoreCount:Int;
-	
 	var currentTestClass:String;	
 	var currentClassResults:Array<TestResult>;
-
-
 	var currentCoverageResult:CoverageResult;
-	
 	static var traces:Array<String>;
-	
 	var totalResults:Array<TestResult>;
-
 	var totalCoveragePercent:Float;
 	var totalCoverageReport:String;
 	var totalCoverageResults:Array<CoverageResult>;
-
 	var originalTrace:Dynamic;
-
 	var finalResult:Bool;
 
-	public function new()
-	{
-		init();
-	}
+	public function new() init();
 
-	function init():Void
-	{
+	function init() {
 		currentTestClass = null;
-
 		currentClassResults = [];
 		traces = [];
-
 		passCount = 0;
 		failCount = 0;
 		errorCount = 0;
 		ignoreCount = 0;
-
 		currentCoverageResult = null;
-
-	
 		totalResults = [];
 		totalCoveragePercent = 0;
 		totalCoverageReport = null;
@@ -114,10 +83,10 @@ class AbstractTestResultClient implements ICoverageTestResultClient
 	}
 
 	/**
-	* Classed when test class changes
-	*
-	* @param className		qualified name of current test class
-	*/
+	 * Classed when test class changes
+	 *
+	 * @param className		qualified name of current test class
+	 */
 	public function setCurrentTestClass(className:String) {
 		if(currentTestClass == className) return;
 		if(currentTestClass != null) finalizeTestClass();
@@ -130,9 +99,8 @@ class AbstractTestResultClient implements ICoverageTestResultClient
 	 *  
 	 * @param	result			a passed test result
 	 */
-	public function addPass(result:TestResult):Void
-	{
-		passCount ++;
+	public function addPass(result:TestResult) {
+		passCount++;
 		updateTestClass(result);
 	}
 	
@@ -141,9 +109,8 @@ class AbstractTestResultClient implements ICoverageTestResultClient
 	 *  
 	 * @param	result			a failed test result
 	 */
-	public function addFail(result:TestResult):Void
-	{
-		failCount ++;
+	public function addFail(result:TestResult) {
+		failCount++;
 		updateTestClass(result);
 	}
 	
@@ -152,9 +119,8 @@ class AbstractTestResultClient implements ICoverageTestResultClient
 	 *  
 	 * @param	result			an erroneous test result
 	 */
-	public function addError(result:TestResult):Void
-	{
-		errorCount ++;
+	public function addError(result:TestResult) {
+		errorCount++;
 		updateTestClass(result);
 	}
 
@@ -163,29 +129,24 @@ class AbstractTestResultClient implements ICoverageTestResultClient
 	 *
 	 * @param	result			an ignored test
 	 */
-	public function addIgnore(result:TestResult):Void
-	{
-		ignoreCount ++;
+	public function addIgnore(result:TestResult) {
+		ignoreCount++;
 		updateTestClass(result);
 	}
 
-	public function setCurrentTestClassCoverage(result:CoverageResult):Void
-	{
-		currentCoverageResult = result;
+	public function setCurrentTestClassCoverage(result:CoverageResult) currentCoverageResult = result;
 
-	}
-
-	////// FINAL REPORTS //////
 	public function reportFinalCoverage(?percent:Float=0, missingCoverageResults:Array<CoverageResult>, summary:String,
 		?classBreakdown:String,
 		?packageBreakdown:String,
 		?executionFrequency:String
-	):Void
+	)
 	{
 		totalCoveragePercent = percent;
 		totalCoverageResults = missingCoverageResults;
 		totalCoverageReport = summary;
 	}
+	
 	/**
 	 * Called when all tests are complete.
 	 *  
@@ -197,8 +158,7 @@ class AbstractTestResultClient implements ICoverageTestResultClient
 	 * @param	time			number of milliseconds taken for all tests to be executed
 	 * @return	collated test result data
 	 */
-	public function reportFinalStatistics(testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float):Dynamic
-	{
+	public function reportFinalStatistics(testCount:Int, passCount:Int, failCount:Int, errorCount:Int, ignoreCount:Int, time:Float):Dynamic {
 		finalResult = passCount == testCount;
 		printReports();
 		printFinalStatistics(finalResult, testCount, passCount, failCount, errorCount, ignoreCount, time);
@@ -211,8 +171,7 @@ class AbstractTestResultClient implements ICoverageTestResultClient
 	/**
 	 * Called when a new test class is about to execute tests
 	 */
-	function initializeTestClass()
-	{
+	function initializeTestClass() {
 		currentClassResults = [];
 		traces = [];
 		passCount = 0;
@@ -224,8 +183,7 @@ class AbstractTestResultClient implements ICoverageTestResultClient
 	/**
 	 * Called after every test has executed
 	 */
-	function updateTestClass(result:TestResult)
-	{
+	function updateTestClass(result:TestResult) {
 		currentClassResults.push(result);
 		totalResults.push(result);
 	}

@@ -59,7 +59,7 @@ class RunCommand extends MUnitTargetCommandBase {
 	var tmpDir:File;
 	var tmpRunnerDir:File;
 	var binDir:File;
-	var killBrowser:Bool;
+	var killBrowser:Bool = false;
 	var indexPage:File;
 	var hasBrowserTests:Bool;
 	var nekoFile:File;
@@ -69,13 +69,9 @@ class RunCommand extends MUnitTargetCommandBase {
 	var pythonFile:File;
 	var phpFiles:Array<File> = [];
 	var nodejsFiles:Array<File> = [];
+	var hlFile:File;
 	var serverTimeoutTimeSec:Int;
 	var resultExitCode:Bool;
-	
-	public function new() {
-		super();
-		killBrowser = false;
-	}
 	
 	override public function initialise() {
 		initialiseTargets(false);
@@ -90,7 +86,7 @@ class RunCommand extends MUnitTargetCommandBase {
 	}
 	
 	function locateBinDir() {
-		var binPath:String = console.getNextArg();
+		var binPath = console.getNextArg();
 		if(binPath == null) {
 			binDir = config.bin;
 			if(binDir == null) error("Default bin directory is not set. Please run munit config.");
@@ -101,7 +97,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		}
 		Log.debug("binPath: " + binDir);
 	}
-	
+
 	function gatherTestRunnerFiles() {
 		if(!binDir.isDirectory || !binDir.resolveDirectory(".temp").exists) return;
 		var tempTargets = [];
@@ -134,29 +130,27 @@ class RunCommand extends MUnitTargetCommandBase {
 		}
 		Log.debug("report: " + reportDir);
 	}
-	
+
 	function checkForCustomBrowser() {
 		reportRunnerDir = reportDir.resolveDirectory("test-runner");
 		reportTestDir = reportDir.resolveDirectory("test");
-		var b:String = console.getOption("browser");
-		if(b != null && b != "true") browser = b;
+		var option = console.getOption("browser");
+		if(option != null && option != "true") browser = option;
 		Log.debug("browser: " + browser);
 	}
-	
-	function checkForBrowserKeepAliveFlag() {
-		if(console.getOption("kill-browser") != null) {
-			killBrowser = true;
-			Log.debug("killBrowser? " + killBrowser);
-		}
+
+	function checkForBrowserKeepAliveFlag() 	{
+		if(console.getOption("kill-browser") == null) return;
+		killBrowser = true;
+		Log.debug("killBrowser? " + killBrowser);
 	}
-	
+
 	function checkForExitOnFail() {
-		if(console.getOption("result-exit-code") != null) {
-			resultExitCode = true;
-			Log.debug("resultExitCode? " + resultExitCode);
-		}
+		if(console.getOption("result-exit-code") == null) return;
+		resultExitCode = true;
+		Log.debug("resultExitCode? " + resultExitCode);
 	}
-	
+
 	function resetOutputDirectories() {
 		for(it in [reportRunnerDir, reportTestDir]) {
 			if(!it.exists) it.createDirectory();
@@ -176,6 +170,7 @@ class RunCommand extends MUnitTargetCommandBase {
 				case python: pythonFile = file;
 				case php: phpFiles.push(file);
 				case js if(function() {for(it in target.flags.keys()) if(it == "nodejs") return true; return false;}()) : nodejsFiles.push(file);
+				case hl: hlFile = file;
 				case _:
 					hasBrowserTests = true;
 					var pageName = target.type;
@@ -202,7 +197,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		var pageContent = getTemplateContent("runner-html", {killBrowser:killBrowser, testCount:pageNames.length, frames:frames, frameCols:frameCols});
 		indexPage = reportRunnerDir.resolvePath("index.html");
 		indexPage.writeString(pageContent, true);
-		var commonResourceDir:File = console.originalDir.resolveDirectory("resource");
+		var commonResourceDir = console.originalDir.resolveDirectory("resource");
 		commonResourceDir.copyTo(reportRunnerDir);
 		if(config.resources != null) config.resources.copyTo(reportRunnerDir);
 		for(target in targets) {
@@ -232,7 +227,7 @@ class RunCommand extends MUnitTargetCommandBase {
 			FileSys.setCwd(console.originalDir.nativePath);
 		} else {
 			//for mac and linux we create a tmp directory locally within the bin
-			FileSys.setCwd(binDir.nativePath);
+			Sys.setCwd(binDir.nativePath);
 		}
 		var serverFile:File = createServerAlias();
 		tmpDir = File.current.resolveDirectory("tmp");
@@ -262,6 +257,7 @@ class RunCommand extends MUnitTargetCommandBase {
 		if(pythonFile != null) launchPython(pythonFile);
 		phpFiles.iter(launchPHP);
 		nodejsFiles.iter(launchNodeJS);
+		if(hlFile != null) launchHashLink(hlFile);
 		if(hasBrowserTests) launchFile(indexPage);
 		else resultMonitor.sendMessage("quit");
 		var platformResults:Bool = Thread.readMessage(true);
@@ -297,7 +293,7 @@ class RunCommand extends MUnitTargetCommandBase {
 			while(true) {
 				serverProcess.stdout.readLine();
 			}
-		} catch (e:haxe.io.Eof) {}
+		} catch(e:haxe.io.Eof) {}
 	}
 	
 	function monitorResults() {
@@ -337,7 +333,7 @@ class RunCommand extends MUnitTargetCommandBase {
 			if(lines.length > lineCount) {
 				var i = lineCount;
 				lineCount = lines.length;
-				if( i < lineCount) lastResultTime = Sys.time();
+				if(i < lineCount) lastResultTime = Sys.time();
 				while(i < lineCount) {
 					var line = lines[i++];
 					if(line != ServerMain.END) {
@@ -391,7 +387,7 @@ class RunCommand extends MUnitTargetCommandBase {
 			parameters.push("open");
 			if(browser != null) parameters.push("-a " + browser);
 		} else if(FileSys.isLinux) {
-			if (browser != null) parameters.push(browser);
+			if(browser != null) parameters.push(browser);
 			else parameters.push("xdg-open");
 		}
 		parameters.push(targetLocation);
@@ -430,6 +426,8 @@ class RunCommand extends MUnitTargetCommandBase {
 	inline function launchPHP(file:File):Int return launch(file, 'php', [file.nativePath]);
 	
 	inline function launchNodeJS(file:File):Int return launch(file, 'node', [file.nativePath]);
+	
+	inline function launchHashLink(file:File):Int return launch(file, 'hl', [file.nativePath]);
 	
 	function launch(file:File, executor:String, ?args:Array<String>):Int {
 		file.copyTo(reportRunnerDir.resolvePath(file.fileName));

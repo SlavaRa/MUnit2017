@@ -26,29 +26,26 @@
 * or implied, of Massive Interactive.
 ****/
 
-
-
 package massive.munit;
 import haxe.PosInfos;
 import massive.haxe.Exception;
-import massive.haxe.util.ReflectUtil;
+using Type;
 
 /**
  * Base exception type for all exceptions raised by munit.
  * 
  * @author Mike Stead
  */
-class MUnitException extends Exception
-{
+class MUnitException extends Exception {
+	
 	/**
 	 * Class constructor.
 	 * 
 	 * @param	message			a description of the exception
 	 * @param	info			pos infos from where the exception was thrown
 	 */
-	public function new(message:String, ?info:PosInfos) 
-	{
+	public function new(message:String, ?info:PosInfos) {
 		super(message, info);
-		type = ReflectUtil.here().className;
+		type = this.getClass().getClassName();
 	}
 }

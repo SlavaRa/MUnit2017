@@ -25,7 +25,6 @@
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of Massive Interactive.
  */
-
 import massive.munit.client.PrintClient;
 import massive.munit.client.RichPrintClient;
 import massive.munit.client.HTTPClient;
@@ -40,41 +39,37 @@ import js.Lib;
  * Auto generated Test Application.
  * Refer to munit command line tool for more information (haxelib run munit)
  */
-class TestMain
-{
-	static function main(){	new TestMain();}
+class TestMain {
+	static function main()	new TestMain();
 
-	public function new()
-	{
+	public function new() {
 		var suites = new Array<Class<massive.munit.TestSuite>>();
 		suites.push(TestSuite);
-
 		#if MCOVER
-			var client = new mcover.coverage.munit.client.MCoverPrintClient();
-			var httpClient = new HTTPClient(new mcover.coverage.munit.client.MCoverSummaryReportClient());
+		var client = new mcover.coverage.munit.client.MCoverPrintClient();
+		var httpClient = new HTTPClient(new mcover.coverage.munit.client.MCoverSummaryReportClient());
 		#else
-			var client = new RichPrintClient();
-			var httpClient = new HTTPClient(new SummaryReportClient());
+		var client = new RichPrintClient();
+		var httpClient = new HTTPClient(new SummaryReportClient());
 		#end
-
-		var runner:TestRunner = new TestRunner(client);
+		var runner = new TestRunner(client);
 		runner.addResultClient(httpClient);
 		runner.addResultClient(new HTTPClient(new JUnitReportClient()));
 		runner.completionHandler = completionHandler;
 		runner.run(suites);
 	}
 
-	/*
-		updates the background color and closes the current browser
-		for flash and html targets (useful for continous integration servers)
-	*/
-	private function completionHandler(successful:Bool):Void {
+	/**
+	 * updates the background color and closes the current browser
+	 * for flash and html targets (useful for continous integration servers)
+	 */
+	function completionHandler(successful:Bool) {
 		try {
 			#if flash
 			flash.external.ExternalInterface.call("testResult", successful);
 			#elseif js
 			js.Lib.eval("testResult(" + successful + ");");
-			#elseif (neko || cpp || java || cs || python || php)
+			#elseif (neko || cpp || java || cs || python || php || hl)
 			Sys.exit(0);
 			#end
 		}

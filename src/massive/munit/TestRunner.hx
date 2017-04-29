@@ -27,7 +27,6 @@
 ****/
 
 package massive.munit;
-
 import haxe.Constraints.Function;
 import haxe.PosInfos;
 import massive.munit.Assert;
@@ -47,8 +46,6 @@ import cpp.vm.Thread;
 #elseif java
 import java.vm.Thread;
 #end
-
-import haxe.CallStack;
 
 /**
  * Runner used to execute one or more suites of unit tests.
@@ -118,8 +115,8 @@ class TestRunner implements IAsyncDelegateObserver {
 
     public var asyncFactory(default, set):AsyncFactory;
     function set_asyncFactory(value:AsyncFactory):AsyncFactory {
-        if (value == asyncFactory) return value;
-        if (running) throw new MUnitException("Can't change AsyncFactory while tests are running");
+        if(value == asyncFactory) return value;
+        if(running) throw new MUnitException("Can't change AsyncFactory while tests are running");
         value.observer = this;
         return asyncFactory = value;
     }
@@ -183,7 +180,7 @@ class TestRunner implements IAsyncDelegateObserver {
         clientCompleteCount = 0;
         Assert.assertionCount = 0; // don't really like this static but can't see way around it atm. ms 17/12/10
         startTime = Timer.stamp();
-        testSuites = [for(suiteType in testSuiteClasses) Type.createInstance(suiteType, emptyParams)];
+        testSuites = [for(it in testSuiteClasses) Type.createInstance(it, emptyParams)];
         #if (neko || cpp || java) 
 		var self = this;
 		var runThread:Thread = Thread.create(function() {
@@ -236,7 +233,7 @@ class TestRunner implements IAsyncDelegateObserver {
 				cl.setCurrentTestClass(activeHelper.className);
 			}
         }
-        for(testCaseData in activeHelper)         {
+        for(testCaseData in activeHelper) {
             if(testCaseData.result.ignore) {
                 ignoreCount++;
                 for(c in clients) c.addIgnore(cast testCaseData.result);
@@ -255,11 +252,11 @@ class TestRunner implements IAsyncDelegateObserver {
         var result = testCaseData.result;
         try {
             if(async) {
-                Reflect.callMethod(null, testCaseData.test, [asyncFactory]);
+                Reflect.callMethod(testCaseData.scope, testCaseData.test, [asyncFactory]);
                 if(asyncDelegate == null) throw new MissingAsyncDelegateException("No AsyncDelegate was created in async test at " + result.location, null);
                 asyncPending = true;
             } else {
-                Reflect.callMethod(null, testCaseData.test, emptyParams);
+                Reflect.callMethod(testCaseData.scope, testCaseData.test, emptyParams);
                 result.passed = true;
                 result.executionTime = Timer.stamp() - testStartTime;
                 passCount++;
@@ -302,6 +299,7 @@ class TestRunner implements IAsyncDelegateObserver {
      */
     public function asyncResponseHandler(delegate:AsyncDelegate) {
         var testCaseData = activeHelper.current();
+		testCaseData.scope = delegate;
         testCaseData.test = delegate.runTest;
         asyncPending = false;
         asyncDelegate = null;

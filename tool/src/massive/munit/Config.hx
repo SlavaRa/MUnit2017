@@ -43,12 +43,12 @@ class Config {
 	public var classPaths:Array<File>;
 	public var targets:Array<Target> = [];
 	public var targetTypes:Array<TargetType>;
-	public var defaultTargetTypes:Array<TargetType> = [as3, js, neko, cpp, java, cs, python, php];
+	public var defaultTargetTypes:Array<TargetType> = [as3, js, neko, cpp, java, cs, python, php, hl];
 	public var coveragePackages:Array<String>;
 	public var coverageIgnoredClasses:Array<String>;
 	var configFile:File;
 	
-	public function new(dir:File, currentVersion:String):Void {
+	public function new(dir:File, currentVersion:String) {
 		this.dir = dir;
 		this.currentVersion = currentVersion;
 		targetTypes = defaultTargetTypes;

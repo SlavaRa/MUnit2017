@@ -88,15 +88,14 @@ class TimerTest
 		Assert.isTrue(newStamp > stamp);
 	}
 
-	#if js
+	#if (js && !nodejs)
 	@AsyncTest
 	public function shouldClearOutIntervals(factory:AsyncFactory):Void
 	{
-		var timer:Timer;
 		handler = factory.createHandler(this, onMegaTimerDelay);
 		for(i in 1...102)
 		{
-			timer = Timer.delay(timerHandler, i);
+			var timer:Timer = Timer.delay(timerHandler, i);
 		}
 		Timer.delay(handler, 200);
 	}

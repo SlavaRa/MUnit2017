@@ -51,8 +51,7 @@ import massive.munit.client.PrintClientBase;
  * 
  * @author Mike Stead
  */
-class PrintClient extends PrintClientBase
-{
+class PrintClient extends PrintClientBase {
 
 	/**
 	 * Default id of this client.
@@ -147,7 +146,7 @@ class PrintClient extends PrintClientBase
 		#end
 		#if nodejs
 		untyped process.stdout.write(value);
-		#elseif (neko || cpp || java || cs || python || php)
+		#elseif (neko || cpp || java || cs || python || php || hl)
 		Sys.print(value);
 		#elseif (js || flash)
 		external.print(value);

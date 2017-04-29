@@ -16,6 +16,8 @@
 ::foreach classPaths::-cp ::__current__::
 ::end::
 -cp ::src::
+#-lib nodejs
+#-D nodejs
 -js ::bin::/js_test.js
 
 ## Neko
@@ -89,3 +91,13 @@
 -cp ::src::
 -D php7
 -php ::bin::/php_test
+
+## HashLink
+--next
+-main TestMain
+-lib munit
+-lib hamcrest
+::foreach classPaths::-cp ::__current__::
+::end::
+-cp ::src::
+-hl ::bin::/hl_test.hl

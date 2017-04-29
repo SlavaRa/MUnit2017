@@ -8,20 +8,14 @@ import massive.munit.report.TeamCityReportFormatter;
 import massive.sys.io.File;
 
 /**
-The ReportCommand converts raw report data into a specific format for a 3rd party tool or CI platform
-*/
+ * The ReportCommand converts raw report data into a specific format for a 3rd party tool or CI platform
+ */
 class ReportCommand extends MUnitTargetCommandBase {
 	var reportType:ReportType;
-	var minCoverage:Int;
+	var minCoverage:Int = 0;
 	var reportDir:File;
 	var destDir:File;
-	
-	public function new() {
-		super();
-		minCoverage = 0;
-		reportType = null;
-	}
-	
+
 	override public function initialise() {
 		reportDir = config.report;
 		if(reportDir == null) error("Default report directory is not set. Please run munit config.");
@@ -31,13 +25,13 @@ class ReportCommand extends MUnitTargetCommandBase {
 		getDestinationDir();
 		getMinCoverage();
 	}
-	
+
 	function getTargetTypes() {
 		//first get from console
 		targetTypes = getTargetsFromConsole();
 		if(targetTypes.length == 0) {
 			//look up generated results summary
-			var file =  reportDir.resolveFile("test/results.txt");
+			var file = reportDir.resolveFile("test/results.txt");
 			if(file.exists) {
 				var contents = file.readString();
 				var lines = contents.split("\n");
@@ -54,6 +48,7 @@ class ReportCommand extends MUnitTargetCommandBase {
 							case cs: targetTypes.push(cs);
 							case python: targetTypes.push(python);
 							case php: targetTypes.push(php);
+							case hl: targetTypes.push(hl);
 						}
 					}
 				}
