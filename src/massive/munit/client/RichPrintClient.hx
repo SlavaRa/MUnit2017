@@ -174,9 +174,9 @@ class RichPrintClient extends PrintClientBase {
 		sb.add("\nTests: "); sb.add(testCount);
 		sb.add("  Passed: "); sb.add(passCount);
 		sb.add("  Failed: "); sb.add(failCount);
-		sb.add(" Errors: "); sb.add(errorCount);
-		sb.add(" Ignored: "); sb.add(ignoreCount);
-		sb.add(" Time: "); sb.add(MathUtil.round(time, 5));
+		sb.add("  Errors: "); sb.add(errorCount);
+		sb.add("  Ignored: "); sb.add(ignoreCount);
+		sb.add("  Time: "); sb.add(MathUtil.round(time, 5));
 		external.printSummary(sb.toString());
 	}
 	

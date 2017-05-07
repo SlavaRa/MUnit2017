@@ -562,6 +562,7 @@ massive_munit_ICoverageTestResultClient.prototype = {
 	__class__: massive_munit_ICoverageTestResultClient
 };
 var massive_munit_TestResult = function() {
+	this.verbose = false;
 	this.ignore = false;
 	this.async = false;
 	this.description = "";
@@ -593,6 +594,20 @@ massive_munit_TestResult.prototype = {
 			return "PASS";
 		}
 		return "UNKNOWN";
+	}
+	,clone: function() {
+		var result = new massive_munit_TestResult();
+		result.passed = this.passed;
+		result.executionTime = this.executionTime;
+		result.name = this.name;
+		result.className = this.className;
+		result.description = this.description;
+		result.async = this.async;
+		result.ignore = this.ignore;
+		result.failure = this.failure;
+		result.error = this.error;
+		result.verbose = this.verbose;
+		return result;
 	}
 	,__class__: massive_munit_TestResult
 };

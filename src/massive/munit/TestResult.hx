@@ -26,6 +26,7 @@
 * or implied, of Massive Interactive.
 ****/
 package massive.munit;
+import massive.munit.TestResult;
 
 /**
  * The value object which contains the result of a test.
@@ -94,10 +95,27 @@ class TestResult {
 		return UNKNOWN;
 	}
 	
+	public var verbose:Bool = false;
+	
 	/**
 	 * Class constructor.
 	 */
 	public function new() {}
+	
+	public function clone():TestResult {
+		var result:TestResult = new TestResult();
+		result.passed = passed;
+		result.executionTime = executionTime;
+		result.name = name;
+		result.className = className;
+		result.description = description;
+		result.async = async;
+		result.ignore = ignore;
+		result.failure = failure;
+		result.error = error;
+		result.verbose = verbose;
+		return result;
+	}
 }
 
 @:enum

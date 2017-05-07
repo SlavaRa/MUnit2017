@@ -33,19 +33,20 @@ import massive.munit.TestResult;
 import massive.munit.util.MathUtil;
 
 class PrintClientBase extends AbstractTestResultClient {
+	
 	/**
 	 * Default id of this client.
 	 */
 	public static inline var DEFAULT_ID:String = "simple";
 	var divider1:String = "------------------------------";
 	var divider2:String = "==============================";
-	public var verbose:Bool;
+	public var classKey = "Class: ";
+	public var verbose:Bool = false;
 	var includeIgnoredReport:Bool;
 	
 	public function new(includeIgnoredReport:Bool = true) {
 		super();
 		id = DEFAULT_ID;
-		verbose = false;
 		this.includeIgnoredReport = includeIgnoredReport;
 		printLine("MUnit Results");
 		printLine(divider1);
@@ -53,12 +54,12 @@ class PrintClientBase extends AbstractTestResultClient {
 	
 	override function initializeTestClass() {
 		super.initializeTestClass();
-		printLine("Class: " + currentTestClass + " ");
+		printLine(classKey + currentTestClass + " ");
 	}
 	
 	override function updateTestClass(result:TestResult) {
 		super.updateTestClass(result);
-		if(verbose) printLine(" " + result.name + ": " + result.type +" ");
+		if(verbose) printLine(" " + result.name + ": " + result.type + " ");
 		else {
 			switch(result.type) {
 				case PASS: print(".");
@@ -151,9 +152,9 @@ class PrintClientBase extends AbstractTestResultClient {
 		sb.add("\nTests: "); sb.add(testCount);
 		sb.add("  Passed: "); sb.add(passCount);
 		sb.add("  Failed: "); sb.add(failCount);
-		sb.add(" Errors: "); sb.add(errorCount);
-		sb.add(" Ignored: "); sb.add(ignoreCount);
-		sb.add(" Time: "); sb.add(MathUtil.round(time, 5));
+		sb.add("  Errors: "); sb.add(errorCount);
+		sb.add("  Ignored: "); sb.add(ignoreCount);
+		sb.add("  Time: "); sb.add(MathUtil.round(time, 5));
 		printLine(sb.toString());
 		printLine("");
 	}

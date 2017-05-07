@@ -259,14 +259,40 @@ class TestRunner implements IAsyncDelegateObserver {
 				if(testCaseData.testCaseSource != null) {
 					var source:Array<TestCaseData> = Reflect.callMethod(testCaseData.scope, Reflect.field(testCaseData.scope, testCaseData.testCaseSource), emptyParams);
 					for(it in source) {
-						var result = Reflect.callMethod(testCaseData.scope, testCaseData.test, it.arguments);
-						if(it.hasExpectedResult) Assert.areEqual(it.expectedResult, result);
+						var actualResult = Reflect.callMethod(testCaseData.scope, testCaseData.test, it.arguments);
+						if(it.hasExpectedResult) Assert.areEqual(it.expectedResult, actualResult);
+						result.executionTime = Timer.stamp() - testStartTime;
+						result.passed = true;
+						passCount++;
+						for(c in clients) {
+							//{FIXME slavara:
+							var classKey = "";
+							if(Reflect.hasField(c, "classKey")) {
+								classKey = Reflect.getProperty(c, "classKey");
+								Reflect.setProperty(c, "classKey", "");
+							}
+							//}
+							var r = result.clone();
+							r.name = '\t${it.name != null ? it.name : Std.string(it)}';
+							r.className = r.name;
+							r.description = r.name;
+							cast(c, IAdvancedTestResultClient).setCurrentTestClass(r.className);
+							c.addPass(result);
+							cast(c, IAdvancedTestResultClient).setCurrentTestClass(null);
+							//{FIXME slavara:
+							if(Reflect.hasField(c, "classKey")) {
+								Reflect.setProperty(c, "classKey", classKey);
+							}
+							//}
+						}
 					}
-				} else Reflect.callMethod(testCaseData.scope, testCaseData.test, emptyParams);
-                result.passed = true;
-                result.executionTime = Timer.stamp() - testStartTime;
-                passCount++;
-                for(c in clients) c.addPass(result);
+				} else {
+					Reflect.callMethod(testCaseData.scope, testCaseData.test, emptyParams);
+					result.passed = true;
+					passCount++;
+					result.executionTime = Timer.stamp() - testStartTime;
+					for(c in clients) c.addPass(result);
+				}
             }
         } catch(e:Dynamic) {
             if(async && asyncDelegate != null) {
