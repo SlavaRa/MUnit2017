@@ -264,27 +264,7 @@ class TestRunner implements IAsyncDelegateObserver {
 						result.executionTime = Timer.stamp() - testStartTime;
 						result.passed = true;
 						passCount++;
-						for(c in clients) {
-							//{FIXME slavara:
-							var classKey = "";
-							if(Reflect.hasField(c, "classKey")) {
-								classKey = Reflect.getProperty(c, "classKey");
-								Reflect.setProperty(c, "classKey", "");
-							}
-							//}
-							var r = result.clone();
-							r.name = '\t${it.name != null ? it.name : Std.string(it)}';
-							r.className = r.name;
-							r.description = r.name;
-							cast(c, IAdvancedTestResultClient).setCurrentTestClass(r.className);
-							c.addPass(result);
-							cast(c, IAdvancedTestResultClient).setCurrentTestClass(null);
-							//{FIXME slavara:
-							if(Reflect.hasField(c, "classKey")) {
-								Reflect.setProperty(c, "classKey", classKey);
-							}
-							//}
-						}
+						for(c in clients) c.addPass(result);
 					}
 				} else {
 					Reflect.callMethod(testCaseData.scope, testCaseData.test, emptyParams);

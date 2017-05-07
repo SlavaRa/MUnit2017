@@ -40,7 +40,6 @@ class PrintClientBase extends AbstractTestResultClient {
 	public static inline var DEFAULT_ID:String = "simple";
 	var divider1:String = "------------------------------";
 	var divider2:String = "==============================";
-	public var classKey = "Class: ";
 	public var verbose:Bool = false;
 	var includeIgnoredReport:Bool;
 	
@@ -54,7 +53,7 @@ class PrintClientBase extends AbstractTestResultClient {
 	
 	override function initializeTestClass() {
 		super.initializeTestClass();
-		printLine(classKey + currentTestClass + " ");
+		printLine('Class: ${currentTestClass} ');
 	}
 	
 	override function updateTestClass(result:TestResult) {
