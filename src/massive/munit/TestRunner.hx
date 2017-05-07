@@ -256,7 +256,13 @@ class TestRunner implements IAsyncDelegateObserver {
                 if(asyncDelegate == null) throw new MissingAsyncDelegateException("No AsyncDelegate was created in async test at " + result.location, null);
                 asyncPending = true;
             } else {
-                Reflect.callMethod(testCaseData.scope, testCaseData.test, emptyParams);
+				if(testCaseData.testCaseSource != null) {
+					var source:Array<TestCaseData> = Reflect.callMethod(testCaseData.scope, Reflect.field(testCaseData.scope, testCaseData.testCaseSource), emptyParams);
+					for(it in source) {
+						var result = Reflect.callMethod(testCaseData.scope, testCaseData.test, it.arguments);
+						if(it.hasExpectedResult) Assert.areEqual(it.expectedResult, result);
+					}
+				} else Reflect.callMethod(testCaseData.scope, testCaseData.test, emptyParams);
                 result.passed = true;
                 result.executionTime = Timer.stamp() - testStartTime;
                 passCount++;

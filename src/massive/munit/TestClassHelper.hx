@@ -90,16 +90,21 @@ class TestClassHelper {
 	 */
 	public inline static var META_TAG_TEST_DEBUG:String = "TestDebug";
 	
+	public static inline var META_TAG_TEST_CASE_SOURCE:String = "TestCaseSource";
+	
 	/**
 	 * Array of all valid meta tags.
 	 */
-	public static var META_TAGS = [META_TAG_BEFORE_CLASS,
-									META_TAG_AFTER_CLASS,
-									META_TAG_BEFORE,
-									META_TAG_AFTER,
-									META_TAG_TEST,
-									META_TAG_ASYNC_TEST,
-									META_TAG_TEST_DEBUG];
+	public static var META_TAGS = [
+		META_TAG_BEFORE_CLASS,
+		META_TAG_AFTER_CLASS,
+		META_TAG_BEFORE,
+		META_TAG_AFTER,
+		META_TAG_TEST,
+		META_TAG_ASYNC_TEST,
+		META_TAG_TEST_DEBUG,
+		META_TAG_TEST_CASE_SOURCE
+	];
 
 	/**
 	 * The type of the test class this helper is wrapping.
@@ -195,14 +200,14 @@ class TestClassHelper {
 	}
 	
 	function collateFieldMeta(inherintanceChain:Array<Class<Dynamic>>):Dynamic {
-		var meta = {};
+		var result = {};
 		var i = inherintanceChain.length;
 		while(i-- > 0) {
-			var clazz = inherintanceChain[i]; // start at root
-			var newMeta = Meta.getFields(clazz);			
+			var type = inherintanceChain[i]; // start at root
+			var newMeta = Meta.getFields(type);			
 			var markedFieldNames = Reflect.fields(newMeta);
 			for(fieldName in markedFieldNames) {
-				var recordedFieldTags = Reflect.field(meta, fieldName);
+				var recordedFieldTags = Reflect.field(result, fieldName);
 				var newFieldTags = Reflect.field(newMeta, fieldName);
 				var newTagNames = Reflect.fields(newFieldTags);
 				if(recordedFieldTags == null) {
@@ -211,7 +216,7 @@ class TestClassHelper {
 					// extends the same class.
 					var tagsCopy = {};
 					for(tagName in newTagNames) Reflect.setField(tagsCopy, tagName, Reflect.field(newFieldTags, tagName));
-					Reflect.setField(meta, fieldName, tagsCopy);
+					Reflect.setField(result, fieldName, tagsCopy);
 				} else {
 					var ignored = false;
 					for(tagName in newTagNames) {
@@ -229,7 +234,7 @@ class TestClassHelper {
 			}
 			
 		}
-		return meta;
+		return result;
 	}
 	
 	function scanForTests(fieldMeta:Dynamic) {
@@ -262,18 +267,19 @@ class TestClassHelper {
 				case META_TAG_ASYNC_TEST: if(!isDebug) addTest(fieldName, func, test, true, isIgnored, description);
 				case META_TAG_TEST: if(!isDebug) addTest(fieldName, func, test, isAsync, isIgnored, description);
 				case META_TAG_TEST_DEBUG: if(isDebug) addTest(fieldName, func, test, isAsync, isIgnored, description);
+				case META_TAG_TEST_CASE_SOURCE: addTest(fieldName, func, test, false, isIgnored, description, description);
 			}
 		}
 	}
 	
-	function addTest(field:String, testFunction:Function, testInstance:Dynamic, isAsync:Bool, isIgnored:Bool, description:String) {
+	function addTest(field:String, testFunction:Function, testInstance:Dynamic, isAsync:Bool, isIgnored:Bool, description:String, ?testCaseSource:String) {
 		var result = new TestResult();
 		result.async = isAsync;
 		result.ignore = isIgnored;
 		result.className = className;
 		result.description = description;
 		result.name = field;
-		tests.push({scope:testInstance, test:testFunction, result:result});
+		tests.push({scope:testInstance, test:testFunction, result:result, testCaseSource:testCaseSource});
 	}
 	
 	inline function sortTestsByName(x:TestData, y:TestData):Int {
@@ -291,4 +297,5 @@ typedef TestData = {
 	var scope:Dynamic;
 	var test:Function;
 	var result:TestResult;
+	@:optional var testCaseSource:String;
 }

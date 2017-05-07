@@ -127,17 +127,16 @@ class GenerateCommand extends MUnitCommand {
 	}	
 	
 	private function getFilteredClassesInDirectory(dir:File):Array<String> {
+		var result:Array<String> = [];
 		var files:Array<File> = dir.getRecursiveDirectoryListing(~/.*Test\.hx$/);
-		var classes:Array<String> = [];
 		for(file in files) {
 			var clasz:String = dir.getRelativePath(file).substr(0, -3);
 			clasz = clasz.split("/").join(".");
 			if(clasz == "TestMain") continue;
 			if(testFilter != null && clasz.indexOf(testFilter) == -1) continue;
-			classes.push(clasz);
-			
+			result.push(clasz);
 		}	
-		return classes;
+		return result;
 	}
 	
 	private function generateTestSuiteClassFromClasses(classes:Array<String>):String {
