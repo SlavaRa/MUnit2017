@@ -561,8 +561,45 @@ massive_munit_ICoverageTestResultClient.__interfaces__ = [massive_munit_IAdvance
 massive_munit_ICoverageTestResultClient.prototype = {
 	__class__: massive_munit_ICoverageTestResultClient
 };
+var massive_munit_TestCaseData = function(args) {
+	this["arguments"] = args != null ? args : [];
+};
+massive_munit_TestCaseData.__name__ = ["massive","munit","TestCaseData"];
+massive_munit_TestCaseData.prototype = {
+	setName: function(value) {
+		this.name = value;
+		return this;
+	}
+	,setDescription: function(value) {
+		this.description = value;
+		return this;
+	}
+	,returs: function(result) {
+		this.expectedResult = result;
+		this.hasExpectedResult = true;
+		return this;
+	}
+	,toString: function() {
+		var result = "" + this.state + ": ";
+		if(this.name != null) {
+			result += this.name;
+		} else {
+			result += "arguments => " + Std.string(this["arguments"]);
+			if(this.hasExpectedResult) {
+				result += ", expectedResult => " + Std.string(this.expectedResult);
+			}
+		}
+		if(this.description != null) {
+			result += "\n\t\t" + this.description;
+		}
+		if(this.resultMessage != null) {
+			result += "\n\t\t" + this.resultMessage;
+		}
+		return result;
+	}
+	,__class__: massive_munit_TestCaseData
+};
 var massive_munit_TestResult = function() {
-	this.verbose = false;
 	this.ignore = false;
 	this.async = false;
 	this.description = "";
@@ -606,7 +643,6 @@ massive_munit_TestResult.prototype = {
 		result.ignore = this.ignore;
 		result.failure = this.failure;
 		result.error = this.error;
-		result.verbose = this.verbose;
 		return result;
 	}
 	,__class__: massive_munit_TestResult
@@ -644,6 +680,8 @@ massive_munit_client_HTTPClient.prototype = {
 		if(js_Boot.__instanceof(this.client,massive_munit_IAdvancedTestResultClient)) {
 			(js_Boot.__cast(this.client , massive_munit_IAdvancedTestResultClient)).setCurrentTestClass(className);
 		}
+	}
+	,setCurrentTestCase: function(testCase) {
 	}
 	,addPass: function(result) {
 		this.client.addPass(result);

@@ -27,6 +27,7 @@
 ****/
 package massive.munit.client;
 import massive.munit.ITestResultClient;
+import massive.munit.TestCaseData;
 import massive.munit.TestResult;
 
 class AbstractTestResultClient implements ICoverageTestResultClient {
@@ -93,6 +94,8 @@ class AbstractTestResultClient implements ICoverageTestResultClient {
 		currentTestClass = className;
 		if(currentTestClass != null) initializeTestClass();
 	}
+	
+	public function setCurrentTestCase(testCase:TestCaseData) {}
 
 	/**
 	 * Called when a test passes.

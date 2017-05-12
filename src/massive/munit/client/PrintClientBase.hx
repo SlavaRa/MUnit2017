@@ -29,6 +29,7 @@ package massive.munit.client;
 
 import massive.haxe.util.ReflectUtil;
 import massive.munit.ITestResultClient.CoverageResult;
+import massive.munit.TestCaseData;
 import massive.munit.TestResult;
 import massive.munit.util.MathUtil;
 
@@ -63,7 +64,7 @@ class PrintClientBase extends AbstractTestResultClient {
 			switch(result.type) {
 				case PASS: print(".");
 				case FAIL: print("!");
-				case ERROR: print ("x");
+				case ERROR: print("x");
 				case IGNORE: print(",");
 				case UNKNOWN:
 			}
@@ -89,6 +90,11 @@ class PrintClientBase extends AbstractTestResultClient {
 	override public function setCurrentTestClassCoverage(result:CoverageResult) {	
 		super.setCurrentTestClassCoverage(result);
 		print(" [" + result.percent + "%]");
+	}
+	
+	override public function setCurrentTestCase(testCase:TestCaseData) {
+		super.setCurrentTestCase(testCase);
+		printLine('\t${testCase.toString()}');
 	}
 	
 	override public function reportFinalCoverage(?percent:Float=0, missingCoverageResults:Array<CoverageResult>, summary:String,

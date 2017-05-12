@@ -29,6 +29,7 @@ package massive.munit.client;
 import haxe.Http;
 import haxe.ds.StringMap;
 import massive.munit.ITestResultClient;
+import massive.munit.TestCaseData;
 import massive.munit.TestResult;
 
 /**
@@ -110,6 +111,8 @@ class HTTPClient implements IAdvancedTestResultClient {
 			cast(client, IAdvancedTestResultClient).setCurrentTestClass(className);
 		}
 	}
+	
+	public function setCurrentTestCase(testCase:TestCaseData):Void {}
 
 	/**
 	 * Called when a test passes.
@@ -156,9 +159,8 @@ class HTTPClient implements IAdvancedTestResultClient {
 		sendResult(result);
 		return result;
 	}
-
-	private function sendResult(result):Void
-	{
+	
+	function sendResult(result) {
 		request = new URLRequest(url);
 		request.setHeader(CLIENT_HEADER_KEY, client.id);
 		request.setHeader(PLATFORM_HEADER_KEY, platform());

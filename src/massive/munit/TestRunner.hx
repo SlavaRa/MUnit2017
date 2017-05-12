@@ -233,6 +233,7 @@ class TestRunner implements IAsyncDelegateObserver {
 				cl.setCurrentTestClass(activeHelper.className);
 			}
         }
+		var testCases:Array<TestCaseData> = [];
         for(testCaseData in activeHelper) {
             if(testCaseData.result.ignore) {
                 ignoreCount++;
@@ -241,41 +242,23 @@ class TestRunner implements IAsyncDelegateObserver {
                 testCount++; // note we don't include ignored in final test count
 				tryCallMethod(activeHelper.test, activeHelper.before, emptyParams);
                 testStartTime = Timer.stamp();
-                executeTestCase(testCaseData, testCaseData.result.async);
+                testCases = testCases.concat(executeTestCase(testCaseData, testCaseData.result.async));
 				if(!asyncPending) tryCallMethod(activeHelper.test, activeHelper.after, emptyParams);
                 else break;
             }
         }
+		for(it in clients) {
+			if(Std.is(it, IAdvancedTestResultClient))
+				Lambda.iter(testCases, cast(it, IAdvancedTestResultClient).setCurrentTestCase);
+		}
     }
 
-    function executeTestCase(testCaseData:TestData, async:Bool) {
-        var result = testCaseData.result;
-        try {
-            if(async) {
-                Reflect.callMethod(testCaseData.scope, testCaseData.test, [asyncFactory]);
-                if(asyncDelegate == null) throw new MissingAsyncDelegateException("No AsyncDelegate was created in async test at " + result.location, null);
-                asyncPending = true;
-            } else {
-				if(testCaseData.testCaseSource != null) {
-					var source:Array<TestCaseData> = Reflect.callMethod(testCaseData.scope, Reflect.field(testCaseData.scope, testCaseData.testCaseSource), emptyParams);
-					for(it in source) {
-						var actualResult = Reflect.callMethod(testCaseData.scope, testCaseData.test, it.arguments);
-						if(it.hasExpectedResult) Assert.areEqual(it.expectedResult, actualResult);
-						result.executionTime = Timer.stamp() - testStartTime;
-						result.passed = true;
-						passCount++;
-						for(c in clients) c.addPass(result);
-					}
-				} else {
-					Reflect.callMethod(testCaseData.scope, testCaseData.test, emptyParams);
-					result.passed = true;
-					passCount++;
-					result.executionTime = Timer.stamp() - testStartTime;
-					for(c in clients) c.addPass(result);
-				}
-            }
-        } catch(e:Dynamic) {
-            if(async && asyncDelegate != null) {
+    function executeTestCase(testCaseData:TestData, async:Bool):Array<TestCaseData> {
+        var testCases:Array<TestCaseData> = [];
+		var testCase:TestCaseData = null;
+		var result = testCaseData.result;
+		function handleError(e:Dynamic) {
+			if(async && asyncDelegate != null) {
                 asyncDelegate.cancelTest();
                 asyncDelegate = null;
             }
@@ -294,7 +277,50 @@ class TestRunner implements IAsyncDelegateObserver {
                 errorCount++;
                 for(c in clients) c.addError(result);
             }
+			if(testCase != null) {
+				testCase.state = result.type;
+				testCase.resultMessage = Std.string(e);
+			}
+			testCase = null;
+		}
+        try {
+            if(async) {
+                Reflect.callMethod(testCaseData.scope, testCaseData.test, [asyncFactory]);
+                if(asyncDelegate == null) throw new MissingAsyncDelegateException("No AsyncDelegate was created in async test at " + result.location, null);
+                asyncPending = true;
+            } else {
+				if(testCaseData.testCaseSource != null) {
+					testCases = Reflect.callMethod(testCaseData.scope, Reflect.field(testCaseData.scope, testCaseData.testCaseSource), emptyParams);
+					for(it in testCases) {
+						result.passed = false;
+						result.error = null;
+						result.failure = null;
+						testCase = it;
+						try {
+							var actualResult = Reflect.callMethod(testCaseData.scope, testCaseData.test, it.arguments);
+							if(it.hasExpectedResult) Assert.areEqual(it.expectedResult, actualResult);
+							result.executionTime = Timer.stamp() - testStartTime;
+							result.passed = true;
+							passCount++;
+							for(c in clients) c.addPass(result);
+							it.state = result.type;
+							testCase = null;
+						} catch(e:Dynamic) {
+							handleError(e);
+						}
+					}
+				} else {
+					Reflect.callMethod(testCaseData.scope, testCaseData.test, emptyParams);
+					result.passed = true;
+					passCount++;
+					result.executionTime = Timer.stamp() - testStartTime;
+					for(c in clients) c.addPass(result);
+				}
+            }
+        } catch(e:Dynamic) {
+			handleError(e);
         }
+		return testCases;
     }
 
     function clientCompletionHandler(resultClient:ITestResultClient) {

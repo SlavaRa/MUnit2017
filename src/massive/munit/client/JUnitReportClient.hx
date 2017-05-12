@@ -28,6 +28,7 @@
 
 package massive.munit.client;
 import massive.munit.ITestResultClient;
+import massive.munit.TestCaseData;
 import massive.munit.TestResult;
 import massive.munit.util.MathUtil;
 import massive.munit.util.Timer;
@@ -101,6 +102,8 @@ class JUnitReportClient implements IAdvancedTestResultClient {
 		currentTestClass = className;
 		if(currentTestClass != null) startTestSuite();
 	}
+	
+	public function setCurrentTestCase(testCase:TestCaseData):Void {}
 
 	/**
 	 * Called when a test passes.

@@ -26,8 +26,6 @@
 * or implied, of Massive Interactive.
 ****/
 
-
-
 package massive.munit;
 
 /**
@@ -40,8 +38,8 @@ package massive.munit;
  * @author Mike Stead
  * @see TestRunner
  */
-interface ITestResultClient
-{	
+interface ITestResultClient {
+	
 	/**
 	 * Handler which if present, should be called when the client has completed its processing of the results.
 	 */
@@ -104,14 +102,16 @@ interface ITestResultClient
  * @author Dominic De Lorenzo
  * @see TestRunner
  */
-interface IAdvancedTestResultClient extends ITestResultClient
-{	
+interface IAdvancedTestResultClient extends ITestResultClient {
+	
 	/**
 	 * Called before a new test class in run.
 	 *
 	 * @param	result			a stub test result
 	 */
 	function setCurrentTestClass(className:String):Void;
+	
+	function setCurrentTestCase(testCase:TestCaseData):Void;
 }
 
 /**
@@ -120,8 +120,8 @@ interface IAdvancedTestResultClient extends ITestResultClient
  * @author Dominic De Lorenzo
  * @see TestRunner
  */
-interface ICoverageTestResultClient extends IAdvancedTestResultClient
-{	
+interface ICoverageTestResultClient extends IAdvancedTestResultClient {
+	
 	/**
 	 * Called after all tests have completed for current class
 	 *
@@ -139,17 +139,11 @@ interface ICoverageTestResultClient extends IAdvancedTestResultClient
  	 * @param	packageBreakdown		results per package
 	 * @param	executionFrequency		statement/branch frequency	
 	 */
-	function reportFinalCoverage(?percent:Float=0, missingCoverageResults:Array<CoverageResult>, summary:String,
-		?classBreakdown:String,
-		?packageBreakdown:String,
-		?executionFrequency:String
-	):Void;
-
+	function reportFinalCoverage(?percent:Float = 0, missingCoverageResults:Array<CoverageResult>, summary:String, ?classBreakdown:String, ?packageBreakdown:String, ?executionFrequency:String):Void;
 }
 
 
-typedef CoverageResult = 
-{
+typedef CoverageResult = {
 	className:String,
 	percent:Float,
 	blocks:Array<String>,

@@ -79,6 +79,12 @@ class RichPrintClient extends PrintClientBase {
 		}
 	}
 	
+	override function setCurrentTestCase(testCase:TestCaseData) {
+		super.setCurrentTestCase(testCase);
+		var name = testCase.name != null ? testCase.name : Std.string(testCase);
+		external.printLine('\t${name}');
+	}
+	
 	function serializeTestResult(result:TestResult):String {
 		var summary = result.name;
 		if(result.description != null && result.description != "") {

@@ -28,6 +28,7 @@
 package massive.munit;
 
 import massive.munit.ITestResultClient;
+import massive.munit.TestCaseData;
 
 /**
  * @author Mike Stead
@@ -73,11 +74,13 @@ class TestResultClientStub implements IAdvancedTestResultClient
 		testClasses = [];
 	}
 
-	public function setCurrentTestClass(className:String):Void
-	{
+	public function setCurrentTestClass(className:String) {
 		if(currentTestClass == className) return;
 		if(className != null) testClasses.push(className);
 		currentTestClass = className;
+	}
+	
+	public function setCurrentTestCase(testCase:TestCaseData):Void {
 	}
 
 	public function addPass(result:TestResult):Void
@@ -129,5 +132,4 @@ class TestResultClientStub implements IAdvancedTestResultClient
 		str += "errorCount: " + errorCount + "\n";
 		return str;
 	}
-
 }

@@ -85,7 +85,7 @@ class TestResult {
 	 * If this test was erroneous, the error that was captured.
 	 */
 	public var error:Dynamic;
-
+	
 	public var type(get_type, never):TestResultType;
 	function get_type():TestResultType {
 		if(error != null) return ERROR;
@@ -94,8 +94,6 @@ class TestResult {
 		if(passed) return PASS;
 		return UNKNOWN;
 	}
-	
-	public var verbose:Bool = false;
 	
 	/**
 	 * Class constructor.
@@ -113,7 +111,6 @@ class TestResult {
 		result.ignore = ignore;
 		result.failure = failure;
 		result.error = error;
-		result.verbose = verbose;
 		return result;
 	}
 }
