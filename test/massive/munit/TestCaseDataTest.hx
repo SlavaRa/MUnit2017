@@ -5,8 +5,6 @@ class TestCaseDataTest {
 	public function testCases():Array<TestCaseData> return [
 		new TestCaseData([1, 2]).returs(3),
 		new TestCaseData([4, 2]).returs(6).setDescription("a + b = c"),
-		new TestCaseData([1, 2]).returs(1),
-		new TestCaseData([1, 2]).returs(2).setDescription("1 + 2 = 2"),
 		new TestCaseData([1, 2]).returs(3).setDescription("1 + 2 = 3"),
 	];
 
